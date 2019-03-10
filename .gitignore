@@ -32,3 +32,6 @@
 *.out
 *.app
 
+# Build & Release folders
+build/
+release/
