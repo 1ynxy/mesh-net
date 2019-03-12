@@ -29,6 +29,7 @@ private:
 	// Member Functions
 
 	void print();
+	
 	void add(int level, const std::string& message);
 public:
 	// Constructors & Destructors

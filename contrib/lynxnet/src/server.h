@@ -6,11 +6,7 @@
 #include <mutex>
 #include <condition_variable>
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <unistd.h>
+#include "sockets.h"
 
 struct Message {
 	// Member Variables
@@ -36,7 +32,7 @@ private:
 	std::condition_variable conditional;
 	std::mutex condmut;
 
-	Sockets sockets;
+	MeshNet mesh;
 
 	std::queue<Message> sendbuffer = std::queue<Message>();
 	std::mutex sendmut;
@@ -59,6 +55,8 @@ public:
 
 	int bind(const std::string& port);
 	int connect(const std::string& addr, const std::string& port);
+
+	void start();
 
 	void send_loc(const Message& message);
 	void send(const Message& message);

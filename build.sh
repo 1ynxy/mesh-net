@@ -29,3 +29,5 @@ if [ ! -d release ]; then
 fi
 
 mv build/lynxgame release/lynxgame
+
+rsync release/lynxgame lynxy@192.168.0.15:/home/lynxy/lynxgame/lynxgame

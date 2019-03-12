@@ -13,9 +13,6 @@ Debug::Debug(int level) {
 Debug::Debug(const Debug& debugger) {
 	running = true;
 
-	levels = debugger.levels;
-	messages = debugger.messages;
-
 	verbosity.store(debugger.verbosity);
 
 	loop = std::thread(&Debug::print, this);
@@ -26,7 +23,7 @@ Debug::~Debug() {
 
 	conditional.notify_one();
 
-	loop.join();
+	if (loop.joinable()) loop.join();
 }
 
 // Member Functions

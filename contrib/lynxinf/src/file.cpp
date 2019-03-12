@@ -36,10 +36,6 @@ IO::IO() {
     #endif
 }
 
-IO::~IO() {
-
-}
-
 // Member Functions
 
 bool IO::read(std::string path, std::string& data) {

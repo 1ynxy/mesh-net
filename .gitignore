@@ -32,6 +32,7 @@
 *.out
 *.app
 
-# Build & Release folders
+# Folders
 build/
 release/
+research/

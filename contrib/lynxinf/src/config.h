@@ -26,8 +26,6 @@ public:
     Config();
     Config(const Config& config);
 
-    ~Config();
-
     // Member Functions
 
     bool get_bool(const std::string& key);

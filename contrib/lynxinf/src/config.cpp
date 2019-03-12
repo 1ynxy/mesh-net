@@ -13,10 +13,6 @@ Config::Config(const Config& config) {
 	strings = config.strings;
 }
 
-Config::~Config() {
-
-}
-
 // Member Functions
 
 bool Config::get_bool(const std::string& key) {

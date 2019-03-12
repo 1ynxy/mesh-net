@@ -41,21 +41,23 @@ void init() {
 
 	stat = server.bind(port);
 
-	if (stat != 1) debug.error("Failed to bind port : " + std::to_string(stat));
+	if (stat != 1) debug.error("Failed to bind : " + std::to_string(stat));
 	else {
 		server.this_addr(addr, port);
 
-		debug.info("Bound to " + addr + ":" + port);
+		debug.info("Bound");
 	}
 
 	stat = server.connect(addr, port);
 
-	if (stat != 1) debug.error("Failed to connect to host : " + std::to_string(stat));
+	if (stat != 1) debug.error("Failed to connect : " + std::to_string(stat));
 	else {
 		server.host_addr(addr, port);
 
-		debug.info("Connected to " + addr + ":" + port);
+		debug.info("Connected");
 	}
+
+	server.start();
 
 	for (;;) update();
 }

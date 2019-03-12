@@ -4,55 +4,65 @@
 #include <string>
 #include <vector>
 #include <queue>
+#include <algorithm>
 
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <arpa/inet.h>
 #include <netdb.h>
+#include <unistd.h>
 
-enum SockType {
-	SOCK_SELF,
-	SOCK_HOST,
-	SOCK_PEER
-};
-
-struct Socket {
+class Socket {
+private:
 	// Member Variables
 
-	SockType type = SOCK_PEER;
+	Socket* host = nullptr;
+	std::vector<Socket*> children = std::vector<Socket*>();
+public:
+	// Member Variables
 
 	int sock = -1;
-
-	struct addrinfo* inf = { 0 };
 
 	std::string addr = "";
 	std::string port = "";
 
 	// Constructors & Destructors
 
-	Socket();
-	Socket(int sock, SockType type);
-
-	~Socket();
-};
-
-class Mesh {
-private:
-	// Member Variables
-
-	std::vector<Socket> peers = std::vector<Socket>();
-
-	fd_set set;
-	int count;
-public:
-	// Constructors & Destructors
-
-	Mesh();
-
-	~Mesh();
+	Socket(int sock);
 
 	// Member Functions
 
-	void add(int sock, struct addrinfo* inf);
+	Socket* get_host();
+	void set_host(int sock);
+	void clear_host();
+
+	Socket* get_child(int sock);
+	void add_child(int sock);
+	void remove_child(int sock);
+};
+
+class MeshNet {
+private:
+	// Member Variables
+
+	fd_set set;
+public:
+	// Member Variables
+
+	Socket* peers = nullptr;
+
+	int count = 0;
+
+	// Member Functions
+
+	bool is_set(int sock);
+	bool is_self(int sock);
+	bool is_host(int sock);
+
+	bool select(fd_set* sel);
+
+	void add(int sock);
+	void remove(int sock);
 	
 	// Remove Somehow
 };

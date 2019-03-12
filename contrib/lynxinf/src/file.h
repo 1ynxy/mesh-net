@@ -14,8 +14,6 @@ public:
 
     IO();
 
-    ~IO();
-
     // Member Functions
 
     bool read(std::string path, std::string& data);

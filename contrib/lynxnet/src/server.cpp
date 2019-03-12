@@ -11,12 +11,7 @@ Server::~Server() {
 		running = false;
 
 		conditional.notify_one();
-
-		//listener->join();
-		//broadcaster->join();
 	}
-	
-	for(int i = 0; i <= maxsock; i++) if (FD_ISSET(i, &sockets)) close(i);
 }
 
 // Member Functions
@@ -32,7 +27,7 @@ int Server::bind(const std::string& port) {
    	hints.ai_socktype = SOCK_STREAM;
    	hints.ai_flags = AI_PASSIVE;
 
-	struct addrinfo* results;
+	struct addrinfo* results = nullptr;
 
    	if (getaddrinfo(NULL, port_c, &hints, &results) != 0) {
        	// Failed To Get Local AddrInfo
@@ -43,11 +38,15 @@ int Server::bind(const std::string& port) {
    	}
 
 	// Loop Through Address Structures Until An Appropriate One Is Found
-    
-   	for(selfinf = results; selfinf != NULL; selfinf = selfinf->ai_next) {
-       	self = socket(selfinf->ai_family, selfinf->ai_socktype, selfinf->ai_protocol);
 
-       	if (self < 0) {
+	int sock = 0;
+
+	struct addrinfo* inf = nullptr;
+    
+   	for(inf = results; inf != NULL; inf = inf->ai_next) {
+       	sock = socket(inf->ai_family, inf->ai_socktype, inf->ai_protocol);
+
+       	if (sock < 0) {
 			// Local Socket Invalid, Skipping
 
        		continue;
@@ -57,11 +56,11 @@ int Server::bind(const std::string& port) {
 
 		int yes = 1;
         
-       	setsockopt(self, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
+       	setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
 
 		// Bind The Socket
 
-       	if (::bind(self, selfinf->ai_addr, selfinf->ai_addrlen) < 0) {
+       	if (::bind(sock, inf->ai_addr, inf->ai_addrlen) < 0) {
 			// Failed To Bind, Skipping
 
            	continue;
@@ -74,7 +73,7 @@ int Server::bind(const std::string& port) {
 
 	freeaddrinfo(results);
 
-	if (selfinf == NULL) {
+	if (inf == NULL) {
 		// Returned Local Socket Invalid
 
 		return -2;
@@ -82,7 +81,7 @@ int Server::bind(const std::string& port) {
 
 	// Try Listen
 
-   	if (::listen(self, 10) == -1) {
+   	if (::listen(sock, 10) == -1) {
        	// Failed To Listen
 
        	return -3;
@@ -90,21 +89,9 @@ int Server::bind(const std::string& port) {
 
 	// Add Server Socket To FileDescriptor Set
 
-	FD_SET(self, &sockets);
+	mesh.add(sock);
 
-	if (self > maxsock) maxsock = self;
-
-	bound = true;
-
-	if (!running) {
-		running = true;
-
-		listener = std::thread(&Server::listen, this);
-		listener.detach();
-
-		broadcaster = std::thread(&Server::broadcast, this);
-		broadcaster.detach();
-	}
+	mesh.peers = new Socket(sock);
 
 	return 1;
 }
@@ -132,10 +119,14 @@ int Server::connect(const std::string& addr, const std::string& port) {
 
 	// Loop Through Address Structures Until An Appropriate One Is Found
 
-	for(hostinf = results; hostinf != NULL; hostinf = hostinf->ai_next) {
-       	host = socket(hostinf->ai_family, hostinf->ai_socktype, hostinf->ai_protocol);
+	int sock = 0;
 
-       	if (host < 0) {
+	struct addrinfo* inf = nullptr;
+
+	for(inf = results; inf != NULL; inf = inf->ai_next) {
+       	sock = socket(inf->ai_family, inf->ai_socktype, inf->ai_protocol);
+
+       	if (sock < 0) {
 			// Host Socket Invalid, Skipping
 
        		continue;
@@ -143,7 +134,7 @@ int Server::connect(const std::string& addr, const std::string& port) {
 
 		// Connect To Socket
 
-		if (::connect(host, hostinf->ai_addr, hostinf->ai_addrlen) < 0) {
+		if (::connect(sock, inf->ai_addr, inf->ai_addrlen) < 0) {
 			// Failed To Connect To Host, Skipping
 
 			continue;
@@ -156,7 +147,7 @@ int Server::connect(const std::string& addr, const std::string& port) {
 
 	freeaddrinfo(results);
 
-	if (hostinf == NULL) {
+	if (inf == NULL) {
 		// Returned Host Socket Invalid
 
 		return -2;
@@ -164,11 +155,15 @@ int Server::connect(const std::string& addr, const std::string& port) {
 
 	// Add Host Socket To FileDescriptor Set
 
-	FD_SET(host, &sockets);
+	mesh.add(sock);
 
-	if (host > maxsock) maxsock = host;
+	mesh.peers->set_host(sock);
 
-	connected = true;
+	return 1;
+}
+
+void Server::start() {
+	// Start Threads If Not Running
 
 	if (!running) {
 		running = true;
@@ -179,8 +174,6 @@ int Server::connect(const std::string& addr, const std::string& port) {
 		broadcaster = std::thread(&Server::broadcast, this);
 		broadcaster.detach();
 	}
-
-	return 1;
 }
 
 void Server::listen() {
@@ -192,43 +185,31 @@ void Server::listen() {
 	while (running) {
 		// Get All FileDescriptors That Return Instead Of Blocking
 
-		fd_set tmp = sockets;
-        	
-		if (select(maxsock + 1, &tmp, NULL, NULL, NULL) == -1) continue;
+		fd_set tmp;
+
+		if (!mesh.select(&tmp)) continue;
 
 		// Loop Through FileDescriptors
         	
-       	for(int i = 0; i <= maxsock; i++) {
+       	for(int i = 0; i <= mesh.count; i++) {
 			// Check If Part Of Set
 
-           	if (FD_ISSET(i, &tmp)) {
+           	if (mesh.is_set(i)) {
 				// If Current Socket Is This Client Listen For New Connections
 
-               	if (self != -1 && i == self) {
-					struct sockaddr_storage remoteaddr;
+               	if (mesh.is_self(i)) {
+					int sock = accept(mesh.peers->sock, NULL, NULL);
 
-                   	socklen_t addrlen = sizeof remoteaddr;
-                    	
-					int newsock = accept(self, (struct sockaddr*) &remoteaddr, &addrlen);
-
-                   	if (newsock != -1) {
+                   	if (sock != -1) {
 						// Add To FileDescriptor Set
 
-                   	    FD_SET(newsock, &sockets);
+                   	    mesh.add(sock);
 
-                   	    if (newsock > maxsock) maxsock = newsock;
+						mesh.peers->add_child(sock);
 
-						// Get Socket Info
+						// Report
 
-						char ipstr[INET6_ADDRSTRLEN];
-						int port;
-
-						struct sockaddr_in* s = (struct sockaddr_in*) &remoteaddr;
-    					
-						inet_ntop(AF_INET, &s->sin_addr, ipstr, sizeof ipstr);
-						port = ntohs(s->sin_port);
-
-						Message msg(newsock, "Client connected " + std::string(ipstr) + ":" + std::to_string(port));
+						Message msg(sock, "Client connected");
 
 						send_loc(msg);
 
@@ -238,25 +219,37 @@ void Server::listen() {
 				else {
 					// Parse Received Data
 
+					std::string text = "";
+
+					for (int c = 0; c < nbytes; c++) text += buf[c];
+
                    	if ((nbytes = ::recv(i, buf, sizeof buf, 0)) <= 0) {
-                      	// Error Received Or Connection Closed By Client
-
-                       	FD_CLR(i, &sockets);
-
-						close(i);
+						bool ishost = mesh.is_host(i);
 
 						if (nbytes == 0) {
-							Message msg(i, "Client disconnected");
+							// Remove From FileDescriptor Set
+
+                    		mesh.remove(i);
+
+							if (ishost) mesh.peers->remove_child(i);
+							else mesh.peers->clear_host();
+
+							// Report
+
+							Message msg(i, ishost ? "Host Disconnected" : "Client disconnected");
 							
 							send_loc(msg);
 
 							send(msg);
 						}
+						else {
+							// Unknown Error
+						}
                    	}
 					else {
-						Message msg(i, "");
+						// Report
 
-						for (int c = 0; c < nbytes; c++) msg.text += buf[c];
+						Message msg(i, text);
 
 						send_loc(msg);
 
@@ -270,19 +263,20 @@ void Server::listen() {
 
 void Server::broadcast() {
 	for (;;) {
+		Message message;
+
 		while (sendbuffer.size() > 0) {
 			sendmut.lock();
 
-			Message msg = sendbuffer.front();
-
+			message = sendbuffer.front();
 			sendbuffer.pop();
 
 			sendmut.unlock();
 				
-			for(int i = 0; i <= maxsock; i++) {
-       			if (i != self && i != msg.sock && FD_ISSET(i, &sockets)) {
-					const char* txt = msg.text.c_str();
-					int len = msg.text.size();
+			for(int i = 0; i <= mesh.count; i++) {
+       			if (i != message.sock && !mesh.is_self(i) && mesh.is_set(i)) {
+					const char* txt = message.text.c_str();
+					int len = message.text.size();
 
 					int total = 0;
 
@@ -317,7 +311,7 @@ void Server::send(const Message& message) {
 	sendmut.lock();
 
 	sendbuffer.push(message);
-		
+
 	sendmut.unlock();
 
 	conditional.notify_one();
@@ -328,7 +322,6 @@ bool Server::recv(Message& message) {
 		recvmut.lock();
 
 		message = recvbuffer.front();
-
 		recvbuffer.pop();
 
 		recvmut.unlock();
