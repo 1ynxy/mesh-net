@@ -1,30 +1,11 @@
 #include "sockets.h"
 
-#include <iostream>
-
 // Socket //
 
 // Constructors & Destructors
 
 Socket::Socket(int sock) : sock(sock) {
-	// Get Addr & Port From addrinfo
-
-	struct sockaddr_in remoteaddr = { 0 };
-
-    socklen_t addrlen = sizeof remoteaddr;
-
-	int stat = getsockname(sock, (struct sockaddr*) &remoteaddr, &addrlen);
-
-	//std::cout << remoteaddr.sa_family
-
-	char addr_c[INET_ADDRSTRLEN];
-
-	inet_ntop(AF_INET, &remoteaddr.sin_addr, addr_c, sizeof addr_c);
-
-	addr = addr_c;
-	port = std::to_string(htons(remoteaddr.sin_port));
-
-	std::cout << "addr:port " << addr << ":" << port << std::endl;
+	
 }
 
 // Member Functions

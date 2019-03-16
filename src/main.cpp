@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <lynxinf.h>
 #include <lynxnet.h>
 //#include <lynxengine.h>
@@ -34,7 +36,10 @@ int main(int argc, char* argv[]) {
 void init() {
 	//Display::Open(glm::vec2(600, 300), glm::vec2(500, 500), "window1", Colour(40, 40, 40));
 
-	std::string addr = conf.get_string("ip-addr");
+	std::string addr = "";
+
+	std::cin >> addr;
+
 	std::string port = conf.get_string("port");
 
 	int stat = 0;

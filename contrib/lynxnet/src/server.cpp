@@ -1,5 +1,7 @@
 #include "server.h"
 
+#include <iostream>
+
 // Constructors & Destructors
 
 Server::Server() {
@@ -92,6 +94,37 @@ int Server::bind(const std::string& port) {
 	mesh.add(sock);
 
 	mesh.peers = new Socket(sock);
+
+	// Get Local IP Addr
+
+	std::string locAddr = "";
+
+	struct ifaddrs* ifAddrStruct = NULL;
+	struct ifaddrs* ifa = NULL;
+	void* tmpAddrPtr = NULL;
+
+	getifaddrs(&ifAddrStruct);
+
+	for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next) {
+		if (!ifa->ifa_addr) continue;
+
+		tmpAddrPtr = &((struct sockaddr_in *) ifa->ifa_addr)->sin_addr;
+		
+		char addressBuffer[INET_ADDRSTRLEN];
+
+		inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
+
+		locAddr = addressBuffer;
+
+		std::cout << ifa->ifa_name << " : " << locAddr << std::endl;
+	}
+
+	if (ifAddrStruct!=NULL) freeifaddrs(ifAddrStruct);
+
+	mesh.peers->addr = locAddr;
+	mesh.peers->port = port;
+
+	std::cout << "addr:port=" << locAddr << ":" << port << std::endl;
 
 	return 1;
 }
@@ -231,8 +264,7 @@ void Server::listen() {
 
                     		mesh.remove(i);
 
-							if (ishost) mesh.peers->remove_child(i);
-							else mesh.peers->clear_host();
+							ishost ? mesh.peers->clear_host() : mesh.peers->remove_child(i);
 
 							// Report
 
