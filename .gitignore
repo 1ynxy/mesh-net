@@ -36,3 +36,7 @@
 build/
 release/
 research/
+guides/
+
+# VSCode
+.vscode
