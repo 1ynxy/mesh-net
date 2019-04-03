@@ -5,9 +5,11 @@ project(lynxengine DESCRIPTION "Basic Component Entity System Engine")
 FIND_PACKAGE(Threads)
 
 include_directories(
+  contrib/lynxinf/lynxinf
   contrib/glfw/include
 )
 
+add_subdirectory(contrib/lynxinf)
 add_subdirectory(contrib/glfw)
 
 add_library(lynxengine
@@ -21,6 +23,7 @@ target_include_directories(lynxengine PRIVATE src)
 
 target_link_libraries(lynxengine
   ${CMAKE_THREAD_LIBS_INIT}
+  lynxinf
   glfw
 )
 

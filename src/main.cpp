@@ -1,6 +1,5 @@
 #include <iostream>
 
-#include <lynxinf.h>
 #include <lynxengine.h>
 #include <lynxnet.h>
 
@@ -9,10 +8,6 @@ void update();
 
 // Program
 
-Debug debug;
-
-Config conf;
-
 Core core;
 
 Server server;
@@ -20,45 +15,45 @@ Server server;
 int main(int argc, char* argv[]) {
 	int stat = 0;
 
-	if (!conf.load("config")) {
-		debug.error("failed to load configuration file");
+	if (!core.conf.load("config")) {
+		core.debug.error("failed to load configuration file");
 
 		return 0;
 	}
 
 	core.set_callbacks(&init, &update, nullptr, nullptr, nullptr, nullptr);
+
+	core.time.set_limit(60);
 	
 	core.init();
 }
 
 void init() {
-	core.time.set_limit(60);
-
 	//Display::Open(glm::vec2(600, 300), glm::vec2(500, 500), "window1", Colour(40, 40, 40));
 
-	std::string addr = conf.get_string("addr");
-	std::string port = conf.get_string("port");
+	std::string addr = core.conf.get_string("addr");
+	std::string port = core.conf.get_string("port");
 
 	int stat = 0;
 
 	stat = server.bind(port);
 
-	if (stat != 1) debug.error("failed to bind : " + std::to_string(stat));
+	if (stat != 1) core.debug.error("failed to bind : " + std::to_string(stat));
 	else {
-		debug.info("bound");
+		core.debug.info("bound");
 	}
 
 	stat = server.connect(addr, port);
 
-	if (stat != 1) debug.error("failed to connect : " + std::to_string(stat));
+	if (stat != 1) core.debug.error("failed to connect : " + std::to_string(stat));
 	else {
-		debug.info("connected");
+		core.debug.info("connected");
 	}
 
 	stat = server.start();
 
-	if (stat = 0) debug.error("failed to start server");
-	else debug.info("started server");
+	if (stat = 0) core.debug.error("failed to start server");
+	else core.debug.info("started server");
 }
 
 void update() {
@@ -66,5 +61,5 @@ void update() {
 
 	Packet result;
 
-	while (server.recv(result)) debug.info(result.text);
+	while (server.recv(result)) core.debug.info(result.text);
 }

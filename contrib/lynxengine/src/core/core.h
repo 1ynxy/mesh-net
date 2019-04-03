@@ -3,6 +3,8 @@
 
 #include <GLFW/glfw3.h>
 
+#include <lynxinf.h>
+
 #include <../src/core/time.h>
 #include <../src/core/input.h>
 
@@ -19,6 +21,10 @@ private:
 	
 public:
 	// Member Variables
+
+	Debug debug;
+
+	Config conf;
 
 	Time time;
 
