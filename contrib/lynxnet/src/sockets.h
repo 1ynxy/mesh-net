@@ -6,13 +6,6 @@
 #include <queue>
 #include <algorithm>
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <ifaddrs.h>
-#include <netdb.h>
-#include <unistd.h>
-
 class Socket {
 private:
 	// Member Variables

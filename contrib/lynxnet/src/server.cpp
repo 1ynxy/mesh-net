@@ -1,12 +1,6 @@
 #include "server.h"
 
-#include <iostream>
-
 // Constructors & Destructors
-
-Server::Server() {
-	
-}
 
 Server::~Server() {
 	if (running) {
@@ -91,40 +85,11 @@ int Server::bind(const std::string& port) {
 
 	// Add Server Socket To FileDescriptor Set
 
-	mesh.add(sock);
+	FD_SET(sock, &sockets);
 
-	mesh.peers = new Socket(sock);
+	if (sock > sockmax) sockmax = sock;
 
-	// Get Local IP Addr
-
-	std::string locAddr = "";
-
-	struct ifaddrs* ifAddrStruct = NULL;
-	struct ifaddrs* ifa = NULL;
-	void* tmpAddrPtr = NULL;
-
-	getifaddrs(&ifAddrStruct);
-
-	for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next) {
-		if (!ifa->ifa_addr) continue;
-
-		tmpAddrPtr = &((struct sockaddr_in *) ifa->ifa_addr)->sin_addr;
-		
-		char addressBuffer[INET_ADDRSTRLEN];
-
-		inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
-
-		locAddr = addressBuffer;
-
-		std::cout << ifa->ifa_name << " : " << locAddr << std::endl;
-	}
-
-	if (ifAddrStruct!=NULL) freeifaddrs(ifAddrStruct);
-
-	mesh.peers->addr = locAddr;
-	mesh.peers->port = port;
-
-	std::cout << "addr:port=" << locAddr << ":" << port << std::endl;
+	self = sock;
 
 	return 1;
 }
@@ -188,14 +153,14 @@ int Server::connect(const std::string& addr, const std::string& port) {
 
 	// Add Host Socket To FileDescriptor Set
 
-	mesh.add(sock);
+	FD_SET(sock, &sockets);
 
-	mesh.peers->set_host(sock);
+	if (sock > sockmax) sockmax = sock;
 
 	return 1;
 }
 
-void Server::start() {
+bool Server::start() {
 	// Start Threads If Not Running
 
 	if (!running) {
@@ -206,7 +171,11 @@ void Server::start() {
 
 		broadcaster = std::thread(&Server::broadcast, this);
 		broadcaster.detach();
+
+		return true;
 	}
+
+	return false;
 }
 
 void Server::listen() {
@@ -220,31 +189,29 @@ void Server::listen() {
 
 		fd_set tmp;
 
-		if (!mesh.select(&tmp)) continue;
+		if (::select(sockmax + 1, &tmp, NULL, NULL, NULL) == -1) continue;
 
 		// Loop Through FileDescriptors
         	
-       	for(int i = 0; i <= mesh.count; i++) {
+       	for(int i = 0; i <= sockmax; i++) {
 			// Check If Part Of Set
 
-           	if (mesh.is_set(i)) {
+           	if (FD_ISSET(i, &sockets)) {
 				// If Current Socket Is This Client Listen For New Connections
 
-               	if (mesh.is_self(i)) {
-					int sock = accept(mesh.peers->sock, NULL, NULL);
+               	if (i == self) {
+					int sock = accept(self, NULL, NULL);
 
                    	if (sock != -1) {
 						// Add To FileDescriptor Set
 
-                   	    mesh.add(sock);
+						FD_SET(sock, &sockets);
 
-						mesh.peers->add_child(sock);
+						if (sock > sockmax) sockmax = sock;
 
 						// Report
 
-						Message msg(sock, "Client connected");
-
-						send_loc(msg);
+						Packet msg(sock, nbytes, "Client connected");
 
 						send(msg);
                    	}
@@ -257,22 +224,18 @@ void Server::listen() {
 					for (int c = 0; c < nbytes; c++) text += buf[c];
 
                    	if ((nbytes = ::recv(i, buf, sizeof buf, 0)) <= 0) {
-						bool ishost = mesh.is_host(i);
-
 						if (nbytes == 0) {
 							// Remove From FileDescriptor Set
 
-                    		mesh.remove(i);
+                    		FD_CLR(i, &sockets);
 
-							ishost ? mesh.peers->clear_host() : mesh.peers->remove_child(i);
+							close(i);
 
 							// Report
 
-							Message msg(i, ishost ? "Host Disconnected" : "Client disconnected");
-							
-							send_loc(msg);
+							Packet message(i, nbytes, "Client disconnected");
 
-							send(msg);
+							send(message);
 						}
 						else {
 							// Unknown Error
@@ -281,11 +244,9 @@ void Server::listen() {
 					else {
 						// Report
 
-						Message msg(i, text);
+						Packet message(i, nbytes, &text[0]);
 
-						send_loc(msg);
-
-						send(msg);
+						send(message);
                    	}
                	}
            	}
@@ -295,7 +256,7 @@ void Server::listen() {
 
 void Server::broadcast() {
 	for (;;) {
-		Message message;
+		Packet message;
 
 		while (sendbuffer.size() > 0) {
 			sendmut.lock();
@@ -305,10 +266,10 @@ void Server::broadcast() {
 
 			sendmut.unlock();
 				
-			for(int i = 0; i <= mesh.count; i++) {
-       			if (i != message.sock && !mesh.is_self(i) && mesh.is_set(i)) {
-					const char* txt = message.text.c_str();
-					int len = message.text.size();
+			for(int i = 0; i <= sockmax; i++) {
+       			if (i != message.socket && FD_ISSET(i, &sockets)) {
+					int len = message.len;
+					const char* txt = message.text;
 
 					int total = 0;
 
@@ -320,7 +281,13 @@ void Server::broadcast() {
 						total += ret;
 					}
        	    	}
-       		}
+			}
+
+			recvmut.lock();
+
+			recvbuffer.push(message);
+
+			recvmut.unlock();
 		}
 
 		if (!running) return;
@@ -331,15 +298,7 @@ void Server::broadcast() {
 	}
 }
 
-void Server::send_loc(const Message& message) {
-	recvmut.lock();
-
-	recvbuffer.push(message);
-
-	recvmut.unlock();
-}
-
-void Server::send(const Message& message) {
+void Server::send(const Packet& message) {
 	sendmut.lock();
 
 	sendbuffer.push(message);
@@ -349,7 +308,7 @@ void Server::send(const Message& message) {
 	conditional.notify_one();
 }
 
-bool Server::recv(Message& message) {
+bool Server::recv(Packet& message) {
 	if (recvbuffer.size() > 0) {
 		recvmut.lock();
 
@@ -362,12 +321,4 @@ bool Server::recv(Message& message) {
 	}
 
 	return false;
-}
-
-void Server::this_addr(std::string& addr, std::string& port) {
-
-}
-
-void Server::host_addr(std::string& addr, std::string& port) {
-
 }

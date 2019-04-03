@@ -5,7 +5,8 @@ project(lynxnet DESCRIPTION "Net Library For Mesh Networks")
 FIND_PACKAGE ( Threads )
 
 add_library(lynxnet
-  src/sockets.cpp
+  src/peer.cpp
+  src/packet.cpp
   src/server.cpp
 )
 

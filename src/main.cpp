@@ -11,8 +11,6 @@ void update();
 
 Debug debug;
 
-IO file;
-
 Config conf;
 
 Server server;
@@ -21,7 +19,7 @@ int main(int argc, char* argv[]) {
 	int stat = 0;
 
 	if (!conf.load("config")) {
-		debug.error("Failed to load configuration file");
+		debug.error("failed to load configuration file");
 
 		return 0;
 	}
@@ -46,20 +44,16 @@ void init() {
 
 	stat = server.bind(port);
 
-	if (stat != 1) debug.error("Failed to bind : " + std::to_string(stat));
+	if (stat != 1) debug.error("failed to bind : " + std::to_string(stat));
 	else {
-		server.this_addr(addr, port);
-
-		debug.info("Bound");
+		debug.info("bound");
 	}
 
 	stat = server.connect(addr, port);
 
-	if (stat != 1) debug.error("Failed to connect : " + std::to_string(stat));
+	if (stat != 1) debug.error("failed to connect : " + std::to_string(stat));
 	else {
-		server.host_addr(addr, port);
-
-		debug.info("Connected");
+		debug.info("connected");
 	}
 
 	server.start();
@@ -68,7 +62,7 @@ void init() {
 }
 
 void update() {
-	Message result;
+	Packet result;
 
 	while (server.recv(result)) debug.info(result.text);
 }

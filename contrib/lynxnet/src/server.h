@@ -1,29 +1,33 @@
 #ifndef server_h
 #define server_h
 
+#include <string>
+#include <vector>
+#include <queue>
+
 #include <thread>
 #include <atomic>
 #include <mutex>
 #include <condition_variable>
 
-#include "sockets.h"
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <ifaddrs.h>
+#include <netdb.h>
+#include <unistd.h>
 
-struct Message {
-	// Member Variables
-
-	int sock = -1;
-
-	std::string text = "";
-
-	// Constructors & Destructors
-
-	Message() {}
-	Message(int sock, const std::string& text) : sock(sock), text(text) {}
-};
+#include <../src/peer.h>
+#include <../src/packet.h>
 
 class Server {
 private:
 	// Member Variables
+
+	fd_set sockets;
+	int sockmax;
+
+	int self;
 
 	std::atomic<bool> running;
 	std::thread listener;
@@ -32,12 +36,10 @@ private:
 	std::condition_variable conditional;
 	std::mutex condmut;
 
-	MeshNet mesh;
-
-	std::queue<Message> sendbuffer = std::queue<Message>();
+	std::queue<Packet> sendbuffer;
 	std::mutex sendmut;
 
-	std::queue<Message> recvbuffer = std::queue<Message>();
+	std::queue<Packet> recvbuffer;
 	std::mutex recvmut;
 
 	// Member Functions
@@ -47,8 +49,6 @@ private:
 public:
 	// Constructors & Destructors
 
-	Server();
-
 	~Server();
 
 	// Member Functions
@@ -56,14 +56,10 @@ public:
 	int bind(const std::string& port);
 	int connect(const std::string& addr, const std::string& port);
 
-	void start();
+	bool start();
 
-	void send_loc(const Message& message);
-	void send(const Message& message);
-	bool recv(Message& message);
-
-	void this_addr(std::string& addr, std::string& port);
-	void host_addr(std::string& addr, std::string& port);
+	void send(const Packet& message);
+	bool recv(Packet& message);
 };
 
 #endif
