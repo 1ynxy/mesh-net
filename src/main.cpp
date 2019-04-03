@@ -34,10 +34,7 @@ int main(int argc, char* argv[]) {
 void init() {
 	//Display::Open(glm::vec2(600, 300), glm::vec2(500, 500), "window1", Colour(40, 40, 40));
 
-	std::string addr = "";
-
-	std::cin >> addr;
-
+	std::string addr = conf.get_string("addr");
 	std::string port = conf.get_string("port");
 
 	int stat = 0;
@@ -56,7 +53,10 @@ void init() {
 		debug.info("connected");
 	}
 
-	server.start();
+	stat = server.start();
+
+	if (stat = 0) debug.error("failed to start server");
+	else debug.info("started server");
 
 	for (;;) update();
 }

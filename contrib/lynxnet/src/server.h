@@ -1,7 +1,6 @@
 #ifndef server_h
 #define server_h
 
-#include <string>
 #include <vector>
 #include <queue>
 
@@ -25,9 +24,9 @@ private:
 	// Member Variables
 
 	fd_set sockets;
-	int sockmax;
+	int sockmax = 0;
 
-	int self;
+	int self = 0;
 
 	std::atomic<bool> running;
 	std::thread listener;
@@ -36,10 +35,10 @@ private:
 	std::condition_variable conditional;
 	std::mutex condmut;
 
-	std::queue<Packet> sendbuffer;
+	std::queue<Packet> sendbuffer = std::queue<Packet>();
 	std::mutex sendmut;
 
-	std::queue<Packet> recvbuffer;
+	std::queue<Packet> recvbuffer = std::queue<Packet>();
 	std::mutex recvmut;
 
 	// Member Functions

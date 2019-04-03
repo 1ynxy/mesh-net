@@ -1,5 +1,7 @@
 #include "server.h"
 
+#include <iostream>
+
 // Constructors & Destructors
 
 Server::~Server() {
@@ -189,17 +191,19 @@ void Server::listen() {
 
 		fd_set tmp;
 
-		if (::select(sockmax + 1, &tmp, NULL, NULL, NULL) == -1) continue;
+		tmp = sockets;
 
-		// Loop Through FileDescriptors
+		if (::select(sockmax + 1, &tmp, NULL, NULL, NULL) == -1) continue;
         	
        	for(int i = 0; i <= sockmax; i++) {
 			// Check If Part Of Set
 
            	if (FD_ISSET(i, &sockets)) {
-				// If Current Socket Is This Client Listen For New Connections
+				// If Current Socket Is Self, Listen For New Connections
 
                	if (i == self) {
+					// Peer Possibly Requested Connection
+
 					int sock = accept(self, NULL, NULL);
 
                    	if (sock != -1) {
@@ -211,7 +215,7 @@ void Server::listen() {
 
 						// Report
 
-						Packet msg(sock, nbytes, "Client connected");
+						Packet msg(sock, "Client connected");
 
 						send(msg);
                    	}
@@ -224,6 +228,8 @@ void Server::listen() {
 					for (int c = 0; c < nbytes; c++) text += buf[c];
 
                    	if ((nbytes = ::recv(i, buf, sizeof buf, 0)) <= 0) {
+						// Peer Disconnected Or Error Occurred
+
 						if (nbytes == 0) {
 							// Remove From FileDescriptor Set
 
@@ -233,7 +239,7 @@ void Server::listen() {
 
 							// Report
 
-							Packet message(i, nbytes, "Client disconnected");
+							Packet message(i, "Client disconnected");
 
 							send(message);
 						}
@@ -242,6 +248,8 @@ void Server::listen() {
 						}
                    	}
 					else {
+						// Packet Received From Peer
+
 						// Report
 
 						Packet message(i, nbytes, &text[0]);
@@ -256,20 +264,22 @@ void Server::listen() {
 
 void Server::broadcast() {
 	for (;;) {
-		Packet message;
-
 		while (sendbuffer.size() > 0) {
+			// Send All Queued Messages To Each Socket
+
 			sendmut.lock();
 
-			message = sendbuffer.front();
+			Packet message = sendbuffer.front();
 			sendbuffer.pop();
 
 			sendmut.unlock();
 				
 			for(int i = 0; i <= sockmax; i++) {
-       			if (i != message.socket && FD_ISSET(i, &sockets)) {
-					int len = message.len;
-					const char* txt = message.text;
+       			if (i != message.socket && i != self && FD_ISSET(i, &sockets)) {
+					// Ensure No Data Is Omitted
+					
+					int len = message.text.length();
+					const char* txt = message.text.c_str();
 
 					int total = 0;
 
@@ -283,12 +293,16 @@ void Server::broadcast() {
        	    	}
 			}
 
+			// Add To Receive Queue In A Thread-Safe Manner For Debugging
+
 			recvmut.lock();
 
 			recvbuffer.push(message);
 
 			recvmut.unlock();
 		}
+
+		// Exit If Program No Longer Running, Wait For Conditional Otherwise
 
 		if (!running) return;
 
@@ -299,6 +313,8 @@ void Server::broadcast() {
 }
 
 void Server::send(const Packet& message) {
+	// Add To Send Queue In A Thread-Safe Manner
+
 	sendmut.lock();
 
 	sendbuffer.push(message);
@@ -309,6 +325,8 @@ void Server::send(const Packet& message) {
 }
 
 bool Server::recv(Packet& message) {
+	// Get From Receive Queue In A Thread-Safe Manner
+
 	if (recvbuffer.size() > 0) {
 		recvmut.lock();
 

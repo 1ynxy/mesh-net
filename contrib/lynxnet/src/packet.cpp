@@ -2,15 +2,22 @@
 
 // Constructors & Destructors
 
-Packet::Packet() : socket(0), len(0) {
-	this->text = new char;
+Packet::Packet() {
+
 }
 
-Packet::Packet(int socket, int len, const char* text) : socket(socket), len(len) {
-	this->text = new char;
+Packet::Packet(int socket, int len, const char* text) : socket(socket) {
+	for (unsigned int i = 0; i < len; i++) this->text += text[i];
+}
 
-	for (unsigned int i = 0; i < len; i++) this->text[i] = text[i];
+Packet::Packet(int socket, const std::string& text) : socket(socket) {
+	this->text = text;
+}
+
+Packet::Packet(const Packet& packet) : socket(packet.socket) {
+	text = packet.text;
 }
 
 // Member Functions
+
 

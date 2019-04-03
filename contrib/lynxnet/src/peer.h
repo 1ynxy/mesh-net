@@ -13,15 +13,15 @@ enum PortStat {
 struct Peer {
 	// Member Variables
 
-	std::string global;
-	std::string local;
+	int socket = 0;
 
-	int socket;
+	std::string global = "";
+	std::string local = "";
 
-	PortStat stat;
+	PortStat stat = PORT_UNDEF;
 
-	Peer* host;
-	std::vector<Peer*> children;
+	Peer* host = nullptr;
+	std::vector<Peer*> children = std::vector<Peer*>();
 
 	// Member Functions
 
@@ -29,7 +29,7 @@ struct Peer {
 
 	// Constructors & Destructors
 
-	
+
 };
 
 #endif
