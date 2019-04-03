@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.2)
 
 project(lynxinf DESCRIPTION "Debug & Configuration Library")
 
-FIND_PACKAGE ( Threads )
+FIND_PACKAGE(Threads)
 
 add_library(lynxinf
   src/debug.cpp

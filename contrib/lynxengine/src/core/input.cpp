@@ -9,179 +9,110 @@ Pressable::Pressable(int id, ButtonState state) {
 	this->state = state;
 }
 
-Pressable::~Pressable() {
-	
-}
-
 // Gameloop Functions
 
-void Pressable::Update() {
+void Pressable::update() {
 	if (state == STATE_PRESSED || state == STATE_RELEASED) state = state == STATE_PRESSED ? STATE_HELD : STATE_NONE;
-}
-
-// Member Functions
-
-int Pressable::ID() {
-	return id;
-}
-
-void Pressable::Press() {
-	state = STATE_PRESSED;
-}
-
-void Pressable::Release() {
-	state = STATE_RELEASED;
-}
-
-bool Pressable::Pressed() {
-	return state == STATE_PRESSED;
-}
-
-bool Pressable::Down() {
-	return state != STATE_NONE;
-}
-
-bool Pressable::Released() {
-	return state == STATE_RELEASED;
-}
-
-bool Pressable::Up() {
-	return state == STATE_NONE;
 }
 
 // KEYBOARD & MOUSE
 
-// KEYBOARD
-	
-// Member Variables
-
-std::vector<Pressable> Keyboard::keys = std::vector<Pressable>();
-
-// Getters & Setters
-
-Pressable* Keyboard::GetKey(int id) {
-	for (Pressable& key : keys) if (key.ID() == id) return &key;
-	return NULL;
-}
-
-void Keyboard::SetKey(int id, ButtonState state) {
-	Pressable* key = GetKey(id);
-	
-	if (key) {
-		if (state == STATE_PRESSED) key->Press();
-		else if (state == STATE_RELEASED) key->Release();
-	}
-	else keys.push_back(Pressable(id, state));
-}
-
-// Gameloop Functions
-
-void Keyboard::Update() {
-	for (Pressable& key : keys) key.Update();
-}
-
-// Member Functions
-
-bool Keyboard::KeyDown(int id) {
-	Pressable* key = GetKey(id);
-	
-	if (key) return key->Pressed();
-	return false;
-}
-
-bool Keyboard::Key(int id) {
-	Pressable* key = GetKey(id);
-	
-	if (key) return key->Down();
-	return false;
-}
-
-bool Keyboard::KeyUp(int id) {
-	Pressable* key = GetKey(id);
-	
-	if (key) return key->Released();
-	return false;
-}
-
 // MOUSE
 
-// Member Variables
-
-bool Mouse::hit = false;
-
-std::vector<Pressable> Mouse::buttons = std::vector<Pressable>();
-
-glm::vec2 Mouse::position;
-glm::vec2 Mouse::deltaPosition;
-
 // Getters & Setters
 
-void Mouse::SetPosition(const glm::vec2& position) {
-	deltaPosition = position - Mouse::position;
+void Mouse::set_button(int id, ButtonState state) {
+	for (Pressable& button : buttons) {
+		if (button.id == id) {
+			button.state = state;
 
-	Mouse::position = position;
-}
-
-Pressable* Mouse::GetButton(int id) {
-	for (Pressable& button : buttons) if (button.ID() == id) return &button;
-	
-	return nullptr;
-}
-
-void Mouse::SetButton(int id, ButtonState state) {
-	Pressable* button = GetButton(id);
-	
-	if (button) {
-		if (state == STATE_PRESSED) button->Press();
-		else if (state == STATE_RELEASED) button->Release();
+			return;
+		}
 	}
-	else buttons.push_back(Pressable(id, state));
+	
+	buttons.push_back(Pressable(id, state));
 }
 
-// Gameloop Functions
+void Mouse::set_position(int x, int y) {
+	deltaPos.x = x - pos.x;
+	deltaPos.y = y - pos.y;
 
-void Mouse::Update() {
-	for (Pressable& button : buttons) button.Update();
-	
-	hit = false;
-
-	deltaPosition = glm::vec2();
+	pos.x = x;
+	pos.y = y;
 }
 
 // Member Functions
 
-bool Mouse::Hit() {
-	return hit;
-}
-
-void Mouse::SetHit() {
-	hit = true;
-}
-
-bool Mouse::ButtonDown(int id) {
-	Pressable* button = GetButton(id);
+void Mouse::update() {
+	for (Pressable& button : buttons) button.update();
 	
-	if (button) return button->Pressed();
+	deltaPos.x = 0;
+	deltaPos.y = 0;
+
+	hit = false;
+}
+
+bool Mouse::button_down(int id) {
+	for (Pressable& button : buttons) if (button.id == id) return button.state == STATE_PRESSED;
+
 	return false;
 }
 
-bool Mouse::Button(int id) {
-	Pressable* button = GetButton(id);
-	
-	if (button) return button->Down();
+bool Mouse::button(int id) {
+	for (Pressable& button : buttons) if (button.id == id) return button.state != STATE_NONE;
+
 	return false;
 }
 
-bool Mouse::ButtonUp(int id) {
-	Pressable* button = GetButton(id);
+bool Mouse::button_up(int id) {
+	for (Pressable& button : buttons) if (button.id == id) return button.state == STATE_RELEASED;
+
+	return false;
+}
+
+// KEYBOARD
+
+// Getters & Setters
+
+void Keyboard::set_key(int id, ButtonState state) {
+	for (Pressable& key : keys) {
+		if (key.id == id) {
+			key.state = state;
+
+			return;
+		}
+	}
 	
-	if (button) return button->Released();
+	keys.push_back(Pressable(id, state));
+}
+
+// Member Functions
+
+void Keyboard::update() {
+	for (Pressable& key : keys) key.update();
+}
+
+bool Keyboard::key_down(int id) {
+	for (Pressable& key : keys) if (key.id == id) return key.state == STATE_PRESSED;
+
+	return false;
+}
+
+bool Keyboard::key(int id) {
+	for (Pressable& key : keys) if (key.id == id) return key.state != STATE_NONE;
+
+	return false;
+}
+
+bool Keyboard::key_up(int id) {
+	for (Pressable& key : keys) if (key.id == id) return key.state == STATE_RELEASED;
+
 	return false;
 }
 
 // INPUT
 
-void Input::Update() {
-	Mouse::Update();
-	Keyboard::Update();
+void Input::update() {
+	mouse.update();
+	keyboard.update();
 }

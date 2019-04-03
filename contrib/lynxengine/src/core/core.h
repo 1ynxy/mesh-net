@@ -1,34 +1,45 @@
 #ifndef core_h
 #define core_h
 
-#include <../src/shared.h>
+#include <GLFW/glfw3.h>
+
+#include <../src/core/time.h>
+#include <../src/core/input.h>
 
 struct Core {
 private:
 	// Gameloop Callbacks
 	
-	static void (*InitCallback) (void);
-	static void (*UpdateCallback) (void);
-	static void (*LateUpdateCallback) (void);
-	static void (*DisplayCallback) (void);
-	static void (*OnGUICallback) (void);
-	static void (*TermCallback) (void);
+	void (*init_callback) (void);
+	void (*update_callback) (void);
+	void (*lateupdate_callback) (void);
+	void (*display_callback) (void);
+	void (*ongui_callback) (void);
+	void (*term_callback) (void);
 	
 public:
+	// Member Variables
+
+	Time time;
+
+	Input input;
+
+	bool running = true;
+
 	// Gameloop Callback Setup
 	
-	static void SetInitCallback(void (*Init) ());
-	static void SetUpdateCallback(void (*Update) ());
-	static void SetLateUpdateCallback(void (*LateUpdate) ());
-	static void SetDisplayCallback(void (*Display) ());
-	static void SetOnGUICallback(void (*OnGUI) ());
-	static void SetTermCallback(void (*Term) ());
+	void set_init_callback(void (*Init) ());
+	void set_update_callback(void (*Update) ());
+	void set_lateupdate_callback(void (*LateUpdate) ());
+	void set_display_callback(void (*Display) ());
+	void set_ongui_callback(void (*OnGUI) ());
+	void set_term_callback(void (*Term) ());
 
-	static void SetCallbacks(void (*Init) (), void (*Update) (), void (*LateUpdate) (), void (*Display) (), void (*OnGUI) (), void (*Term) ());
+	void set_callbacks(void (*init) (), void (*update) (), void (*lateupdate) (), void (*display) (), void (*ongui) (), void (*term) ());
 	
 	// Member Functions
 	
-	static void Init();
+	void init();
 };
 
 #endif

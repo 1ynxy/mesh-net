@@ -1,7 +1,7 @@
 #ifndef input_h
 #define input_h
 
-#include <../src/shared.h>
+#include <vector>
 
 // PRESSABLE
 
@@ -13,63 +13,26 @@ enum ButtonState {
 };
 
 struct Pressable {
-private:
 	// Member Variables
-	
+
 	int id = 0;
-	
 	ButtonState state = STATE_NONE;
-	
-public:
+
 	// Constructors & Destructors
 	
 	Pressable(int id = 0, ButtonState state = STATE_NONE);
 	
-	~Pressable();
-	
 	// Gameloop Functions
 	
-	void Update();
-	
-	// Member Functions
-	
-	int ID();
-	
-	void Press();
-	void Release();
-	
-	bool Pressed();
-	bool Down();
-	bool Released();
-	bool Up();
+	void update();
+};
+
+struct Position {
+	int x = 0;
+	int y = 0;
 };
 
 // KEYBOARD & MOUSE
-
-// KEYBOARD
-	
-struct Keyboard {
-private:
-	// Member Variables
-	
-	static std::vector<Pressable> keys;
-	
-public:
-	// Getters & Setters
-	
-	static Pressable* GetKey(int id);
-	static void SetKey(int id, ButtonState state);
-	
-	// Gameloop Functions
-	
-	static void Update();
-	
-	// Member Functions
-	
-	static bool KeyDown(int id);
-	static bool Key(int id);
-	static bool KeyUp(int id);
-};
 
 // MOUSE
 
@@ -77,41 +40,64 @@ struct Mouse {
 private:
 	// Member Variables
 	
-	static bool hit;
-	
-	static std::vector<Pressable> buttons;
+	std::vector<Pressable> buttons;
 	
 public:
 	// Member Variables
 
-	static glm::vec2 position;
-	static glm::vec2 deltaPosition;
+	Position pos;
+	Position deltaPos;
+
+	bool hit = false;
 	
 	// Getters & Setters
 	
-	static void SetPosition(const glm::vec2& position);
-	
-	static Pressable* GetButton(int id);
-	static void SetButton(int id, ButtonState state);
-	
-	// Gameloop Functions
-	
-	static void Update();
+	void set_button(int id, ButtonState state);
+
+	void set_position(int x, int y);
 	
 	// Member Functions
 	
-	static bool Hit();
-	static void SetHit();
+	void update();
 	
-	static bool ButtonDown(int id);
-	static bool Button(int id);
-	static bool ButtonUp(int id);
+	bool button_down(int id);
+	bool button(int id);
+	bool button_up(int id);
+};
+
+// KEYBOARD
+	
+struct Keyboard {
+private:
+	// Member Variables
+	
+	std::vector<Pressable> keys;
+	
+public:
+	// Getters & Setters
+	
+	void set_key(int id, ButtonState state);
+	
+	// Member Functions
+	
+	void update();
+	
+	bool key_down(int id);
+	bool key(int id);
+	bool key_up(int id);
 };
 
 // INPUT
 
-namespace Input {
-	void Update();
+struct Input {
+	// Member Variables
+
+	Mouse mouse;
+	Keyboard keyboard;
+
+	// Member Functions
+
+	void update();
 };
 
 #endif

@@ -1,76 +1,60 @@
 #include "core.h"
 
-#include <../src/core/time.h>
-#include <../src/core/input.h>
-
-#include <../src/graphics/display.h>
-
-// Gameloop Callbacks
-
-void (*Core::InitCallback) (void) = nullptr;
-void (*Core::UpdateCallback) (void) = nullptr;
-void (*Core::LateUpdateCallback) (void) = nullptr;
-void (*Core::DisplayCallback) (void) = nullptr;
-void (*Core::OnGUICallback) (void) = nullptr;
-void (*Core::TermCallback) (void) = nullptr;
-
 // Gameloop Callback Setup
 
-void Core::SetInitCallback(void (*Init) ()) {
-	InitCallback = Init;
+void Core::set_init_callback(void (*init) ()) {
+	init_callback = init;
 	
-	Debug::Info("CALLBACK", Init ? "Registered Init Callback" : "Reset Init Callback");
+	//Debug::Info("CALLBACK", Init ? "Registered Init Callback" : "Reset Init Callback");
 }
 
-void Core::SetUpdateCallback(void (*Update) ()) {
-	UpdateCallback = Update;
+void Core::set_update_callback(void (*update) ()) {
+	update_callback = update;
 	
-	Debug::Info("CALLBACK", Update ? "Registered Update Callback" : "Reset Update Callback");
+	//Debug::Info("CALLBACK", Update ? "Registered Update Callback" : "Reset Update Callback");
 }
 
-void Core::SetLateUpdateCallback(void (*LateUpdate) ()) {
-	LateUpdateCallback = LateUpdate;
+void Core::set_lateupdate_callback(void (*lateupdate) ()) {
+	lateupdate_callback = lateupdate;
 	
-	Debug::Info("CALLBACK", LateUpdate ? "Registered LateUpdate Callback" : "Reset LateUpdate Callback");
+	//Debug::Info("CALLBACK", LateUpdate ? "Registered LateUpdate Callback" : "Reset LateUpdate Callback");
 }
 
-void Core::SetDisplayCallback(void (*Display) ()) {
-	DisplayCallback = Display;
+void Core::set_display_callback(void (*display) ()) {
+	display_callback = display;
 	
-	Debug::Info("CALLBACK", Display ? "Registered Display Callback" : "Reset Display Callback");
+	//Debug::Info("CALLBACK", Display ? "Registered Display Callback" : "Reset Display Callback");
 }
 
-void Core::SetOnGUICallback(void (*OnGUI) ()) {
-	OnGUICallback = OnGUI;
+void Core::set_ongui_callback(void (*ongui) ()) {
+	ongui_callback = ongui;
 	
-	Debug::Info("CALLBACK", OnGUI ? "Registered OnGUI Callback" : "Reset OnGUI Callback");
+	//Debug::Info("CALLBACK", OnGUI ? "Registered OnGUI Callback" : "Reset OnGUI Callback");
 }
 
-void Core::SetTermCallback(void (*Term) ()) {
-	TermCallback = Term;
+void Core::set_term_callback(void (*term) ()) {
+	term_callback = term;
 	
-	Debug::Info("CALLBACK", Term ? "Registered Term Callback" : "Reset Term Callback");
+	//Debug::Info("CALLBACK", Term ? "Registered Term Callback" : "Reset Term Callback");
 }
 
-void Core::SetCallbacks(void (*Init) (), void (*Update) (), void (*LateUpdate) (), void (*Display) (), void (*OnGUI) (), void (*Term) ()) {
-	SetInitCallback(Init);
-	SetUpdateCallback(Update);
-	SetLateUpdateCallback(LateUpdate);
-	SetDisplayCallback(Display);
-	SetOnGUICallback(OnGUI);
-	SetTermCallback(Term);
+void Core::set_callbacks(void (*init) (), void (*update) (), void (*lateupdate) (), void (*display) (), void (*ongui) (), void (*term) ()) {
+	set_init_callback(init);
+	set_update_callback(update);
+	set_lateupdate_callback(lateupdate);
+	set_display_callback(display);
+	set_ongui_callback(ongui);
+	set_term_callback(term);
 }
 
 // Member Functions
 
-void Core::Init() {
+void Core::init() {
 	if (!glfwInit()) {
-		Debug::Error("CORE", "Failed to initialise GLFW");
+		// GLFW Failed To Init
 
 		return;
 	}
-
-	Debug::Info("CORE", "Initialised GLFW");
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -78,62 +62,33 @@ void Core::Init() {
 	
 	// Do Initialise
 	
-	if (InitCallback) InitCallback();
-	//Scene::Init();
-	
-	//GUI::Init();
+	if (init_callback) init_callback();
 	
 	// Do Gameloop
 	
-	while (Display::Valid()) {
-		Time::Update();
+	while (true) {
+		time.update();
 
-		// Update Resources, Inputs & Display
-
-		//Resource::Update();
-		Input::Update();
-
-		if (!Config::Get<bool>("headless")) {
-			Display::Update();
-
-			if (!Display::Valid()) break;
-		}
-		
 		// Do Update Step
 		
-		if (UpdateCallback) UpdateCallback();
-		//Scene::Update();
+		if (update_callback) update_callback();
 
-		//if (!Config::Get<bool>("headless")) {
-		//	Compositor::LateUpdate();
-		//}
-
-		if (LateUpdateCallback) LateUpdateCallback();
-		//Scene::LateUpdate();
+		if (lateupdate_callback) lateupdate_callback();
 		
 		// Do Display Step
-		
-		if (!Config::Get<bool>("headless")) {
-			if (DisplayCallback) DisplayCallback();
-			//Scene::Display();
 
-			//Compositor::Display();
-		
-			if (OnGUICallback) OnGUICallback();
-			//Scene::OnGUI();
-		
-			Display::Finish();
-		}
+		if (display_callback) display_callback();
+
+		if (ongui_callback) ongui_callback();
 
 		// Do FPS Limit
 
-		Time::Wait();
+		time.wait();
 	}
 	
 	// Do Terminate
 	
-	if (TermCallback) TermCallback();
-	//Scene::Term();
+	if (term_callback) term_callback();
 	
 	glfwTerminate();
 }

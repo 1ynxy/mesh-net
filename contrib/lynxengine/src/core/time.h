@@ -1,31 +1,29 @@
 #ifndef timer_h
 #define timer_h
 
-#include <../src/shared.h>
-
 struct Time {
 private:
 	// Member Variables
 
-	static double minDelta;
-	static double frameTime;
-	static double deltaTime;
+	double minDelta = 0;
+	double frameTime = 0;
+	double deltaTime = 0;
 public:
 	// Member Variables
 	
-	static float delta;
+	float delta = 0.0f;
 	
-	static unsigned int fps;
-	static unsigned int tick;
+	unsigned int fps = 0;
+	unsigned int tick = 0;
 	
 	// Member Functions
 
-	static void Update();
-	static void Wait();
+	void update();
+	void wait();
 
-	static void Sleep(double seconds);
+	void sleep(double seconds);
 
-	static void SetFPSLimit(unsigned int fps);
+	void set_limit(unsigned int fps);
 };
 
 #endif

@@ -1,8 +1,8 @@
 #include <iostream>
 
 #include <lynxinf.h>
+#include <lynxengine.h>
 #include <lynxnet.h>
-//#include <lynxengine.h>
 
 void init();
 void update();
@@ -12,6 +12,8 @@ void update();
 Debug debug;
 
 Config conf;
+
+Core core;
 
 Server server;
 
@@ -24,14 +26,14 @@ int main(int argc, char* argv[]) {
 		return 0;
 	}
 
-	init();
-
-	//Core::SetCallbacks(&Init, &Update, nullptr, nullptr, &OnGUI, nullptr);
+	core.set_callbacks(&init, &update, nullptr, nullptr, nullptr, nullptr);
 	
-	//Core::Init();
+	core.init();
 }
 
 void init() {
+	core.time.set_limit(60);
+
 	//Display::Open(glm::vec2(600, 300), glm::vec2(500, 500), "window1", Colour(40, 40, 40));
 
 	std::string addr = conf.get_string("addr");
@@ -57,11 +59,11 @@ void init() {
 
 	if (stat = 0) debug.error("failed to start server");
 	else debug.info("started server");
-
-	for (;;) update();
 }
 
 void update() {
+	//debug.info("delta : " + std::to_string(core.time.delta));
+
 	Packet result;
 
 	while (server.recv(result)) debug.info(result.text);

@@ -1,24 +1,16 @@
 #include "time.h"
 
+#include <GLFW/glfw3.h>
+
 #ifdef __linux__
 	#include <unistd.h>
 #elif WIN32
 	#include <windows.h>
 #endif
 
-// Member Variables
-
-double Time::minDelta = 0;
-double Time::frameTime = 0;
-double Time::deltaTime = 0;
-
-float Time::delta = 0;
-unsigned int Time::fps = 0;
-unsigned int Time::tick = 0;
-
 // Member Functions
 
-void Time::Update() {
+void Time::update() {
 	// Calculate Delta Time
 	
 	double newTime = glfwGetTime();
@@ -36,15 +28,15 @@ void Time::Update() {
 	tick++;
 }
 
-void Time::Wait() {
+void Time::wait() {
 	if (minDelta != 0) {
 		double wait = minDelta - (glfwGetTime() - frameTime);
 
-		if (wait > 0) Time::Sleep(wait);
+		if (wait > 0) sleep(wait);
 	}
 }
 
-void Time::Sleep(double seconds) {
+void Time::sleep(double seconds) {
 	int milli = (unsigned int) (seconds * 1000);
 
 	#ifdef __linux__
@@ -54,6 +46,6 @@ void Time::Sleep(double seconds) {
 	#endif
 }
 
-void Time::SetFPSLimit(unsigned int fps) {
+void Time::set_limit(unsigned int fps) {
 	minDelta = 1.0f / fps;
 }
