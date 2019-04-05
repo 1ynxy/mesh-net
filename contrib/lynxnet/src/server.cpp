@@ -215,7 +215,7 @@ void Server::listen() {
 
 						// Report
 
-						Packet msg(sock, "Client connected");
+						Packet msg(sock, "client connected");
 
 						send(msg);
                    	}
@@ -239,7 +239,7 @@ void Server::listen() {
 
 							// Report
 
-							Packet message(i, "Client disconnected");
+							Packet message(i, "client disconnected");
 
 							send(message);
 						}

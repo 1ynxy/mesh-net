@@ -38,16 +38,16 @@ void init() {
 
 	stat = server.bind(port);
 
-	if (stat != 1) core.debug.error("failed to bind : " + std::to_string(stat));
+	if (stat != 1) core.debug.error("failed to bind listener : " + std::to_string(stat));
 	else {
-		core.debug.info("bound");
+		core.debug.info("bound listener");
 	}
 
 	stat = server.connect(addr, port);
 
-	if (stat != 1) core.debug.error("failed to connect : " + std::to_string(stat));
+	if (stat != 1) core.debug.error("failed to connect to host : " + std::to_string(stat));
 	else {
-		core.debug.info("connected");
+		core.debug.info("connected to host");
 	}
 
 	stat = server.start();

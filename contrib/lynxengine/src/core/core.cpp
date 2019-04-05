@@ -5,37 +5,37 @@
 void Core::set_init_callback(void (*init) ()) {
 	init_callback = init;
 	
-	//Debug::Info("CALLBACK", Init ? "Registered Init Callback" : "Reset Init Callback");
+	if (init) debug.info("registered init callback");
 }
 
 void Core::set_update_callback(void (*update) ()) {
 	update_callback = update;
 	
-	//Debug::Info("CALLBACK", Update ? "Registered Update Callback" : "Reset Update Callback");
+	if (update) debug.info("registered update callback");
 }
 
 void Core::set_lateupdate_callback(void (*lateupdate) ()) {
 	lateupdate_callback = lateupdate;
 	
-	//Debug::Info("CALLBACK", LateUpdate ? "Registered LateUpdate Callback" : "Reset LateUpdate Callback");
+	if (lateupdate) debug.info("registered lateupdate callback");
 }
 
 void Core::set_display_callback(void (*display) ()) {
 	display_callback = display;
 	
-	//Debug::Info("CALLBACK", Display ? "Registered Display Callback" : "Reset Display Callback");
+	if (display) debug.info("registered display callback");
 }
 
 void Core::set_ongui_callback(void (*ongui) ()) {
 	ongui_callback = ongui;
 	
-	//Debug::Info("CALLBACK", OnGUI ? "Registered OnGUI Callback" : "Reset OnGUI Callback");
+	if (ongui) debug.info("registered ongui callback");
 }
 
 void Core::set_term_callback(void (*term) ()) {
 	term_callback = term;
 	
-	//Debug::Info("CALLBACK", Term ? "Registered Term Callback" : "Reset Term Callback");
+	if (term) debug.info("registered term callback");
 }
 
 void Core::set_callbacks(void (*init) (), void (*update) (), void (*lateupdate) (), void (*display) (), void (*ongui) (), void (*term) ()) {
@@ -50,8 +50,10 @@ void Core::set_callbacks(void (*init) (), void (*update) (), void (*lateupdate) 
 // Member Functions
 
 void Core::init() {
+	glfwSetErrorCallback(glfwerror_callback);
+
 	if (!glfwInit()) {
-		// GLFW Failed To Init
+		debug.error("glfw failed to init");
 
 		return;
 	}
@@ -91,4 +93,8 @@ void Core::init() {
 	if (term_callback) term_callback();
 	
 	glfwTerminate();
+}
+
+void glfwerror_callback(int error, const char* desc) {
+	std::cout << error << " : " << desc << std::endl;
 }

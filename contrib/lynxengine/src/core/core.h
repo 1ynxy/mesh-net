@@ -3,10 +3,10 @@
 
 #include <GLFW/glfw3.h>
 
-#include <lynxinf.h>
-
 #include <../src/core/time.h>
 #include <../src/core/input.h>
+#include <../src/core/debug.h>
+#include <../src/core/config.h>
 
 struct Core {
 private:
@@ -47,5 +47,7 @@ public:
 	
 	void init();
 };
+
+void glfwerror_callback(int error, const char* desc);
 
 #endif
