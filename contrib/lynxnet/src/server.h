@@ -48,6 +48,7 @@ private:
 public:
 	// Constructors & Destructors
 
+	Server();
 	~Server();
 
 	// Member Functions

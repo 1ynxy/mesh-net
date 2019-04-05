@@ -4,6 +4,10 @@
 
 // Constructors & Destructors
 
+Server::Server() {
+	FD_ZERO(&sockets);
+}
+
 Server::~Server() {
 	if (running) {
 		running = false;
@@ -93,6 +97,8 @@ int Server::bind(const std::string& port) {
 
 	self = sock;
 
+	std::cout << "BOUND LIST : " << sock << std::endl;
+
 	return 1;
 }
 
@@ -124,7 +130,7 @@ int Server::connect(const std::string& addr, const std::string& port) {
 	struct addrinfo* inf = nullptr;
 
 	for(inf = results; inf != NULL; inf = inf->ai_next) {
-       	sock = socket(inf->ai_family, inf->ai_socktype, inf->ai_protocol);
+       	sock = ::socket(inf->ai_family, inf->ai_socktype, inf->ai_protocol);
 
        	if (sock < 0) {
 			// Host Socket Invalid, Skipping
@@ -136,6 +142,8 @@ int Server::connect(const std::string& addr, const std::string& port) {
 
 		if (::connect(sock, inf->ai_addr, inf->ai_addrlen) < 0) {
 			// Failed To Connect To Host, Skipping
+
+			::close(sock);
 
 			continue;
 		}
@@ -158,6 +166,8 @@ int Server::connect(const std::string& addr, const std::string& port) {
 	FD_SET(sock, &sockets);
 
 	if (sock > sockmax) sockmax = sock;
+
+	std::cout << "HOST CONN : " << sock << std::endl;
 
 	return 1;
 }
@@ -187,15 +197,15 @@ void Server::listen() {
    	int nbytes;
 
 	while (running) {
+		std::cout << "LISTEN LOOP START" << std::endl;
+
 		// Get All FileDescriptors That Return Instead Of Blocking
 
-		fd_set tmp;
-
-		tmp = sockets;
+		fd_set tmp = sockets;
 
 		if (::select(sockmax + 1, &tmp, NULL, NULL, NULL) == -1) continue;
-        	
-       	for(int i = 0; i <= sockmax; i++) {
+        
+       	for (int i = 0; i <= sockmax; i++) {
 			// Check If Part Of Set
 
            	if (FD_ISSET(i, &sockets)) {
@@ -204,7 +214,7 @@ void Server::listen() {
                	if (i == self) {
 					// Peer Possibly Requested Connection
 
-					int sock = accept(self, NULL, NULL);
+					int sock = ::accept(self, NULL, NULL);
 
                    	if (sock != -1) {
 						// Add To FileDescriptor Set
@@ -215,17 +225,15 @@ void Server::listen() {
 
 						// Report
 
-						Packet msg(sock, "client connected");
+						std::cout << "PEER CONN : " << sock << std::endl;
 
-						send(msg);
+						//Packet message(sock, "client connected");
+
+						//send(message);
                    	}
                	}
 				else {
 					// Parse Received Data
-
-					std::string text = "";
-
-					for (int c = 0; c < nbytes; c++) text += buf[c];
 
                    	if ((nbytes = ::recv(i, buf, sizeof buf, 0)) <= 0) {
 						// Peer Disconnected Or Error Occurred
@@ -235,30 +243,46 @@ void Server::listen() {
 
                     		FD_CLR(i, &sockets);
 
-							close(i);
+							::close(i);
 
 							// Report
 
-							Packet message(i, "client disconnected");
+							std::cout << "PEER DISC : " << i << std::endl;
 
-							send(message);
+							//Packet message(i, "client disconnected");
+
+							//send(message);
 						}
 						else {
 							// Unknown Error
+
+							std::cout << "PEER ERROR : " << i << std::endl;
 						}
                    	}
 					else {
 						// Packet Received From Peer
 
-						// Report
+						std::string text = "";
+
+						for (int c = 0; c < nbytes; c++) text += buf[c];
 
 						Packet message(i, nbytes, &text[0]);
 
-						send(message);
+						//send(message);
+
+						recvmut.lock();
+						recvbuffer.push(message);
+						recvmut.unlock();
+
+						// Report
+
+						std::cout << "PEER MSG : " << i << std::endl;
                    	}
                	}
            	}
        	}
+
+		std::cout << "LISTEN LOOP END" << std::endl;
 	}
 }
 
@@ -268,10 +292,8 @@ void Server::broadcast() {
 			// Send All Queued Messages To Each Socket
 
 			sendmut.lock();
-
 			Packet message = sendbuffer.front();
 			sendbuffer.pop();
-
 			sendmut.unlock();
 				
 			for(int i = 0; i <= sockmax; i++) {
@@ -292,14 +314,6 @@ void Server::broadcast() {
 					}
        	    	}
 			}
-
-			// Add To Receive Queue In A Thread-Safe Manner For Debugging
-
-			recvmut.lock();
-
-			recvbuffer.push(message);
-
-			recvmut.unlock();
 		}
 
 		// Exit If Program No Longer Running, Wait For Conditional Otherwise
@@ -316,9 +330,7 @@ void Server::send(const Packet& message) {
 	// Add To Send Queue In A Thread-Safe Manner
 
 	sendmut.lock();
-
 	sendbuffer.push(message);
-
 	sendmut.unlock();
 
 	conditional.notify_one();
@@ -329,10 +341,8 @@ bool Server::recv(Packet& message) {
 
 	if (recvbuffer.size() > 0) {
 		recvmut.lock();
-
 		message = recvbuffer.front();
 		recvbuffer.pop();
-
 		recvmut.unlock();
 
 		return true;
