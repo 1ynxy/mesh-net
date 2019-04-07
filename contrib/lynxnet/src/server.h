@@ -15,6 +15,7 @@
 #include <ifaddrs.h>
 #include <netdb.h>
 #include <unistd.h>
+#include <poll.h>
 
 #include <../src/peer.h>
 #include <../src/packet.h>

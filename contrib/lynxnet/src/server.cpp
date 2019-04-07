@@ -204,6 +204,8 @@ void Server::listen() {
 		fd_set tmp = sockets;
 
 		if (::select(sockmax + 1, &tmp, NULL, NULL, NULL) == -1) continue;
+
+		if (::poll(&tmp, sockmax + 1, NULL) == -1) continue;
         
        	for (int i = 0; i <= sockmax; i++) {
 			// Check If Part Of Set
