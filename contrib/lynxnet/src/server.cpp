@@ -214,7 +214,9 @@ void Server::listen() {
 		for (int i = 0; i <= sockmax; i++) {
 			// Check If Part Of Set
 
-		   	if (FD_ISSET(i, &sockets)) {
+			if (FD_ISSET(i, &tmp)) {
+				std::cout << "SOCK : " << i << " ACT" << std::endl << std::flush;
+				
 				// If Current Socket Is Self, Listen For New Connections
 
 			   	if (i == self) {
@@ -247,9 +249,9 @@ void Server::listen() {
 						if (nbytes == 0) {
 							// Remove From FileDescriptor Set
 
-							FD_CLR(i, &sockets);
-
 							::close(i);
+
+							FD_CLR(i, &sockets);
 
 							//Packet message(i, "client disconnected");
 
