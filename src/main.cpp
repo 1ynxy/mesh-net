@@ -52,7 +52,7 @@ void init() {
 void update() {
 	//debug.info("delta : " + std::to_string(core.time.delta));
 
-	if (core.time.tick == 500) server.send(Packet(-1, "TEST"));
+	//if (core.time.tick == 500) server.send(Packet(-1, "TEST"));
 
 	Packet result;
 

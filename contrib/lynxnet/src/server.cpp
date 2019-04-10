@@ -32,7 +32,7 @@ int Server::bind(const std::string& port) {
 	struct addrinfo* results = nullptr;
 
    	if (getaddrinfo(NULL, port_c, &hints, &results) != 0) {
-       	// Failed To Get Local AddrInfo
+	   	// Failed To Get Local AddrInfo
 
 		freeaddrinfo(results);
 			
@@ -44,31 +44,31 @@ int Server::bind(const std::string& port) {
 	int sock = 0;
 
 	struct addrinfo* inf = nullptr;
-    
+	
    	for(inf = results; inf != NULL; inf = inf->ai_next) {
-       	sock = socket(inf->ai_family, inf->ai_socktype, inf->ai_protocol);
+	   	sock = socket(inf->ai_family, inf->ai_socktype, inf->ai_protocol);
 
-       	if (sock < 0) {
+	   	if (sock < 0) {
 			// Local Socket Invalid, Skipping
 
-       		continue;
-       	}
+	   		continue;
+	   	}
 
 		// Set/Get Socket Options - Address Reuseable
 
 		int yes = 1;
-        
-       	setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
+		
+	   	setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
 
 		// Bind The Socket
 
-       	if (::bind(sock, inf->ai_addr, inf->ai_addrlen) < 0) {
+	   	if (::bind(sock, inf->ai_addr, inf->ai_addrlen) < 0) {
 			// Failed To Bind, Skipping
 
-           	continue;
-       	}
+		   	continue;
+	   	}
 
-       	break;
+	   	break;
    	}
 
 	// Check Bind Valid
@@ -84,9 +84,9 @@ int Server::bind(const std::string& port) {
 	// Try Listen
 
    	if (::listen(sock, 10) == -1) {
-       	// Failed To Listen
+	   	// Failed To Listen
 
-       	return -3;
+	   	return -3;
    	}
 
 	// Add Server Socket To FileDescriptor Set
@@ -116,7 +116,7 @@ int Server::connect(const std::string& addr, const std::string& port) {
 	struct addrinfo* results;
 
 	if (getaddrinfo(addr_c, port_c, &hints, &results) != 0) {
-       	// Failed To Get Host AddrInfo
+	   	// Failed To Get Host AddrInfo
 
 		freeaddrinfo(results);
 			
@@ -130,13 +130,13 @@ int Server::connect(const std::string& addr, const std::string& port) {
 	struct addrinfo* inf = nullptr;
 
 	for(inf = results; inf != NULL; inf = inf->ai_next) {
-       	sock = ::socket(inf->ai_family, inf->ai_socktype, inf->ai_protocol);
+	   	sock = ::socket(inf->ai_family, inf->ai_socktype, inf->ai_protocol);
 
-       	if (sock < 0) {
+	   	if (sock < 0) {
 			// Host Socket Invalid, Skipping
 
-       		continue;
-       	}
+	   		continue;
+	   	}
 
 		// Connect To Socket
 
@@ -148,7 +148,7 @@ int Server::connect(const std::string& addr, const std::string& port) {
 			continue;
 		}
 
-       	break;
+	   	break;
    	}
 
 	// Check Connect Valid
@@ -197,70 +197,72 @@ void Server::listen() {
    	int nbytes;
 
 	while (running) {
-		std::cout << "LISTEN LOOP START" << std::endl;
+		std::cout << "LISTEN LOOP START" << std::endl << std::flush;
 
 		// Get All FileDescriptors That Return Instead Of Blocking
 
 		fd_set tmp = sockets;
 
-		if (::select(sockmax + 1, &tmp, NULL, NULL, NULL) == -1) continue;
+		if (::select(sockmax + 1, &tmp, NULL, NULL, NULL) == -1) {
+			std::cout << "LISTEN LOOP END" << std::endl << std::flush;
 
-		if (::poll(&tmp, sockmax + 1, NULL) == -1) continue;
-        
-       	for (int i = 0; i <= sockmax; i++) {
+			continue;
+		}
+
+		//if (::poll(&tmp, sockmax + 1, NULL) == -1) continue;
+
+		for (int i = 0; i <= sockmax; i++) {
 			// Check If Part Of Set
 
-           	if (FD_ISSET(i, &sockets)) {
+		   	if (FD_ISSET(i, &sockets)) {
 				// If Current Socket Is Self, Listen For New Connections
 
-               	if (i == self) {
+			   	if (i == self) {
 					// Peer Possibly Requested Connection
 
-					int sock = ::accept(self, NULL, NULL);
+					nbytes = ::accept(self, NULL, NULL);
 
-                   	if (sock != -1) {
+				   	if (nbytes != -1) {
 						// Add To FileDescriptor Set
 
-						FD_SET(sock, &sockets);
+						FD_SET(nbytes, &sockets);
 
-						if (sock > sockmax) sockmax = sock;
-
-						// Report
-
-						std::cout << "PEER CONN : " << sock << std::endl;
+						if (nbytes > sockmax) sockmax = nbytes;
 
 						//Packet message(sock, "client connected");
 
 						//send(message);
-                   	}
-               	}
+
+						std::cout << "PEER CONN : " << nbytes << std::endl << std::flush;
+				   	}
+			   	}
 				else {
 					// Parse Received Data
 
-                   	if ((nbytes = ::recv(i, buf, sizeof buf, 0)) <= 0) {
+					nbytes = ::recv(i, buf, sizeof buf, 0);
+
+				   	if (nbytes <= 0) {
 						// Peer Disconnected Or Error Occurred
 
 						if (nbytes == 0) {
 							// Remove From FileDescriptor Set
 
-                    		FD_CLR(i, &sockets);
+							FD_CLR(i, &sockets);
 
 							::close(i);
-
-							// Report
-
-							std::cout << "PEER DISC : " << i << std::endl;
 
 							//Packet message(i, "client disconnected");
 
 							//send(message);
+
+							std::cout << "PEER DISC : " << i << std::endl << std::flush;
 						}
 						else {
 							// Unknown Error
 
-							std::cout << "PEER ERROR : " << i << std::endl;
+							std::cout << "PEER ERROR : " << i << std::endl << std::flush;
 						}
-                   	}
+				   	}
 					else {
 						// Packet Received From Peer
 
@@ -272,19 +274,17 @@ void Server::listen() {
 
 						//send(message);
 
+						std::cout << "PEER MSG : " << i << std::endl << std::flush;
+
 						recvmut.lock();
 						recvbuffer.push(message);
 						recvmut.unlock();
+				   	}
+			   	}
+		   	}
+	   	}
 
-						// Report
-
-						std::cout << "PEER MSG : " << i << std::endl;
-                   	}
-               	}
-           	}
-       	}
-
-		std::cout << "LISTEN LOOP END" << std::endl;
+		std::cout << "LISTEN LOOP END" << std::endl << std::flush;
 	}
 }
 
@@ -299,7 +299,7 @@ void Server::broadcast() {
 			sendmut.unlock();
 				
 			for(int i = 0; i <= sockmax; i++) {
-       			if (i != message.socket && i != self && FD_ISSET(i, &sockets)) {
+	   			if (i != message.socket && i != self && FD_ISSET(i, &sockets)) {
 					// Ensure No Data Is Omitted
 					
 					int len = message.text.length();
@@ -314,7 +314,7 @@ void Server::broadcast() {
 						
 						total += ret;
 					}
-       	    	}
+	   			}
 			}
 		}
 
