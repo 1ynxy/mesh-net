@@ -1,7 +1,5 @@
 #include "server.h"
 
-#include <iostream>
-
 // Constructors & Destructors
 
 Server::Server() {
@@ -97,8 +95,6 @@ int Server::bind(const std::string& port) {
 
 	self = sock;
 
-	std::cout << "BOUND LIST : " << sock << std::endl;
-
 	return 1;
 }
 
@@ -167,8 +163,6 @@ int Server::connect(const std::string& addr, const std::string& port) {
 
 	if (sock > sockmax) sockmax = sock;
 
-	std::cout << "HOST CONN : " << sock << std::endl;
-
 	return 1;
 }
 
@@ -197,17 +191,11 @@ void Server::listen() {
    	int nbytes;
 
 	while (running) {
-		std::cout << "LISTEN LOOP START" << std::endl << std::flush;
-
 		// Get All FileDescriptors That Return Instead Of Blocking
 
 		fd_set tmp = sockets;
 
-		if (::select(sockmax + 1, &tmp, NULL, NULL, NULL) == -1) {
-			std::cout << "LISTEN LOOP END" << std::endl << std::flush;
-
-			continue;
-		}
+		if (::select(sockmax + 1, &tmp, NULL, NULL, NULL) == -1) continue;
 
 		//if (::poll(&tmp, sockmax + 1, NULL) == -1) continue;
 
@@ -215,8 +203,6 @@ void Server::listen() {
 			// Check If Part Of Set
 
 			if (FD_ISSET(i, &tmp)) {
-				std::cout << "SOCK : " << i << " ACT" << std::endl << std::flush;
-				
 				// If Current Socket Is Self, Listen For New Connections
 
 			   	if (i == self) {
@@ -231,11 +217,11 @@ void Server::listen() {
 
 						if (nbytes > sockmax) sockmax = nbytes;
 
-						//Packet message(sock, "client connected");
+						// Send Peer Connect Information To Peers
 
-						//send(message);
+						Packet message(nbytes, "client connected");
 
-						std::cout << "PEER CONN : " << nbytes << std::endl << std::flush;
+						send(message, true);
 				   	}
 			   	}
 				else {
@@ -253,16 +239,14 @@ void Server::listen() {
 
 							FD_CLR(i, &sockets);
 
-							//Packet message(i, "client disconnected");
+							// Send Peer Disconnect Information To Peers
 
-							//send(message);
+							Packet message(i, "client disconnected");
 
-							std::cout << "PEER DISC : " << i << std::endl << std::flush;
+							send(message, true);
 						}
 						else {
 							// Unknown Error
-
-							std::cout << "PEER ERROR : " << i << std::endl << std::flush;
 						}
 				   	}
 					else {
@@ -272,21 +256,15 @@ void Server::listen() {
 
 						for (int c = 0; c < nbytes; c++) text += buf[c];
 
+						// Send Received Data To Peers
+						
 						Packet message(i, nbytes, &text[0]);
 
-						//send(message);
-
-						std::cout << "PEER MSG : " << i << std::endl << std::flush;
-
-						recvmut.lock();
-						recvbuffer.push(message);
-						recvmut.unlock();
+						send(message, true);
 				   	}
 			   	}
 		   	}
 	   	}
-
-		std::cout << "LISTEN LOOP END" << std::endl << std::flush;
 	}
 }
 
@@ -330,12 +308,18 @@ void Server::broadcast() {
 	}
 }
 
-void Server::send(const Packet& message) {
+void Server::send(const Packet& message, bool includeLocal) {
 	// Add To Send Queue In A Thread-Safe Manner
 
 	sendmut.lock();
 	sendbuffer.push(message);
 	sendmut.unlock();
+
+	if (includeLocal) {
+		recvmut.lock();
+		recvbuffer.push(message);
+		recvmut.unlock();
+	}
 
 	conditional.notify_one();
 }

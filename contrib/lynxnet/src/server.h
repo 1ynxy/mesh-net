@@ -59,7 +59,7 @@ public:
 
 	bool start();
 
-	void send(const Packet& message);
+	void send(const Packet& message, bool includeLocal = false);
 	bool recv(Packet& message);
 };
 

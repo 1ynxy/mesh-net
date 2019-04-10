@@ -37,16 +37,16 @@ void init() {
 	int stat = 0;
 
 	stat = server.bind(port);
-	//if (stat != 1) core.debug.error("failed to bind listener : " + std::to_string(stat));
-	//else core.debug.info("bound listener");
+	if (stat != 1) core.debug.error("failed to bind listener : " + std::to_string(stat));
+	else core.debug.info("bound listener");
 
 	stat = server.connect(addr, port);
-	//if (stat != 1) core.debug.error("failed to connect to host : " + std::to_string(stat));
-	//else core.debug.info("connected to host");
+	if (stat != 1) core.debug.error("failed to connect to host : " + std::to_string(stat));
+	else core.debug.info("connected to host");
 
 	stat = server.start();
-	//if (stat != 1) core.debug.error("failed to start server");
-	//else core.debug.info("started server");
+	if (stat != 1) core.debug.error("failed to start server");
+	else core.debug.info("started server");
 }
 
 void update() {
