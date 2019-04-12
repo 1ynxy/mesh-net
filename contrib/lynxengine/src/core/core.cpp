@@ -1,5 +1,7 @@
 #include "core.h"
 
+Core core;
+
 // Gameloop Callback Setup
 
 void Core::set_init_callback(void (*init) ()) {
@@ -72,6 +74,8 @@ void Core::init() {
 		time.update();
 
 		// Do Update Step
+
+		display.update();
 		
 		if (update_callback) update_callback();
 
@@ -82,6 +86,8 @@ void Core::init() {
 		if (display_callback) display_callback();
 
 		if (ongui_callback) ongui_callback();
+
+		display.finish();
 
 		// Do FPS Limit
 

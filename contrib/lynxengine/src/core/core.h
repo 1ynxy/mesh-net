@@ -1,12 +1,14 @@
 #ifndef core_h
 #define core_h
 
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include <../src/core/time.h>
 #include <../src/core/input.h>
 #include <../src/core/debug.h>
 #include <../src/core/config.h>
+#include <../src/core/display.h>
 
 struct Core {
 private:
@@ -22,13 +24,13 @@ private:
 public:
 	// Member Variables
 
-	Debug debug;
-
 	Config conf;
 
 	Time time;
 
 	Input input;
+
+	Display display;
 
 	bool running = true;
 
@@ -49,5 +51,7 @@ public:
 };
 
 void glfwerror_callback(int error, const char* desc);
+
+extern Core core;
 
 #endif

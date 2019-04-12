@@ -1,5 +1,7 @@
 #include "debug.h"
 
+Debug debug;
+
 // Constructors & Destructors
 
 Debug::Debug(int level) {

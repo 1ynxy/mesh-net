@@ -235,9 +235,9 @@ void Server::listen() {
 						if (nbytes == 0) {
 							// Remove From FileDescriptor Set
 
-							::close(i);
-
 							FD_CLR(i, &sockets);
+
+							::close(i);
 
 							// Send Peer Disconnect Information To Peers
 

@@ -52,4 +52,6 @@ public:
 	static std::string dltostr(int verbosity);
 };
 
+extern Debug debug;
+
 #endif
