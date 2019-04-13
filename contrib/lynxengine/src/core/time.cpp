@@ -8,6 +8,8 @@
 	#include <windows.h>
 #endif
 
+Time timer;
+
 // Member Functions
 
 void Time::update() {

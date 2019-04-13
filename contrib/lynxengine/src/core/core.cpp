@@ -52,7 +52,7 @@ void Core::set_callbacks(void (*init) (), void (*update) (), void (*lateupdate) 
 // Member Functions
 
 void Core::init() {
-	glfwSetErrorCallback(glfwerror_callback);
+	glfwSetErrorCallback(glfw_error_callback);
 
 	if (!glfwInit()) {
 		debug.error("glfw failed to init");
@@ -71,7 +71,7 @@ void Core::init() {
 	// Do Gameloop
 	
 	while (true) {
-		time.update();
+		timer.update();
 
 		// Do Update Step
 
@@ -93,7 +93,7 @@ void Core::init() {
 
 		// Do FPS Limit
 
-		time.wait();
+		timer.wait();
 	}
 	
 	// Do Terminate
@@ -103,6 +103,6 @@ void Core::init() {
 	glfwTerminate();
 }
 
-void glfwerror_callback(int error, const char* desc) {
-	std::cout << error << " : " << desc << std::endl;
+void glfw_error_callback(int error, const char* desc) {
+	debug.error(std::to_string(error) + " : " + desc);
 }

@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
 
 	core.set_callbacks(&init, &update, nullptr, nullptr, nullptr, nullptr);
 
-	core.time.set_limit(60);
+	timer.set_limit(60);
 	
 	core.init();
 }
@@ -48,7 +48,7 @@ void init() {
 }
 
 void update() {
-	//debug.info("delta : " + std::to_string(core.time.delta));
+	//debug.info("delta : " + std::to_string(timer.delta));
 
 	//if (core.time.tick == 500) server.send(Packet(-1, "TEST"));
 

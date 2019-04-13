@@ -40,55 +40,25 @@ float Display::aspect_ratio() const {
 	return (float) size.x / (float) size.y;
 }
 
-/*
-
-void Display::SetMinimised(bool minimised) {
+void Display::set_minimised(bool minimised, bool update) {
 	if (!context) return;
 
 	state = minimised ? WINDOW_MINIMISED : WINDOW_UNFOCUSED;
 
-	Debug::Info("DISPLAY", (minimised ? "minimised \"" : "unminimised\"") + title + "\"");
+	if (update) minimised ? glfwIconifyWindow(context) : glfwRestoreWindow(context);
+
+	debug.info((minimised ? "minimised \"" : "unminimised \"") + title + "\"");
 }
 
-void Display::SetFocused(bool focused) {
+void Display::set_focused(bool focused, bool update) {
 	if (!context) return;
 
 	state = focused ? WINDOW_FOCUSED : WINDOW_UNFOCUSED;
 
-	Debug::Info("DISPLAY", (focused ? "focused \"" : "unfocused \"") + title + "\"");
+	if (update) focused ? glfwFocusWindow(context) : glfwHideWindow(context);
+
+	debug.info((focused ? "focused \"" : "unfocused \"") + title + "\"");
 }
-
-void Display::Minimise() {
-	if (!Valid()) return;
-
-	glfwIconifyWindow(context);
-}
-
-void Display::Restore() {
-	if (!Valid()) return;
-
-	glfwRestoreWindow(context);
-}
-
-void Display::Hide() {
-	if (!Valid()) return;
-
-	glfwHideWindow(context);
-}
-
-void Display::Show() {
-	if (!Valid()) return;
-
-	glfwShowWindow(context);
-}
-
-void Display::Focus() {
-	if (!Valid()) return;
-
-	glfwFocusWindow(context);
-}
-
-*/
 
 // Member Functions
 
@@ -197,11 +167,11 @@ void window_size_callback(GLFWwindow* context, int width, int height) {
 }
 
 void window_focus_callback(GLFWwindow* context, int focused) {
-	//Display::SetFocused(focused);
+	core.display.set_focused(focused, false);
 }
 
 void window_iconify_callback(GLFWwindow* context, int state) {
-	//Display::SetMinimised(state);
+	core.display.set_minimised(state, false);
 }
 
 void window_close_callback(GLFWwindow* context) {

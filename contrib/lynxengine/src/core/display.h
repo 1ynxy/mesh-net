@@ -45,6 +45,9 @@ public:
 	
 	float aspect_ratio() const;
 
+	void set_minimised(bool minimised = true, bool update = true);
+	void set_focused(bool focused = true, bool update = true);
+
 	// Member Functions
 
 	bool valid() const;

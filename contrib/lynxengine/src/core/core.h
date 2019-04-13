@@ -26,8 +26,6 @@ public:
 
 	Config conf;
 
-	Time time;
-
 	Display display;
 
 	bool running = true;
@@ -48,7 +46,7 @@ public:
 	void init();
 };
 
-void glfwerror_callback(int error, const char* desc);
+void glfw_error_callback(int error, const char* desc);
 
 extern Core core;
 

@@ -26,4 +26,6 @@ public:
 	void set_limit(unsigned int fps);
 };
 
+extern Time timer;
+
 #endif
