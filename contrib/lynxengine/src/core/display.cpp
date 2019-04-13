@@ -145,7 +145,9 @@ bool Display::close() {
 void Display::update() {
 	glfwPollEvents();
 
-	glClearColor(colour.r / 255.0f, colour.g / 255.0f, colour.b / 255.0f, colour.a / 255.0f);
+	glm::vec4 colvec = colour.vec4();
+
+	glClearColor(colvec.r, colvec.g, colvec.b, colvec.a);
 	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }

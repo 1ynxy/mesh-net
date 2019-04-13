@@ -52,6 +52,8 @@ void Core::set_callbacks(void (*init) (), void (*update) (), void (*lateupdate) 
 // Member Functions
 
 void Core::init() {
+	// Init GLFW
+
 	glfwSetErrorCallback(glfw_error_callback);
 
 	if (!glfwInit()) {
@@ -63,6 +65,14 @@ void Core::init() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+	// Load Default Config
+
+	if (!conf.load("config")) {
+		debug.error("failed to load configuration file");
+
+		return;
+	}
 	
 	// Do Initialise
 	
@@ -99,6 +109,8 @@ void Core::init() {
 	// Do Terminate
 	
 	if (term_callback) term_callback();
+
+	// Terminate GLFW
 	
 	glfwTerminate();
 }

@@ -34,9 +34,7 @@
 
 # Folders
 build/
-release/
-research/
-guides/
+old/
 
 # VSCode
 .vscode

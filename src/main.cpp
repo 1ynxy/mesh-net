@@ -11,14 +11,6 @@ void update();
 Server server;
 
 int main(int argc, char* argv[]) {
-	int stat = 0;
-
-	if (!core.conf.load("config")) {
-		debug.error("failed to load configuration file");
-
-		return 0;
-	}
-
 	core.set_callbacks(&init, &update, nullptr, nullptr, nullptr, nullptr);
 
 	timer.set_limit(60);
