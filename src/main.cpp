@@ -27,7 +27,7 @@ int main(int argc, char* argv[]) {
 }
 
 void init() {
-	core.display.open(glm::vec2(600, 300), glm::vec2(500, 500), "window1", Colour(40, 40, 40));
+	core.display.open(glm::vec2(600, 300), glm::vec2(500, 500), "window", Colour(40, 40, 40));
 
 	std::string addr = core.conf.get_string("addr");
 	std::string port = core.conf.get_string("port");
@@ -51,6 +51,9 @@ void update() {
 	//debug.info("delta : " + std::to_string(core.time.delta));
 
 	//if (core.time.tick == 500) server.send(Packet(-1, "TEST"));
+
+	//if (input.keyboard.key_down(GLFW_KEY_SPACE)) debug.info("space key depressed");
+	//if (input.keyboard.key_up(GLFW_KEY_SPACE)) debug.info("space key released");
 
 	Packet result;
 

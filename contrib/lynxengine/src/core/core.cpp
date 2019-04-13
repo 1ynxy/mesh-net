@@ -75,6 +75,8 @@ void Core::init() {
 
 		// Do Update Step
 
+		input.update();
+
 		display.update();
 		
 		if (update_callback) update_callback();

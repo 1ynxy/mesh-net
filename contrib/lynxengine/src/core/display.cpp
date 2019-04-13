@@ -211,13 +211,13 @@ void window_close_callback(GLFWwindow* context) {
 void key_callback(GLFWwindow* context, int key, int scanCode, int action, int mods) {
 	if (action == GLFW_REPEAT) return;
 	
-	core.input.keyboard.set_key(key, action == GLFW_PRESS ? STATE_PRESSED : STATE_RELEASED);
+	input.keyboard.set_key(key, action == GLFW_PRESS ? STATE_PRESSED : STATE_RELEASED);
 }
 
 void cursor_pos_callback(GLFWwindow* context, double xPos, double yPos) {
-	core.input.mouse.set_position((int) xPos, (int) yPos);
+	input.mouse.set_position((int) xPos, (int) yPos);
 }
 
 void button_callback(GLFWwindow* context, int button, int action, int mods) {
-	core.input.mouse.set_button(button, action == GLFW_PRESS ? STATE_PRESSED : STATE_RELEASED);
+	input.mouse.set_button(button, action == GLFW_PRESS ? STATE_PRESSED : STATE_RELEASED);
 }

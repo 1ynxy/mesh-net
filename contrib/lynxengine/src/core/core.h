@@ -28,8 +28,6 @@ public:
 
 	Time time;
 
-	Input input;
-
 	Display display;
 
 	bool running = true;

@@ -112,6 +112,8 @@ bool Keyboard::key_up(int id) {
 
 // INPUT
 
+Input input;
+
 void Input::update() {
 	mouse.update();
 	keyboard.update();

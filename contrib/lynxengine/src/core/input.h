@@ -100,4 +100,6 @@ struct Input {
 	void update();
 };
 
+extern Input input;
+
 #endif
