@@ -8,6 +8,8 @@ find_package(Threads REQUIRED)
 find_package(glm REQUIRED)
 
 add_library(lynxengine
+  src/resource/asset/req/lodepng.cpp
+
   src/data/colour.cpp
 
   src/core/core.cpp
@@ -17,6 +19,10 @@ add_library(lynxengine
   src/core/file.cpp
   src/core/config.cpp
   src/core/display.cpp
+
+  src/resource/resource.cpp
+  src/resource/asset.cpp
+  src/resource/asset/sprite.cpp
 )
 
 target_include_directories(lynxengine PRIVATE lynxengine)

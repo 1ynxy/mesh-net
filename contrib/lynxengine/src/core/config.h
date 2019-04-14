@@ -6,8 +6,6 @@
 
 #include <mutex>
 
-#include "file.h"
-
 class Config {
 private:
     // Member Variables
@@ -18,8 +16,6 @@ private:
     std::map<std::string, std::string> strings = std::map<std::string, std::string>();
 
     std::mutex mut;
-
-    IO file;
 public:
     // Constructors & Destructors
 

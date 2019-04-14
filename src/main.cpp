@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include <lynxengine.h>
 #include <lynxnet.h>
 
@@ -11,38 +9,47 @@ void update();
 Server server;
 
 int main(int argc, char* argv[]) {
+	// Initialise Core, Debug & Timer
+
 	core.set_callbacks(&init, &update, nullptr, nullptr, nullptr, nullptr);
 
-	timer.set_limit(60);
+	debug.set_verbosity(core.conf.get_int("verbosity"));
+
+	timer.set_limit(core.conf.get_int("fps-limit"));
 	
 	core.init();
 }
 
 void init() {
-	core.display.open(glm::vec2(600, 300), glm::vec2(500, 500), "window", Colour(40, 40, 40));
-
+	// Start Up Server & Connect
+	
 	std::string addr = core.conf.get_string("addr");
 	std::string port = core.conf.get_string("port");
 
 	int stat = 0;
 
-	stat = server.bind(port);
-	if (stat != 1) debug.error("failed to bind listener : " + std::to_string(stat));
+	if ((stat = server.bind(port)) != 1) debug.warn("failed to bind listener : " + std::to_string(stat));
 	else debug.info("bound listener");
 
-	stat = server.connect(addr, port);
-	if (stat != 1) debug.error("failed to connect to host : " + std::to_string(stat));
+	if ((stat = server.connect(addr, port)) != 1) debug.warn("failed to connect to host : " + std::to_string(stat));
 	else debug.info("connected to host");
 
-	stat = server.start();
-	if (stat != 1) debug.error("failed to start server");
+	if ((stat = server.start()) != 1) debug.error("failed to start server");
 	else debug.info("started server");
+
+	// Open Window
+
+	core.display.open(glm::vec2(600, 300), glm::vec2(500, 500), "window", Colour(40, 40, 40));
+
+	// Test Resource Loader
+
+	Shared<Sprite> sprite = resource.load<Sprite>("sprites/test");
 }
 
 void update() {
 	//debug.info("delta : " + std::to_string(timer.delta));
 
-	//if (core.time.tick == 500) server.send(Packet(-1, "TEST"));
+	//if (timer.tick == 500) server.send(Packet(-1, "TEST"));
 
 	//if (input.keyboard.key_down(GLFW_KEY_SPACE)) debug.info("space key depressed");
 	//if (input.keyboard.key_up(GLFW_KEY_SPACE)) debug.info("space key released");

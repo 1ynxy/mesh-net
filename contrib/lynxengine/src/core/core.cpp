@@ -85,6 +85,8 @@ void Core::init() {
 
 		// Do Update Step
 
+		resource.update();
+
 		input.update();
 
 		display.update();

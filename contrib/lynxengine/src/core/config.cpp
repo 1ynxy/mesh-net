@@ -1,5 +1,7 @@
 #include "config.h"
 
+#include "file.h"
+
 // Constructors & Destructors
 
 Config::Config() {

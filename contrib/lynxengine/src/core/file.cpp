@@ -9,6 +9,8 @@
 
 #include <limits.h>
 
+IO file;
+
 // Constructors & Destructors
 
 IO::IO() {

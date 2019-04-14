@@ -2,13 +2,17 @@
 #define core_h
 
 #include <glad/glad.h>
+#include <glm/glm.hpp>
 #include <GLFW/glfw3.h>
 
 #include <../src/core/time.h>
 #include <../src/core/input.h>
 #include <../src/core/debug.h>
+#include <../src/core/file.h>
 #include <../src/core/config.h>
 #include <../src/core/display.h>
+
+#include <../src/resource/resource.h>
 
 struct Core {
 private:

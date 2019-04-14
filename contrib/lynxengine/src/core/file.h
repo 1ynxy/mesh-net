@@ -20,4 +20,6 @@ public:
     bool write(std::string path, const std::string& data);
 };
 
+extern IO file;
+
 #endif

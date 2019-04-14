@@ -1,2 +1,8 @@
+i:verbosity=0
+b:headless=false
+b:vsync=true
+i:fps-limit=60
+f:resource-timeout=10
+s:resource-loc=assets/
 s:addr=192.168.0.15
 s:port=56456
