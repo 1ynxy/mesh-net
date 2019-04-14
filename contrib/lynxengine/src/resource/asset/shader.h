@@ -13,33 +13,33 @@
 
 class Shader : public Asset {
 private:
-    // Member Variables
+	// Member Variables
 
-    std::map<std::string, int> uniforms = std::map<std::string, int>();
-    
+	std::map<std::string, int> uniforms = std::map<std::string, int>();
+	
 public:
-    // Member Variables
+	// Member Variables
 
-    GLuint program = 0;
+	GLuint program = 0;
 
-    // Constructors & Destructors
+	// Constructors & Destructors
 
-    Shader(const std::string& name);
+	Shader(const std::string& name);
 
 	~Shader();
 
-    // Member Functions
+	// Member Functions
 
 	void init() override;
-    void load() override;
-    void upload() override;
-    void unload() override;
+	void load() override;
+	void upload() override;
+	void unload() override;
 
-    bool load_pass(std::string data, GLenum type);
+	bool load_pass(std::string data, GLenum type);
 
-    int get_uniform(const std::string& name);
+	int get_uniform(const std::string& name);
 
-    void set(const std::string& name, float val);
+	void set(const std::string& name, float val);
 	void set(const std::string& name, glm::vec2 val);
 	void set(const std::string& name, glm::vec3 val);
 	void set(const std::string& name, glm::vec4 val);

@@ -49,7 +49,7 @@ void Sprite::load() {
 	if (!file.read(path, data)) {
 		debug.error("failed to read data from \"" + name + "\"");
 
-       	state = ASSET_INVALID;
+	   	state = ASSET_INVALID;
 		
 		return;
    	}
