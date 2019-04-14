@@ -14,30 +14,30 @@ This can be achieved using Xvfb.
 
 ## progress
 
-[x] file loading & saving
-[x] configuration loading
-[x] threadsafe debug logging
-[x] timer and fps cap handling
-[x] basic window creation & management
-[x] user input capture : mouse & keyboard
-[x] shared threaded resource handler
-[x] resource loading : sprites
-[x] resource loading : shaders
-[ ] resource loading : meshes
-[ ] resource loading : samples
-[ ] basic component-entity system
-[ ] gui drawing & interaction
-[ ] basic mesh rendering
-[ ] mesh texture application
-[ ] mesh dynamic lighting
-[ ] camera compositing
-[ ] post-processing effects
-[x] creation of server+client instance
-[x] connection to peers
-[ ] protocol for data type differentiation
-[ ] imaging of network structure
-[ ] smart reconnection handling
-[ ] smart network balancing
+- [x] file loading & saving
+- [x] configuration loading
+- [x] threadsafe debug logging
+- [x] timer and fps cap handling
+- [x] basic window creation & management
+- [x] user input capture : mouse & keyboard
+- [x] shared threaded resource handler
+- [x] resource loading : sprites
+- [x] resource loading : shaders
+- [ ] resource loading : meshes
+- [ ] resource loading : samples
+- [ ] basic component-entity system
+- [ ] gui drawing & interaction
+- [ ] basic mesh rendering
+- [ ] mesh texture application
+- [ ] mesh dynamic lighting
+- [ ] camera compositing
+- [ ] post-processing effects
+- [x] creation of server+client instance
+- [x] connection to peers
+- [ ] protocol for data type differentiation
+- [ ] imaging of network structure
+- [ ] smart reconnection handling
+- [ ] smart network balancing
 
 ## abtract
 
