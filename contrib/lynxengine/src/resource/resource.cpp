@@ -39,7 +39,6 @@ template <typename T> Shared<T> Resource::load(const std::string& name)  {
 	return nullptr;
 }
 
-template Shared<Asset> Resource::load<Asset>(const std::string& name);
 template Shared<Sprite> Resource::load<Sprite>(const std::string& name);
 
 void Resource::update() {
@@ -48,7 +47,7 @@ void Resource::update() {
 		
 		// Delete Resources With No References
 
-		if (resource && resource->count() <= 1) {
+		if (resource && (resource->count() <= 1 || resource->invalid())) {
 			resource->timeout -= timer.delta;
 
 			if (resource->timeout <= 0) resource->destroy();

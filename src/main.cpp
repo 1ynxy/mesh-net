@@ -9,13 +9,19 @@ void update();
 Server server;
 
 int main(int argc, char* argv[]) {
-	// Initialise Core, Debug & Timer
+	// Initialise Core
 
 	core.set_callbacks(&init, &update, nullptr, nullptr, nullptr, nullptr);
+
+	core.load_conf("config");
+
+	// Initialise Timer & Debugger
 
 	debug.set_verbosity(core.conf.get_int("verbosity"));
 
 	timer.set_limit(core.conf.get_int("fps-limit"));
+
+	// Start Game
 	
 	core.init();
 }
@@ -40,19 +46,15 @@ void init() {
 	// Open Window
 
 	core.display.open(glm::vec2(600, 300), glm::vec2(500, 500), "window", Colour(40, 40, 40));
-
-	// Test Resource Loader
-
-	Shared<Sprite> sprite = resource.load<Sprite>("sprites/test");
 }
 
 void update() {
-	//debug.info("delta : " + std::to_string(timer.delta));
-
-	//if (timer.tick == 500) server.send(Packet(-1, "TEST"));
+	//debug.info("delta : " + std::to_string(timer.delta) + " - " + std::to_string(timer.fps));
 
 	//if (input.keyboard.key_down(GLFW_KEY_SPACE)) debug.info("space key depressed");
 	//if (input.keyboard.key_up(GLFW_KEY_SPACE)) debug.info("space key released");
+
+	//if (timer.tick == 500) server.send(Packet(-1, "TEST"));
 
 	Packet result;
 

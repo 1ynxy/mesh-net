@@ -65,14 +65,6 @@ void Core::init() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-	// Load Default Config
-
-	if (!conf.load("config")) {
-		debug.error("failed to load configuration file");
-
-		return;
-	}
 	
 	// Do Initialise
 	
@@ -115,6 +107,16 @@ void Core::init() {
 	// Terminate GLFW
 	
 	glfwTerminate();
+}
+
+bool Core::load_conf(const std::string& name) {
+	if (!conf.load(name)) {
+		debug.error("failed to load configuration file");
+
+		return false;
+	}
+
+	return true;
 }
 
 void glfw_error_callback(int error, const char* desc) {

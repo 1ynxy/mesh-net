@@ -27,12 +27,6 @@ public:
 
 	std::atomic<int> state;
 
-	// Constructors & Destructors
-
-	Asset(const std::string& name);
-
-	~Asset();
-
 	// Member Functions
 
 	virtual void init();
@@ -41,6 +35,7 @@ public:
 	virtual void unload();
 
 	bool ready() const;
+	bool invalid() const;
 };
 
 #endif

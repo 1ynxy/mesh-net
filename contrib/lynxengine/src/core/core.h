@@ -48,6 +48,8 @@ public:
 	// Member Functions
 	
 	void init();
+
+	bool load_conf(const std::string& name);
 };
 
 void glfw_error_callback(int error, const char* desc);

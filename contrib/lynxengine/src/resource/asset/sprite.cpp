@@ -9,7 +9,9 @@
 
 // Constructors & Destructors
 
-Sprite::Sprite(const std::string& name) : Asset(name) {
+Sprite::Sprite(const std::string& name) {
+	this->name = name;
+
 	init();
 }
 
