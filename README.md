@@ -39,7 +39,7 @@ This can be achieved using Xvfb.
 - [ ] smart reconnection handling
 - [ ] smart network balancing
 
-## abtract
+## abstract
 
 // put abstract here
 
