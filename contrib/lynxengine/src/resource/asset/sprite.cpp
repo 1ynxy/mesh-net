@@ -47,7 +47,7 @@ void Sprite::load() {
 	std::string path = core.conf.get_string("resource-loc") + name + ".png";
 
 	if (!file.read(path, data)) {
-		debug.error("failed to read data from \"" + path + "\"");
+		debug.error("failed to read data from \"" + name + "\"");
 
        	state = ASSET_INVALID;
 		
