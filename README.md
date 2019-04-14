@@ -16,7 +16,7 @@ This can be achieved using Xvfb.
 
 - [x] file loading & saving
 - [x] configuration loading
-- [x] threadsafe debug logging
+- [x] thread safe debug logging
 - [x] timer and fps cap handling
 - [x] basic window creation & management
 - [x] user input capture : mouse & keyboard
