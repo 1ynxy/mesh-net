@@ -11,9 +11,7 @@ Server server;
 
 float rot = 0.0f;
 
-Shared<Sprite> sprite1;
-Shared<Sprite> sprite2;
-
+Shared<Sprite> sprite;
 Shared<Shader> shader;
 Shared<Mesh> mesh;
 
@@ -58,10 +56,17 @@ void init() {
 
 	// Load Shaders
 
-	sprite1 = resource.load<Sprite>("sprite/island");
-	sprite2 = resource.load<Sprite>("sprite/island_tmp");
+	sprite = resource.load<Sprite>("sprite/island");
 	mesh = resource.load<Mesh>("mesh/island");
 	shader = resource.load<Shader>("shader/default");
+
+	// Test CES
+
+	Shared<Entity> entity = scene.instantiate("new entity");
+
+	Shared<Transform> transform = entity->get<Transform>();
+
+	if (transform) debug.info(std::to_string(transform->position.x) + " " + std::to_string(transform->position.y) + " " + std::to_string(transform->position.z));
 }
 
 void update() {
@@ -80,6 +85,5 @@ void update() {
 }
 
 void display() {
-	render.mesh(glm::vec3(-1.5, 0, -5), glm::vec3(0, rot, 0), mesh, shader, sprite1);
-	render.mesh(glm::vec3(1.5, 0, -5), glm::vec3(0, rot, 0), mesh, shader, sprite2);
+	render.mesh(glm::vec3(-1.5, 0, -5), glm::vec3(0, rot, 0), mesh, shader, sprite);
 }

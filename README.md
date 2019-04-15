@@ -31,7 +31,8 @@ Use of a program such as 'pngcheck -c [file]' is advised to ensure that all imag
 - [x] basic mesh rendering
 - [x] mesh texture application
 - [ ] mesh dynamic lighting
-- [ ] basic component-entity system
+- [x] basic component-entity system
+- [ ] base components : transform, camera, meshrenderer
 - [ ] camera compositing
 - [ ] post-processing effects
 - [x] creation of server+client instance

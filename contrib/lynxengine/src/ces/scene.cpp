@@ -1,5 +1,7 @@
 #include "scene.h"
 
+#include <../src/ces/component/transform.h>
+
 Scene scene;
 
 // Constructors & Destructors
@@ -19,7 +21,7 @@ Shared<Entity> Scene::instantiate(const std::string& name, const glm::vec3& posi
 
 	entity->scene = this;
 
-	//entity->Add<Transform>(Transform(position, rotation));
+	entity->add<Transform>(Transform(position, rotation));
 
 	entities.push_back(entity);
 

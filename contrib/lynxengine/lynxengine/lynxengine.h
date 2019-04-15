@@ -26,5 +26,6 @@
 #include <../src/ces/scene.h>
 #include <../src/ces/entity.h>
 #include <../src/ces/component.h>
+#include <../src/ces/component/transform.h>
 
 #endif

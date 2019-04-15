@@ -31,6 +31,7 @@ add_library(lynxengine
   src/ces/scene.cpp
   src/ces/entity.cpp
   src/ces/component.cpp
+  src/ces/component/transform.cpp
 )
 
 target_include_directories(lynxengine PRIVATE lynxengine)
