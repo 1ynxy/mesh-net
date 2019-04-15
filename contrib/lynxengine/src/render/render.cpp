@@ -78,7 +78,7 @@ bool Render::mesh(glm::vec3 position, glm::vec3 rotation, Shared<Mesh> mesh, Sha
 	}
 	
 	if (sprite && sprite->ready()) {
-		glActiveTexture(GL_TEXTURE0 + sprite->pos);
+		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, sprite->pos);
 		
 		shader->set("diffuseSampler", sprite->pos);
