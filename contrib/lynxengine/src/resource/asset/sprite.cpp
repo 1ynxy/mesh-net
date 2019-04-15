@@ -47,27 +47,19 @@ void Sprite::load() {
 	std::string path = core.conf.get_string("resource-loc") + name + ".png";
 
 	if (!file.read(path, data)) {
-		debug.error("failed to read data from \"" + name + "\"");
+		debug.error("failed to read data from \"" + path + "\"");
 
 	   	state = ASSET_INVALID;
 		
 		return;
    	}
-
-	std::vector<unsigned char> png = std::vector<unsigned char>();
-
-	for (char chr : data) png.push_back(chr);
 	
 	// Decode Data
 
-	unsigned int width = 0, height = 0;
-
-	unsigned int error = lodepng::decode(image, width, height, png);
-
-	size = glm::vec2(width, height);
+	int error = lodepng::decode(image, width, height, file.split(data));
 
 	if (error) {
-		debug.error("failed to parse data from \"" + name + "\" : " + std::to_string(error));
+		debug.error("failed to parse data from \"" + path + "\" : " + std::to_string(error));
 
 		state = ASSET_INVALID;
 
@@ -82,6 +74,7 @@ void Sprite::upload() {
 
 	// Upload Asset To GPU
 
+	//glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, pos);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -89,11 +82,13 @@ void Sprite::upload() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, (int) size.x, (int) size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, &image.front());
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &image.front());
 
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	state = ASSET_READY;
+
+	debug.info("loaded sprite \"" + name + "\"");
 }
 
 void Sprite::unload() {

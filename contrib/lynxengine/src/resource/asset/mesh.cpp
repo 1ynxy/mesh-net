@@ -45,7 +45,7 @@ void Mesh::load() {
 	std::string path = core.conf.get_string("resource-loc") + name + ".obj";
 
 	if (!file.read(path, data)) {
-		debug.error("failed to read data from \"" + name + "\"");
+		debug.error("failed to read data from \"" + path + "\"");
 
 	   	state = ASSET_INVALID;
 		
@@ -114,6 +114,8 @@ void Mesh::upload() {
 	}
 
 	state = ASSET_READY;
+
+	debug.info("loaded mesh \"" + name + "\"");
 }
 
 void Mesh::unload() {

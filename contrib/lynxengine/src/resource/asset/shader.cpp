@@ -45,7 +45,7 @@ void Shader::load() {
 	std::string path = core.conf.get_string("resource-loc") + name + ".shader";
 
 	if (!file.read(path, data)) {
-		debug.error("failed to read data from \"" + name + "\"");
+		debug.error("failed to read data from \"" + path + "\"");
 
 	   	state = ASSET_INVALID;
 		
@@ -71,6 +71,8 @@ void Shader::upload() {
 	glLinkProgram(program);
 
 	state = ASSET_READY;
+
+	debug.info("loaded shader \"" + name + "\"");
 }
 
 void Shader::unload() {

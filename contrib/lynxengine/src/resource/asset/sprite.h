@@ -15,12 +15,13 @@ class Sprite : public Asset {
 private:
 	// Member Variables
 
+	unsigned int width = 0;
+	unsigned int height = 0;
+
 	std::vector<unsigned char> image;
 
 public:
 	// Member Variables
-
-	glm::vec2 size;
 
 	GLuint pos = 0;
 

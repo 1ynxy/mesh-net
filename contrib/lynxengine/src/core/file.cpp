@@ -31,6 +31,8 @@ IO::IO() {
                 prt = "/";
             }
         }
+
+		bin += "/";
     #elif _WIN32
         // Add Windows Method Here
 
@@ -41,7 +43,7 @@ IO::IO() {
 // Member Functions
 
 bool IO::read(std::string path, std::string& data) const {
-    path = bin + "/" + path;
+    path = bin + path;
 
 	std::ifstream file(path);
 	
@@ -59,7 +61,7 @@ bool IO::read(std::string path, std::string& data) const {
 }
 
 bool IO::write(std::string path, const std::string& data) const {
-    path = bin + "/" + path;
+    path = bin + path;
 
     std::ofstream file(path);
 
@@ -70,6 +72,14 @@ bool IO::write(std::string path, const std::string& data) const {
     file.close();
 
     return true;
+}
+
+std::vector<unsigned char> IO::split(const std::string& data) const {
+	std::vector<unsigned char> result = std::vector<unsigned char>();
+
+	for (char i : data) result.push_back(i);
+
+	return result;
 }
 
 std::vector<std::string> IO::split(const std::string& data, const char chr) const {

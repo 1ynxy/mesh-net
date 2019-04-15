@@ -11,7 +11,9 @@ Server server;
 
 float rot = 0.0f;
 
-Shared<Sprite> sprite;
+Shared<Sprite> sprite1;
+Shared<Sprite> sprite2;
+
 Shared<Shader> shader;
 Shared<Mesh> mesh;
 
@@ -56,7 +58,8 @@ void init() {
 
 	// Load Shaders
 
-	sprite = resource.load<Sprite>("sprite/island");
+	sprite1 = resource.load<Sprite>("sprite/island");
+	sprite2 = resource.load<Sprite>("sprite/island_tmp");
 	mesh = resource.load<Mesh>("mesh/island");
 	shader = resource.load<Shader>("shader/default");
 }
@@ -77,5 +80,6 @@ void update() {
 }
 
 void display() {
-	render.mesh(glm::vec3(0, 0, -5), glm::vec3(0, rot, 0), mesh, shader, sprite);
+	render.mesh(glm::vec3(-1.5, 0, -5), glm::vec3(0, rot, 0), mesh, shader, sprite1);
+	render.mesh(glm::vec3(1.5, 0, -5), glm::vec3(0, rot, 0), mesh, shader, sprite2);
 }

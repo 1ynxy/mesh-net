@@ -6,12 +6,11 @@
 #include <fstream>
 #include <vector>
 
-class IO {
-private:
-    // Member Variables
+struct IO {
+	// Member Variables
 
     std::string bin = "";
-public:
+
     // Constructors & Destructors
 
     IO();
@@ -21,6 +20,7 @@ public:
     bool read(std::string path, std::string& data) const;
     bool write(std::string path, const std::string& data) const;
 
+	std::vector<unsigned char> split(const std::string& data) const;
 	std::vector<std::string> split(const std::string& data, const char chr) const;
 };
 

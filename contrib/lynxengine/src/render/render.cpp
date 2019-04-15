@@ -6,6 +6,25 @@ Render render;
 
 // Member Functions
 
+/*
+
+bool Render::camera(Shared<Camera> camera) {
+	if (camera->target) {
+		glBindFramebuffer(GL_FRAMEBUFFER, camera->target->pos);
+
+		glViewport(0, 0, (int) camera->target->size.x, (int) camera->target->size.y);
+	}
+	else {
+		glm::vec2 screenSize = core.display.get_size();
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		glViewport(0, 0, (int) screenSize.x, (int) screenSize.y);
+	}
+}
+
+*/
+
 bool Render::sprite(glm::vec2 position, glm::vec2 size, Shared<Sprite> sprite, Shared<Shader> shader) {
 
 
@@ -37,15 +56,26 @@ bool Render::mesh(glm::vec3 position, glm::vec3 rotation, Shared<Mesh> mesh, Sha
 
 	// Draw
 
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
-	if (!shader || !shader->ready()) return false;
-	glUseProgram(shader->program);
-	
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+
 	if (!mesh || !mesh->ready()) return false;
-	glBindVertexArray(mesh->vao);
+
+	if (mesh != meshCache) {
+		glBindVertexArray(mesh->vao);
+
+		meshCache = mesh;
+	}
+
+	if (!shader || !shader->ready()) return false;
+
+	if (shader != shaderCache) {
+		glUseProgram(shader->program);
+
+		shaderCache = shader;
+	}
 	
 	if (sprite && sprite->ready()) {
 		glActiveTexture(GL_TEXTURE0 + sprite->pos);
