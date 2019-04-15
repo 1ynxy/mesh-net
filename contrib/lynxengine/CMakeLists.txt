@@ -23,6 +23,8 @@ add_library(lynxengine
   src/resource/resource.cpp
   src/resource/asset.cpp
   src/resource/asset/sprite.cpp
+  src/resource/asset/shader.cpp
+  src/resource/asset/mesh.cpp
 )
 
 target_include_directories(lynxengine PRIVATE lynxengine)

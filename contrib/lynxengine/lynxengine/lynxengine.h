@@ -18,5 +18,7 @@
 #include <../src/resource/resource.h>
 #include <../src/resource/asset.h>
 #include <../src/resource/asset/sprite.h>
+#include <../src/resource/asset/shader.h>
+#include <../src/resource/asset/mesh.h>
 
 #endif

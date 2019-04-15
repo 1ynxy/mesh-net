@@ -23,7 +23,7 @@ This can be achieved using Xvfb.
 - [x] shared threaded resource handler
 - [x] resource loading : sprites
 - [x] resource loading : shaders
-- [ ] resource loading : meshes
+- [x] resource loading : meshes
 - [ ] resource loading : samples
 - [ ] basic component-entity system
 - [ ] gui drawing & interaction

@@ -3,6 +3,7 @@
 
 #include <string>
 #include <fstream>
+#include <vector>
 
 class IO {
 private:
@@ -16,8 +17,10 @@ public:
 
     // Member Functions
 
-    bool read(std::string path, std::string& data);
-    bool write(std::string path, const std::string& data);
+    bool read(std::string path, std::string& data) const;
+    bool write(std::string path, const std::string& data) const;
+
+	std::vector<std::string> split(const std::string& data, const char chr) const;
 };
 
 extern IO file;

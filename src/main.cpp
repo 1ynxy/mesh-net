@@ -11,9 +11,9 @@ Server server;
 int main(int argc, char* argv[]) {
 	// Initialise Core
 
-	core.set_callbacks(&init, &update, nullptr, nullptr, nullptr, nullptr);
-
 	core.load_conf("config");
+
+	core.set_callbacks(&init, &update, nullptr, nullptr, nullptr, nullptr);
 
 	// Initialise Timer & Debugger
 

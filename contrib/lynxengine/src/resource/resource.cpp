@@ -40,6 +40,8 @@ template <typename T> Shared<T> Resource::load(const std::string& name)  {
 }
 
 template Shared<Sprite> Resource::load<Sprite>(const std::string& name);
+template Shared<Shader> Resource::load<Shader>(const std::string& name);
+template Shared<Mesh> Resource::load<Mesh>(const std::string& name);
 
 void Resource::update() {
 	for (unsigned int i = 0; i < resources.size(); i++) {

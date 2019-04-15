@@ -40,7 +40,7 @@ IO::IO() {
 
 // Member Functions
 
-bool IO::read(std::string path, std::string& data) {
+bool IO::read(std::string path, std::string& data) const {
     path = bin + "/" + path;
 
 	std::ifstream file(path);
@@ -55,7 +55,7 @@ bool IO::read(std::string path, std::string& data) {
 	return true;
 }
 
-bool IO::write(std::string path, const std::string& data) {
+bool IO::write(std::string path, const std::string& data) const {
     path = bin + "/" + path;
 
     std::ofstream file(path);
@@ -67,4 +67,23 @@ bool IO::write(std::string path, const std::string& data) {
     file.close();
 
     return true;
+}
+
+std::vector<std::string> IO::split(const std::string& data, const char chr) const {
+	std::vector<std::string> result = std::vector<std::string>();
+
+	std::string buf = "";
+
+	for (char i : data) {
+		if (i != chr) buf += i;
+		else {
+			result.push_back(buf);
+
+			buf = "";
+		}
+	}
+
+	result.push_back(buf);
+
+	return result;
 }
