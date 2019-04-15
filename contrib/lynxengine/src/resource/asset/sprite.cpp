@@ -54,11 +54,11 @@ void Sprite::load() {
 		return;
    	}
 
-	std::vector<unsigned char> png;	
+	std::vector<unsigned char> png = std::vector<unsigned char>();
 
-	for (unsigned char chr : data) png.push_back(chr);
-
-	// Do Parse Data Here
+	for (char chr : data) png.push_back(chr);
+	
+	// Decode Data
 
 	unsigned int width = 0, height = 0;
 
@@ -67,7 +67,7 @@ void Sprite::load() {
 	size = glm::vec2(width, height);
 
 	if (error) {
-		debug.error("failed to parse data from \"" + name + "\"");
+		debug.error("failed to parse data from \"" + name + "\" : " + std::to_string(error));
 
 		state = ASSET_INVALID;
 

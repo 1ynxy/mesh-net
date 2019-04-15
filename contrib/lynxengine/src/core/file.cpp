@@ -47,8 +47,11 @@ bool IO::read(std::string path, std::string& data) const {
 	
     if (file.fail()) return false;
 
-    std::string line;
-	while (std::getline(file, line)) if (line != "") data += line + '\n';
+	std::stringstream buffer;
+
+	buffer << file.rdbuf();
+
+	data = buffer.str();
 	
 	file.close();
 	

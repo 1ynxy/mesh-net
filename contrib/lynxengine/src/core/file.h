@@ -2,6 +2,7 @@
 #define file_h
 
 #include <string>
+#include <sstream>
 #include <fstream>
 #include <vector>
 
