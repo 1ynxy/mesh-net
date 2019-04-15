@@ -41,6 +41,9 @@ Use of a program such as 'pngcheck -c [file]' is advised to ensure that all imag
 - [ ] imaging of network structure
 - [ ] smart reconnection handling
 - [ ] smart network balancing
+- [ ] game network data parsing
+- [ ] basic player interactions | chat functions
+- [ ] persistent data loading from existing peers
 
 ## abstract
 
