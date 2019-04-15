@@ -25,11 +25,11 @@ This can be achieved using Xvfb.
 - [x] resource loading : shaders
 - [x] resource loading : meshes
 - [ ] resource loading : samples
-- [ ] basic component-entity system
 - [ ] gui drawing & interaction
-- [ ] basic mesh rendering
-- [ ] mesh texture application
+- [x] basic mesh rendering
+- [x] mesh texture application
 - [ ] mesh dynamic lighting
+- [ ] basic component-entity system
 - [ ] camera compositing
 - [ ] post-processing effects
 - [x] creation of server+client instance
