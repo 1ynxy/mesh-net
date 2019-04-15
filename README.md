@@ -5,6 +5,8 @@ Dissertation project on peer-to-peer network architectures for procedurally gene
 When running on a headless server it must be run using a virtual framebuffer so that GLFW can initialise correctly.
 This can be achieved using Xvfb.
 
+Use of a program such as 'pngcheck -c [file]' is advised to ensure that all image assets pass CRC checks.
+
 ## dependencies
 
 - GLFW3
