@@ -23,4 +23,8 @@
 
 #include <../src/render/render.h>
 
+#include <../src/ces/scene.h>
+#include <../src/ces/entity.h>
+#include <../src/ces/component.h>
+
 #endif

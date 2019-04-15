@@ -27,6 +27,10 @@ add_library(lynxengine
   src/resource/asset/mesh.cpp
 
   src/render/render.cpp
+
+  src/ces/scene.cpp
+  src/ces/entity.cpp
+  src/ces/component.cpp
 )
 
 target_include_directories(lynxengine PRIVATE lynxengine)
