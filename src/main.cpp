@@ -3,17 +3,23 @@
 
 void init();
 void update();
+void display();
 
 // Program
 
 Server server;
+
+float rot = 0.0f;
+
+Shared<Shader> shader;
+Shared<Mesh> mesh;
 
 int main(int argc, char* argv[]) {
 	// Initialise Core
 
 	core.load_conf("config");
 
-	core.set_callbacks(&init, &update, nullptr, nullptr, nullptr, nullptr);
+	core.set_callbacks(&init, &update, nullptr, &display, nullptr, nullptr);
 
 	// Initialise Timer & Debugger
 
@@ -46,6 +52,11 @@ void init() {
 	// Open Window
 
 	core.display.open(glm::vec2(600, 300), glm::vec2(500, 500), "window", Colour(40, 40, 40));
+
+	// Load Shaders
+
+	mesh = resource.load<Mesh>("mesh/island");
+	shader = resource.load<Shader>("shader/normal");
 }
 
 void update() {
@@ -59,4 +70,10 @@ void update() {
 	Packet result;
 
 	while (server.recv(result)) debug.info(result.text);
+}
+
+void display() {
+	render.mesh(glm::vec3(0, 0, -5), glm::vec3(0, rot, 0), mesh, shader, nullptr);
+
+	rot += timer.delta * 5;
 }

@@ -21,4 +21,6 @@
 #include <../src/resource/asset/shader.h>
 #include <../src/resource/asset/mesh.h>
 
+#include <../src/render/render.h>
+
 #endif
