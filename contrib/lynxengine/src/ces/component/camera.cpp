@@ -23,7 +23,7 @@ Camera::~Camera() {
 // Member Functions
 
 void Camera::init() {
-	transform = entity->get<Transform>();
+	if (entity) transform = entity->get<Transform>();
 
 	//target = new RenderTexture("camera_target", glm::vec2(1, 1));
 }

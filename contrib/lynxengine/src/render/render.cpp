@@ -48,10 +48,18 @@ void Render::set_camera(Shared<Camera> camera) {
 	this->camera = camera;
 }
 
+bool Render::sprite(Shared<Transform> transform, Shared<Sprite> sprite, Shared<Shader> shader) {
+	return this->sprite(glm::vec2(transform->position), glm::vec2(transform->rotation), sprite, shader);
+}
+
 bool Render::sprite(glm::vec2 position, glm::vec2 size, Shared<Sprite> sprite, Shared<Shader> shader) {
 
 
 	return true;
+}
+
+bool Render::mesh(Shared<Transform> transform, Shared<Mesh> mesh, Shared<Shader> shader, Shared<Sprite> sprite) {
+	return this->mesh(transform->position, transform->rotation, mesh, shader, sprite);
 }
 
 bool Render::mesh(glm::vec3 position, glm::vec3 rotation, Shared<Mesh> mesh, Shared<Shader> shader, Shared<Sprite> sprite) {

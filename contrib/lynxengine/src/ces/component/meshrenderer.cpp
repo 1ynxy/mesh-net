@@ -1,9 +1,11 @@
 #include "meshrenderer.h"
 
-#include <graphics/display.h>
+#include <../src/resource/resource.h>
 
-#include <ces/scene.h>
-#include <ces/entity.h>
+#include <../src/render/render.h>
+#include <../src/render/compositor.h>
+
+#include <../src/ces/entity.h>
 
 // Constructors & Destructors
 
@@ -11,57 +13,30 @@ MeshRenderer::MeshRenderer(const std::string& shaderName, const std::string& mes
 
 }
 
-// Gameloop Functions
+MeshRenderer::MeshRenderer(Shared<Entity> entity, const MeshRenderer& meshrenderer) : shaderName(meshrenderer.shaderName), meshName(meshrenderer.meshName), spriteName(meshrenderer.spriteName) {
+	this->entity = entity;
 
-void MeshRenderer::Init() {
-	shader = Resource::Load<Shader>(shaderName);
-	sprite = Resource::Load<Sprite>(spriteName);
-	mesh = Resource::Load<Mesh>(meshName);
-
-	if (entity) transform = entity->Get<Transform>();
+	init();
 }
 
-void MeshRenderer::Display() {
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
+MeshRenderer::~MeshRenderer() {
+	term();
+}
 
-	if (!shader || !shader->Ready()) return;
-	glUseProgram(shader->program);
-	
-	if (!mesh || !mesh->Ready()) return;
-	glBindVertexArray(mesh->vao);
-	
-	if (sprite && sprite->Ready()) {
-		glActiveTexture(GL_TEXTURE0 + sprite->pos);
-		glBindTexture(GL_TEXTURE_2D, sprite->pos);
-		
-		shader->Set("diffuseSampler", sprite->pos);
+// Gameloop Functions
+
+void MeshRenderer::init() {
+	if (entity) transform = entity->get<Transform>();
+
+	sprite = resource.load<Sprite>(spriteName);
+	mesh = resource.load<Mesh>(meshName);
+	shader = resource.load<Shader>(shaderName);
+}
+
+void MeshRenderer::display() {
+	for (Shared<Camera> camera : compositor.cameras) {
+		render.set_camera(camera);
+
+		render.mesh(transform, mesh, shader, sprite);
 	}
-
-	if (transform) shader->Set("modelMat", transform->matrix);
-
-	for (Shared<Camera>& camera : Scene::cameras) {
-		if (!camera) continue;
-
-		if (camera->target) {
-			glBindFramebuffer(GL_FRAMEBUFFER, camera->target->buffer);
-
-			glViewport(0, 0, (int) camera->size.x, (int) camera->size.y);
-		}
-		else {
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-			glViewport(0, 0, (int) Display::Size().x, (int) Display::Size().y);
-		}
-
-		if (camera->transform) shader->Set("viewMat", glm::inverse(camera->transform->matrix));
-		
-		shader->Set("projMat", camera->projection);
-
-		glDrawArrays(GL_TRIANGLES, 0, mesh->size);
-	}
-
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);
 }

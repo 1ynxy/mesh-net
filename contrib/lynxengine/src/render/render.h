@@ -28,7 +28,10 @@ public:
 
 	void set_camera(Shared<Camera> camera);
 
-	bool sprite(glm::vec2 position, glm::vec2 size, Shared<Sprite> sprite, Shared<Shader> shader);
+	bool sprite(Shared<Transform> transform, Shared<Sprite> sprite, Shared<Shader> shader = nullptr);
+	bool sprite(glm::vec2 position, glm::vec2 size, Shared<Sprite> sprite, Shared<Shader> shader = nullptr);
+	
+	bool mesh(Shared<Transform> transform, Shared<Mesh> mesh, Shared<Shader> shader, Shared<Sprite> sprite = nullptr);
 	bool mesh(glm::vec3 position, glm::vec3 rotation, Shared<Mesh> mesh, Shared<Shader> shader, Shared<Sprite> sprite = nullptr);
 };
 

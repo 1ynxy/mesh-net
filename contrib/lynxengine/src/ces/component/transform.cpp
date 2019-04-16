@@ -5,9 +5,7 @@
 // Constructors & Destructors
 
 Transform::Transform(const glm::vec3& position, const glm::vec3& rotation) : position(position), rotation(rotation) {
-	this->rotation.x = glm::radians(rotation.x);
-	this->rotation.y = glm::radians(rotation.y);
-	this->rotation.z = glm::radians(rotation.z);
+
 }
 
 Transform::Transform(Shared<Entity> entity, const Transform& transform) : position(transform.position), rotation(transform.rotation) {
@@ -27,7 +25,7 @@ void Transform::posite(const glm::vec3& position) {
 }
 
 void Transform::rotate(float rotation, const glm::vec3& axis) {
-	this->rotation += axis * glm::radians(rotation);
+	this->rotation += axis * rotation;
 }
 
 glm::vec3 Transform::up() const {
@@ -59,7 +57,7 @@ glm::vec3 Transform::right() const {
 }
 
 glm::vec3 Transform::forward() const {
-	glm::vec3 forward = glm::vec3(0, 0, 1);
+	glm::vec3 forward = glm::vec3(0, 0, -1);
 	
 	forward = glm::rotateX(forward, glm::radians(rotation.x));
 	forward = glm::rotateY(forward, glm::radians(rotation.y));

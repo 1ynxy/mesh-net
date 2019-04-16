@@ -3,26 +3,24 @@
 
 void init();
 void update();
-void display();
 
 // Program
 
 Server server;
 
-float rot = 0.0f;
-
 Shared<Sprite> sprite;
 Shared<Shader> shader;
 Shared<Mesh> mesh;
 
-Shared<Entity> entity;
+Shared<Entity> cament;
+Shared<Entity> objent;
 
 int main(int argc, char* argv[]) {
 	// Initialise Core
 
 	core.load_conf("config");
 
-	core.set_callbacks(&init, &update, nullptr, &display, nullptr, nullptr);
+	core.set_callbacks(&init, &update, nullptr, nullptr, nullptr, nullptr);
 
 	// Initialise Timer & Debugger
 
@@ -64,9 +62,14 @@ void init() {
 
 	// Test Cameras
 
-	entity = scene.instantiate("camera", glm::vec3(), glm::vec3(0, 180, 0));
-	entity->add(Camera(45.0f, 0.01f, 100.0f));
-	entity->add(Controller(4.0f));
+	cament = scene.instantiate("camera", glm::vec3(), glm::vec3(0, 0, 0));
+	cament->add(Camera(45.0f, 0.01f, 100.0f));
+	cament->add(Controller(4.0f));
+
+	compositor.add_camera(cament->get<Camera>());
+
+	objent = scene.instantiate("object", glm::vec3(0, 0, -5), glm::vec3());
+	objent->add(MeshRenderer("shader/default", "mesh/island", "sprite/island"));
 }
 
 void update() {
@@ -81,11 +84,10 @@ void update() {
 
 	while (server.recv(result)) debug.info(result.text);
 
-	rot += timer.delta * 5;
+	// Rotate Object
+
+	Shared<Transform> transform = objent->get<Transform>();
+
+	transform->rotate(timer.delta * 5, transform->up());
 }
 
-void display() {
-	render.set_camera(entity->get<Camera>());
-
-	render.mesh(glm::vec3(0, 0, 5), glm::vec3(0, rot, 0), mesh, shader, sprite);
-}

@@ -31,5 +31,6 @@
 #include <../src/ces/component/transform.h>
 #include <../src/ces/component/camera.h>
 #include <../src/ces/component/controller.h>
+#include <../src/ces/component/meshrenderer.h>
 
 #endif
