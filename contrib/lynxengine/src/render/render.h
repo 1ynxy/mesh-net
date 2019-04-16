@@ -15,6 +15,8 @@ class Render {
 private:
 	// Member Variables
 
+	Shared<Camera> camera;
+
 	glm::mat4 projection = glm::mat4(1.0f);
 	glm::mat4 view = glm::mat4(1.0f);
 
@@ -24,7 +26,7 @@ private:
 public:
 	// Member Functions
 
-	void camera(Shared<Camera> camera);
+	void set_camera(Shared<Camera> camera);
 
 	bool sprite(glm::vec2 position, glm::vec2 size, Shared<Sprite> sprite, Shared<Shader> shader);
 	bool mesh(glm::vec3 position, glm::vec3 rotation, Shared<Mesh> mesh, Shared<Shader> shader, Shared<Sprite> sprite = nullptr);

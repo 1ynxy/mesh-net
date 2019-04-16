@@ -6,24 +6,31 @@ Render render;
 
 // Member Functions
 
-void Render::camera(Shared<Camera> camera) {
+void Render::set_camera(Shared<Camera> camera) {
+	if (this->camera == camera) return;
+
+	// Bind Framebuffers & Calculate Viewport Size
+
 	glm::vec2 size;
 
-	if (camera->target && camera->target->ready()) {
-		glBindFramebuffer(GL_FRAMEBUFFER, camera->target->buffer);
+	if (camera) {
+		if (camera->target) {
+			glBindFramebuffer(GL_FRAMEBUFFER, camera->target->buffer);
 
-		size = camera->target->colour->get_size();
-	}
-	else {
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			size = camera->target->colour->get_size();
+		}
+		else {
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		size = core.display.get_size();
+			size = core.display.get_size();
+		}
 	}
 
 	glViewport(0, 0, (int) size.x, (int) size.y);
 
-	if (camera->projection == PROJ_ORTHO) projection = glm::ortho(0, (int) size.x, 0, (int) size.y);
-	else projection = glm::perspective(45.0f, core.display.aspect_ratio(), 0.01f, 100.0f);
+	// Generate Projection & View Matrices
+
+	projection = camera->projection();
 
 	if (camera->transform) {
 		glm::vec3 position = camera->transform->position;
@@ -37,6 +44,8 @@ void Render::camera(Shared<Camera> camera) {
 
 		view = glm::inverse(view);
 	}
+
+	this->camera = camera;
 }
 
 bool Render::sprite(glm::vec2 position, glm::vec2 size, Shared<Sprite> sprite, Shared<Shader> shader) {
@@ -91,10 +100,6 @@ bool Render::mesh(glm::vec3 position, glm::vec3 rotation, Shared<Mesh> mesh, Sha
 	shader->set("modelMat", transform);
 	shader->set("viewMat", view);
 	shader->set("projMat", projection);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	glViewport(0, 0, (int) screenSize.x, (int) screenSize.y);
 
 	glDrawArrays(GL_TRIANGLES, 0, mesh->size);
 

@@ -15,6 +15,7 @@ Shared<Sprite> sprite;
 Shared<Shader> shader;
 Shared<Mesh> mesh;
 
+Shared<Entity> entity;
 Shared<Camera> camera;
 
 int main(int argc, char* argv[]) {
@@ -62,7 +63,11 @@ void init() {
 	mesh = resource.load<Mesh>("mesh/island");
 	shader = resource.load<Shader>("shader/default");
 
-	camera = new Camera(45.0f, 0.01f, 100.0f);
+	// Test Cameras
+
+	entity = scene.instantiate("camera");
+
+	camera = entity->add(Camera(45.0f, 0.01f, 100.0f));
 }
 
 void update() {
@@ -81,7 +86,7 @@ void update() {
 }
 
 void display() {
-	render.camera(camera);
+	render.set_camera(camera);
 
 	render.mesh(glm::vec3(-1.5, 0, -5), glm::vec3(0, rot, 0), mesh, shader, sprite);
 }
