@@ -27,6 +27,8 @@ Use of a program such as 'pngcheck -c [file]' is advised to ensure that all imag
 - [x] resource loading : shaders
 - [x] resource loading : meshes
 - [ ] resource loading : samples
+- [x] resource creation : sprites
+- [x] resource creation : rendertextures
 - [ ] gui drawing & interaction
 - [x] basic mesh rendering
 - [x] mesh texture application

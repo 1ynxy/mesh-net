@@ -15,6 +15,8 @@ class Sprite : public Asset {
 private:
 	// Member Variables
 
+	GLuint type = GL_RGBA;
+
 	unsigned int width = 0;
 	unsigned int height = 0;
 
@@ -28,7 +30,8 @@ public:
 	// Constructors & Destructors
 
 	Sprite(const std::string& name);
-	Sprite(glm::vec2 size, const Colour& fill);
+	Sprite(glm::vec2 size, const Colour& fill, GLuint type = GL_RGBA);
+	Sprite(const std::string& name, glm::vec2 size, const Colour& fill, GLuint type = GL_RGBA);
 
 	~Sprite();
 
@@ -37,6 +40,7 @@ public:
 	void init() override;
 	void load() override;
 	void create(glm::vec2 size, const Colour& fill = Colour());
+	void resize(glm::vec2 size, const Colour& fill = Colour());
 	void upload() override;
 	void unload() override;
 };

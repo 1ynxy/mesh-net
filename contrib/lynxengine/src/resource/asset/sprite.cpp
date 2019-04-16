@@ -15,8 +15,16 @@ Sprite::Sprite(const std::string& name) {
 	init();
 }
 
-Sprite::Sprite(glm::vec2 size, const Colour& fill) {
+Sprite::Sprite(glm::vec2 size, const Colour& fill, GLuint type) : type(type) {
 	this->name = "created_sprite";
+
+	init();
+
+	create(size, fill);
+}
+
+Sprite::Sprite(const std::string& name, glm::vec2 size, const Colour& fill, GLuint type) : type(type) {
+	this->name = name;
 
 	init();
 
@@ -84,6 +92,8 @@ void Sprite::create(glm::vec2 size, const Colour& fill) {
 
 	// Create Asset Data
 
+	image.clear();
+
 	width = size.x;
 	height = size.y;
 
@@ -99,6 +109,12 @@ void Sprite::create(glm::vec2 size, const Colour& fill) {
 	upload();
 }
 
+void Sprite::resize(glm::vec2 size, const Colour& fill) {
+	if (size.x == width && size.y == height) return;
+
+	create(size, fill);
+}
+
 void Sprite::upload() {
 	state = ASSET_WAITING;
 
@@ -112,7 +128,7 @@ void Sprite::upload() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &image.front());
+	glTexImage2D(GL_TEXTURE_2D, 0, type, width, height, 0, type, GL_UNSIGNED_BYTE, &image.front());
 
 	glGenerateMipmap(GL_TEXTURE_2D);
 

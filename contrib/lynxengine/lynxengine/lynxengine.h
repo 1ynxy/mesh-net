@@ -20,6 +20,7 @@
 #include <../src/resource/asset/sprite.h>
 #include <../src/resource/asset/shader.h>
 #include <../src/resource/asset/mesh.h>
+#include <../src/resource/asset/rendertexture.h>
 
 #include <../src/render/render.h>
 
