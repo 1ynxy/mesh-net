@@ -35,6 +35,7 @@ add_library(lynxengine
   src/ces/component.cpp
   src/ces/component/transform.cpp
   src/ces/component/camera.cpp
+  src/ces/component/controller.cpp
 )
 
 target_include_directories(lynxengine PRIVATE lynxengine)

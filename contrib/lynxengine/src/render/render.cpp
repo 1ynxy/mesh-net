@@ -7,7 +7,7 @@ Render render;
 // Member Functions
 
 void Render::set_camera(Shared<Camera> camera) {
-	if (this->camera == camera) return;
+	//if (this->camera == camera) return;
 
 	// Bind Framebuffers & Calculate Viewport Size
 

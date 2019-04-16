@@ -83,14 +83,18 @@ void Core::init() {
 
 		display.update();
 		
+		scene.update();
 		if (update_callback) update_callback();
 
+		scene.lateupdate();
 		if (lateupdate_callback) lateupdate_callback();
 		
 		// Do Display Step
 
+		scene.display();
 		if (display_callback) display_callback();
 
+		scene.ongui();
 		if (ongui_callback) ongui_callback();
 
 		display.finish();

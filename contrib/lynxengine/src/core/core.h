@@ -14,6 +14,8 @@
 
 #include <../src/resource/resource.h>
 
+#include <../src/ces/scene.h>
+
 struct Core {
 private:
 	// Gameloop Callbacks

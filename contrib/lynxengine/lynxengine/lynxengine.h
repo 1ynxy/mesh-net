@@ -30,5 +30,6 @@
 #include <../src/ces/component.h>
 #include <../src/ces/component/transform.h>
 #include <../src/ces/component/camera.h>
+#include <../src/ces/component/controller.h>
 
 #endif
