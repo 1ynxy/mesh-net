@@ -1,10 +1,8 @@
 #ifndef transform_h
 #define transform_h
 
-#include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtx/rotate_vector.hpp>
-#include <GLFW/glfw3.h>
 
 #include <../src/ces/component.h>
 
@@ -15,11 +13,10 @@ public:
 	glm::vec3 position;
 	glm::vec3 rotation;
 
-	glm::mat4 matrix = glm::mat4(1.0f);
-
 	// Constructors & Destructors
 	
 	Transform(const glm::vec3& position = glm::vec3(), const glm::vec3& rotation = glm::vec3());
+	Transform(Shared<Entity> entity, const Transform& transform);
 
 	~Transform();
 	

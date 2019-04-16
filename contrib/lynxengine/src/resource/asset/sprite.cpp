@@ -72,6 +72,9 @@ void Sprite::load() {
 	
 	// Decode Data
 
+	unsigned int width;
+	unsigned int height;
+
 	int error = lodepng::decode(image, width, height, file.split(data));
 
 	if (error) {
@@ -81,6 +84,9 @@ void Sprite::load() {
 
 		return;
 	}
+
+	size.x = width;
+	size.y = height;
 
 	state = ASSET_LOADED;
 }
@@ -94,10 +100,9 @@ void Sprite::create(glm::vec2 size, const Colour& fill) {
 
 	image.clear();
 
-	width = size.x;
-	height = size.y;
+	this->size = size;
 
-	for (unsigned int i = 0; i < width * height; i++) {
+	for (unsigned int i = 0; i < size.x * size.y; i++) {
 		image.push_back(fill.r);
 		image.push_back(fill.g);
 		image.push_back(fill.b);
@@ -110,7 +115,7 @@ void Sprite::create(glm::vec2 size, const Colour& fill) {
 }
 
 void Sprite::resize(glm::vec2 size, const Colour& fill) {
-	if (size.x == width && size.y == height) return;
+	if (this->size.x == size.x && this->size.y == size.y) return;
 
 	create(size, fill);
 }
@@ -128,7 +133,7 @@ void Sprite::upload() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, type, width, height, 0, type, GL_UNSIGNED_BYTE, &image.front());
+	glTexImage2D(GL_TEXTURE_2D, 0, type, (int) size.x, (int) size.y, 0, type, GL_UNSIGNED_BYTE, &image.front());
 
 	glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -145,4 +150,8 @@ void Sprite::unload() {
 	glDeleteTextures(1, &pos);
 
 	state = ASSET_INVALID;
+}
+
+glm::vec2 Sprite::get_size() {
+	return size;
 }

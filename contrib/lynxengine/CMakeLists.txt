@@ -28,11 +28,13 @@ add_library(lynxengine
   src/resource/asset/rendertexture.cpp
 
   src/render/render.cpp
+  src/render/compositor.cpp
 
   src/ces/scene.cpp
   src/ces/entity.cpp
   src/ces/component.cpp
   src/ces/component/transform.cpp
+  src/ces/component/camera.cpp
 )
 
 target_include_directories(lynxengine PRIVATE lynxengine)

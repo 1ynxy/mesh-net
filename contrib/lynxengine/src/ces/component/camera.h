@@ -1,50 +1,44 @@
 #ifndef camera_h
 #define camera_h
 
-#include <shared.h>
+#include <glm/glm.hpp>
 
-#include <resource/asset/rendertexture.h>
+#include <../src/resource/asset/rendertexture.h>
 
-#include <ces/component.h>
+#include <../src/ces/component/transform.h>
 
-#include <ces/component/transform.h>
+enum ProjectionType {
+	PROJ_ORTHO,
+	PROJ_PERSP
+};
 
 class Camera : public Component {
-private:
+public:
 	// Member Variables
 
 	float fov;
 	float min;
 	float max;
 
-public:
-	// Member Variables
-
-	glm::mat4 projection = glm::mat4(1.0f);
+	ProjectionType projection;
 
 	Shared<Transform> transform = nullptr;
+
 	Shared<RenderTexture> target = nullptr;
-
-	Colour colour;
-
-	glm::vec2 position;
-	glm::vec2 size;
 
 	// Constructors & Destructors
 
-	Camera(float fov, float min, float max, const Colour colour = Colour(0, 0, 0, 0));
+	Camera(float fov, float min, float max, ProjectionType projection = PROJ_PERSP);
+	Camera(Shared<Entity> entity, const Camera& camera);
+
+	~Camera();
 
 	// Member Functions
 
-	void SetFOV(float fov);
-	void SetDistance(float min, float max);
+	void init() override;
+	void term() override;
 
-	void Resize(glm::vec2 size);
-
-	// Gameloop Functions
-
-	void Init() override;
-	void LateUpdate() override;	
+	void resize(glm::vec2 size);
 };
 
 #endif

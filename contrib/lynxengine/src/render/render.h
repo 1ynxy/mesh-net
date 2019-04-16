@@ -9,9 +9,14 @@
 #include <../src/resource/asset/shader.h>
 #include <../src/resource/asset/mesh.h>
 
+#include <../src/ces/component/camera.h>
+
 class Render {
 private:
 	// Member Variables
+
+	glm::mat4 projection = glm::mat4(1.0f);
+	glm::mat4 view = glm::mat4(1.0f);
 
 	Shared<Mesh> meshCache = nullptr;
 	Shared<Shader> shaderCache = nullptr;
@@ -19,7 +24,7 @@ private:
 public:
 	// Member Functions
 
-	//bool camera(Shared<Camera> camera);
+	void camera(Shared<Camera> camera);
 
 	bool sprite(glm::vec2 position, glm::vec2 size, Shared<Sprite> sprite, Shared<Shader> shader);
 	bool mesh(glm::vec3 position, glm::vec3 rotation, Shared<Mesh> mesh, Shared<Shader> shader, Shared<Sprite> sprite = nullptr);

@@ -36,9 +36,7 @@ public:
 
 	template <typename T>
 	Shared<T> add(const T& src = T()) {
-		Shared<T> component = Shared<T>(new T(src));
-
-		component->entity = this;
+		Shared<T> component = Shared<T>(new T(this, src));
 
 		components.push_back(component);
 

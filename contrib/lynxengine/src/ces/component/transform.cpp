@@ -1,8 +1,16 @@
 #include "transform.h"
 
+#include <../src/ces/entity.h>
+
 // Constructors & Destructors
 
 Transform::Transform(const glm::vec3& position, const glm::vec3& rotation) : position(position), rotation(rotation) {
+	
+}
+
+Transform::Transform(Shared<Entity> entity, const Transform& transform) : position(transform.position), rotation(transform.rotation) {
+	this->entity = entity;
+	
 	init();
 }
 

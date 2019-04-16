@@ -6,24 +6,38 @@ Render render;
 
 // Member Functions
 
-/*
+void Render::camera(Shared<Camera> camera) {
+	glm::vec2 size;
 
-bool Render::camera(Shared<Camera> camera) {
-	if (camera->target) {
-		glBindFramebuffer(GL_FRAMEBUFFER, camera->target->pos);
+	if (camera->target && camera->target->ready()) {
+		glBindFramebuffer(GL_FRAMEBUFFER, camera->target->buffer);
 
-		glViewport(0, 0, (int) camera->target->size.x, (int) camera->target->size.y);
+		size = camera->target->colour->get_size();
 	}
 	else {
-		glm::vec2 screenSize = core.display.get_size();
-
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		glViewport(0, 0, (int) screenSize.x, (int) screenSize.y);
+		size = core.display.get_size();
+	}
+
+	glViewport(0, 0, (int) size.x, (int) size.y);
+
+	if (camera->projection == PROJ_ORTHO) projection = glm::ortho(0, (int) size.x, 0, (int) size.y);
+	else projection = glm::perspective(45.0f, core.display.aspect_ratio(), 0.01f, 100.0f);
+
+	if (camera->transform) {
+		glm::vec3 position = camera->transform->position;
+		glm::vec3 rotation = camera->transform->rotation;
+
+		view = glm::translate(glm::mat4(1.0f), position);
+
+		view = glm::rotate(view, rotation.x, glm::vec3(0, 0, 1));
+		view = glm::rotate(view, rotation.y, glm::vec3(0, 1, 0));
+		view = glm::rotate(view, rotation.z, glm::vec3(1, 0, 0));
+
+		view = glm::inverse(view);
 	}
 }
-
-*/
 
 bool Render::sprite(glm::vec2 position, glm::vec2 size, Shared<Sprite> sprite, Shared<Shader> shader) {
 
@@ -43,16 +57,6 @@ bool Render::mesh(glm::vec3 position, glm::vec3 rotation, Shared<Mesh> mesh, Sha
 	transform = glm::rotate(transform, glm::radians(rotation.z), glm::vec3(0, 0, 1));
 	transform = glm::rotate(transform, glm::radians(rotation.y), glm::vec3(0, 1, 0));
 	transform = glm::rotate(transform, glm::radians(rotation.x), glm::vec3(1, 0, 0));
-
-	glm::mat4 view = glm::mat4(1.0f);
-
-	view = glm::translate(view, glm::vec3(0, 0, 0));
-
-	view = glm::rotate(view, glm::radians(0.0f), glm::vec3(0, 0, 1));
-	view = glm::rotate(view, glm::radians(0.0f), glm::vec3(0, 1, 0));
-	view = glm::rotate(view, glm::radians(0.0f), glm::vec3(1, 0, 0));
-	
-	glm::mat4 projection = glm::perspective(45.0f, core.display.aspect_ratio(), 0.01f, 100.0f);
 
 	// Draw
 
@@ -85,7 +89,7 @@ bool Render::mesh(glm::vec3 position, glm::vec3 rotation, Shared<Mesh> mesh, Sha
 	}
 
 	shader->set("modelMat", transform);
-	shader->set("viewMat", glm::inverse(view));
+	shader->set("viewMat", view);
 	shader->set("projMat", projection);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);

@@ -17,8 +17,7 @@ private:
 
 	GLuint type = GL_RGBA;
 
-	unsigned int width = 0;
-	unsigned int height = 0;
+	glm::vec2 size;
 
 	std::vector<unsigned char> image;
 
@@ -43,6 +42,8 @@ public:
 	void resize(glm::vec2 size, const Colour& fill = Colour());
 	void upload() override;
 	void unload() override;
+
+	glm::vec2 get_size();
 };
 
 #endif

@@ -23,10 +23,12 @@
 #include <../src/resource/asset/rendertexture.h>
 
 #include <../src/render/render.h>
+#include <../src/render/compositor.h>
 
 #include <../src/ces/scene.h>
 #include <../src/ces/entity.h>
 #include <../src/ces/component.h>
 #include <../src/ces/component/transform.h>
+#include <../src/ces/component/camera.h>
 
 #endif

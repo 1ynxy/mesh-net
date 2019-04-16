@@ -15,7 +15,7 @@ Shared<Sprite> sprite;
 Shared<Shader> shader;
 Shared<Mesh> mesh;
 
-Shared<RenderTexture> newRenderTexture;
+Shared<Camera> camera;
 
 int main(int argc, char* argv[]) {
 	// Initialise Core
@@ -62,9 +62,7 @@ void init() {
 	mesh = resource.load<Mesh>("mesh/island");
 	shader = resource.load<Shader>("shader/default");
 
-	// Test Creating Resources
-
-	newRenderTexture = new RenderTexture("camera_target", glm::vec2(100, 100));
+	camera = new Camera(45.0f, 0.01f, 100.0f);
 }
 
 void update() {
@@ -83,5 +81,7 @@ void update() {
 }
 
 void display() {
+	render.camera(camera);
+
 	render.mesh(glm::vec3(-1.5, 0, -5), glm::vec3(0, rot, 0), mesh, shader, sprite);
 }
