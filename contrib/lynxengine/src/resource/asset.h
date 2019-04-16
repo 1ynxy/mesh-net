@@ -19,6 +19,8 @@ enum LoadState {
 class Asset : public Sharable {
 public:
 	// Member Variables
+
+	bool created = false;
 	
 	float timeout = 0;
 

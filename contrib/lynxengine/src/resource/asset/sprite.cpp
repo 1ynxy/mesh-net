@@ -15,6 +15,14 @@ Sprite::Sprite(const std::string& name) {
 	init();
 }
 
+Sprite::Sprite(glm::vec2 size, const Colour& fill) {
+	this->name = "created_sprite";
+
+	init();
+
+	create(size, fill);
+}
+
 Sprite::~Sprite() {
 	unload();
 }
@@ -69,6 +77,28 @@ void Sprite::load() {
 	state = ASSET_LOADED;
 }
 
+void Sprite::create(glm::vec2 size, const Colour& fill) {
+	state = ASSET_WAITING;
+
+	created = true;
+
+	// Create Asset Data
+
+	width = size.x;
+	height = size.y;
+
+	for (unsigned int i = 0; i < width * height; i++) {
+		image.push_back(fill.r);
+		image.push_back(fill.g);
+		image.push_back(fill.b);
+		image.push_back(fill.a);
+	}
+
+	state = ASSET_LOADED;
+
+	upload();
+}
+
 void Sprite::upload() {
 	state = ASSET_WAITING;
 
@@ -88,7 +118,7 @@ void Sprite::upload() {
 
 	state = ASSET_READY;
 
-	debug.info("loaded sprite \"" + name + "\"");
+	debug.info(std::string(created ? "created" : "loaded") + " sprite \"" + name + "\"");
 }
 
 void Sprite::unload() {

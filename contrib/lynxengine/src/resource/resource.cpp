@@ -26,7 +26,7 @@ template <typename T> Shared<T> Resource::load(const std::string& name)  {
 		}
 	}
 
-	Shared<T> resource = Shared<T>(new T(name));
+	Shared<T> resource = new T(name);
 
 	if (resource) {
 		resources.push_back(resource);

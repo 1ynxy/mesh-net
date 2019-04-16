@@ -15,6 +15,8 @@ Shared<Sprite> sprite;
 Shared<Shader> shader;
 Shared<Mesh> mesh;
 
+Shared<Sprite> newSprite;
+
 int main(int argc, char* argv[]) {
 	// Initialise Core
 
@@ -60,13 +62,9 @@ void init() {
 	mesh = resource.load<Mesh>("mesh/island");
 	shader = resource.load<Shader>("shader/default");
 
-	// Test CES
+	// Test Creating Resources
 
-	Shared<Entity> entity = scene.instantiate("new entity");
-
-	Shared<Transform> transform = entity->get<Transform>();
-
-	if (transform) debug.info(std::to_string(transform->position.x) + " " + std::to_string(transform->position.y) + " " + std::to_string(transform->position.z));
+	newSprite = new Sprite(glm::vec2(10, 20), Colour(255, 0, 255));
 }
 
 void update() {
@@ -85,5 +83,5 @@ void update() {
 }
 
 void display() {
-	render.mesh(glm::vec3(-1.5, 0, -5), glm::vec3(0, rot, 0), mesh, shader, sprite);
+	render.mesh(glm::vec3(-1.5, 0, -5), glm::vec3(0, rot, 0), mesh, shader, newSprite);
 }

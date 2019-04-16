@@ -28,6 +28,7 @@ public:
 	// Constructors & Destructors
 
 	Sprite(const std::string& name);
+	Sprite(glm::vec2 size, const Colour& fill);
 
 	~Sprite();
 
@@ -35,6 +36,7 @@ public:
 
 	void init() override;
 	void load() override;
+	void create(glm::vec2 size, const Colour& fill = Colour());
 	void upload() override;
 	void unload() override;
 };
