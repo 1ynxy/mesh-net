@@ -31,8 +31,6 @@ int Server::bind(const std::string& port) {
 
    	if (getaddrinfo(NULL, port_c, &hints, &results) != 0) {
 	   	// Failed To Get Local AddrInfo
-
-		freeaddrinfo(results);
 			
 		return -1;
    	}
@@ -113,8 +111,6 @@ int Server::connect(const std::string& addr, const std::string& port) {
 
 	if (getaddrinfo(addr_c, port_c, &hints, &results) != 0) {
 	   	// Failed To Get Host AddrInfo
-
-		freeaddrinfo(results);
 			
 		return -1;
    	}

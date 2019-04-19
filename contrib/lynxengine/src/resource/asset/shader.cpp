@@ -87,7 +87,7 @@ void Shader::unload() {
 
 bool Shader::load_pass(std::string data, GLenum type) {
 	std::string define = type == GL_VERTEX_SHADER ? "COMP_VERT" : "COMP_FRAG";
-	data = "#version 450 core\n\n#define " + define + "\n\n" + data;
+	data = "#version 330 core\n\n#define " + define + "\n\n" + data;
 
 	// Compile Shader Pass
 
