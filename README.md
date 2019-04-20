@@ -53,7 +53,7 @@ Use of a program such as 'pngcheck -c [file]' is advised to ensure that all imag
 
 One of the primary costs associated with developing large scale online video games is that of continued hosting of non-community run game servers. Often, these are the only type of server available, as it allows the company more authority over how the servers are interacted with by the players.
 
-This project aims to develop and test a method for enabling the distributed processing and hosting of virtual game worlds in which all clients act as equal nodes in the network. An attempt will be made to introduce data persistence to a mesh network with load balancing, when it comes to data distribution.
+This project aims to develop and test a method for enabling the distributed processing and hosting of virtual game worlds in which all clients act as equal nodes in the network. An attempt will be made to introduce data persistence and load balancing to a mesh network.
 
 The result will be a module written in C++, integrated loosely with a simple, custom, 3D capable game engine. This module will abstract all network events and methods in a way that can be utilised by any program, rather than being tied to a particular game engine.
 
