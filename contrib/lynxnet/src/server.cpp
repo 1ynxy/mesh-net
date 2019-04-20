@@ -204,9 +204,16 @@ void Server::listen() {
 			   	if (i == self) {
 					// Peer Possibly Requested Connection
 
-					nbytes = ::accept(self, NULL, NULL);
+					struct sockaddr_in clientaddr;
+					socklen_t clientaddr_size = sizeof(clientaddr);
+
+					nbytes = ::accept(self, (struct sockaddr*) &clientaddr, &clientaddr_size);
 
 				   	if (nbytes != -1) {
+						// Get Socket IP Address
+
+
+
 						// Add To FileDescriptor Set
 
 						FD_SET(nbytes, &sockets);
@@ -214,10 +221,12 @@ void Server::listen() {
 						if (nbytes > sockmax) sockmax = nbytes;
 
 						// Send Peer Connect Information To Peers
+						
+						// TODO - Comply With Protocol : NEWCONN[PEERID>HOSTID]
 
 						Packet message(nbytes, "client connected");
 
-						send(message, true);
+						send(message);
 				   	}
 			   	}
 				else {
@@ -237,9 +246,11 @@ void Server::listen() {
 
 							// Send Peer Disconnect Information To Peers
 
+							// TODO - Comply With Protocol : CONNLOST[PEERID]
+
 							Packet message(i, "client disconnected");
 
-							send(message, true);
+							send(message);
 						}
 						else {
 							// Unknown Error
@@ -256,7 +267,11 @@ void Server::listen() {
 						
 						Packet message(i, nbytes, &text[0]);
 
-						send(message, true);
+						send(message);
+
+						// Parse Or Store
+
+						parse(message);
 				   	}
 			   	}
 		   	}
@@ -333,4 +348,8 @@ bool Server::recv(Packet& message) {
 	}
 
 	return false;
+}
+
+void Server::parse(const Packet& message) {
+	
 }

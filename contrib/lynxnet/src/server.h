@@ -29,6 +29,9 @@ private:
 
 	int self = 0;
 
+	Peer* root = nullptr;
+	Peer* peer = nullptr;
+
 	std::atomic<bool> running;
 	std::thread listener;
 	std::thread broadcaster;
@@ -61,6 +64,8 @@ public:
 
 	void send(const Packet& message, bool includeLocal = false);
 	bool recv(Packet& message);
+
+	void parse(const Packet& message);
 };
 
 #endif

@@ -13,6 +13,8 @@ enum PortStat {
 struct Peer {
 	// Member Variables
 
+	int uuid = 0;
+
 	int socket = 0;
 
 	std::string global = "";

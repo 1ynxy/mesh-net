@@ -75,7 +75,58 @@ This project aims to develop and test a method for enabling the distributed proc
 
 ## methodology
 
-// put methodology here
+# representing network
+
+tree:
+  each peer is a node
+  a node has one host & many children
+  most accurate view of network relationships
+  innefficient to traverse
+    depth first techniques:
+      - INORDER
+      - PREORDER
+      - POSTORDER
+  every operation requires a traversal
+list:
+  simple list of nodes
+  simpler algorithmically
+  no indication of relationships : disconnects will not be accurate
+  much easier to traverse
+both:
+  easy to traverse
+  accurate view of network relationships
+  modification of peers requires multiple operations
+  list can be used for traversal, then acted upon as a tree node
+
+# protocol
+
+fixed header:
+  simpler to parse
+  smaller header
+dynamic header:
+  more metadata
+  can support multiple layers
+
+# examples of dynamic header
+
+NEWCONN PEERID HOSTID
+[7 NEWCONN 005 002]
+
+SETIP PEERID PEERIP
+[5 SETIP 005 192.168.0.15]
+
+CONNLOST PEERID
+[8 CONNLOST 005]
+
+# peer structure
+
+integer unique user identification [UUID]
+integer socket number
+string global ip
+string local ip
+enum port status { PORT_FORWARD, PORT_BLOCK, PORT_UNDEF }
+peer* host
+list peer* children
 
 ## conclusion
 
