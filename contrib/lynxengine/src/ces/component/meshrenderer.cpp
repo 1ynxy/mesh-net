@@ -28,9 +28,9 @@ MeshRenderer::~MeshRenderer() {
 void MeshRenderer::init() {
 	if (entity) transform = entity->get<Transform>();
 
-	sprite = resource.load<Sprite>(spriteName);
-	mesh = resource.load<Mesh>(meshName);
-	shader = resource.load<Shader>(shaderName);
+	if (spriteName != "") sprite = resource.load<Sprite>(spriteName);
+	if(meshName != "") mesh = resource.load<Mesh>(meshName);
+	if (shaderName != "") shader = resource.load<Shader>(shaderName);
 }
 
 void MeshRenderer::display() {

@@ -53,7 +53,7 @@ bool Render::sprite(Shared<Transform> transform, Shared<Sprite> sprite, Shared<S
 }
 
 bool Render::sprite(glm::vec2 position, glm::vec2 size, Shared<Sprite> sprite, Shared<Shader> shader) {
-
+	// HERE
 
 	return true;
 }
