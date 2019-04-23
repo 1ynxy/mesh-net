@@ -102,6 +102,7 @@ protocol
 fixed header:
 - simpler to parse
 - smaller header
+
 dynamic header:
 - more metadata
 - can support multiple layers
@@ -123,6 +124,7 @@ human readable vs machine readable
 human readable:
 - text in headers to indicate event types
 - easier to debug
+
 machine readable:
 - replaces text in header with event ids
 - smaller headers
