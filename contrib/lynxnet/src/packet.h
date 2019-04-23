@@ -5,16 +5,18 @@
 
 enum BroadcastType {
 	BROADCAST_GLBL = 0,
-	BROADCAST_MSSG = 1
+	BROADCAST_MSSG = 1,
+	BROADCAST_SNGL = 2
 };
 
 enum PacketType {
 	PCKT_GAMEDAT = 0,
 	PCKT_NEWCONN = 1,
 	PCKT_REMCONN = 2,
-	PCKT_SETNAME = 3,
-	PCKT_SETIDIP = 4,
-	PCKT_NETSTAT = 5
+	PCKT_SETUUID = 3,
+	PCKT_SETNAME = 4,
+	PCKT_SETIDIP = 5,
+	PCKT_NETSTAT = 6
 };
 
 struct Packet {

@@ -62,7 +62,7 @@ public:
 
 	bool start();
 
-	void send(const Packet& message, bool includeLocal = false);
+	void send(const Packet& message);
 	bool recv(Packet& message);
 
 	void parse(Packet message);

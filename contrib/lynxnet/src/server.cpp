@@ -210,27 +210,15 @@ void Server::listen() {
 					nbytes = ::accept(self, (struct sockaddr*) &clientaddr, &clientaddr_size);
 
 				   	if (nbytes != -1) {
-						// Get Socket IP Address
-
-
-
 						// Add To FileDescriptor Set
 
 						FD_SET(nbytes, &sockets);
 
 						if (nbytes > sockmax) sockmax = nbytes;
 
-						// Send Peer Connect Information To Peers
-						
-						// TODO - Comply With Protocol : NEWCONN[PEERID>HOSTID]
+						// Inform New Peer Of UUID
 
-						Packet message(nbytes, "01UUIDIP");
-
-						send(message);
-
-						// Parse Or Store
-
-						parse(message);
+						send(Packet(nbytes, "23UUID"));
 				   	}
 			   	}
 				else {
@@ -248,17 +236,9 @@ void Server::listen() {
 
 							::close(i);
 
-							// Send Peer Disconnect Information To Peers
+							// Parse Connection Lost Message & Forward
 
-							// TODO - Comply With Protocol : CONNLOST[PEERID]
-
-							Packet message(i, "02UUID");
-
-							send(message);
-
-							// Parse Or Store
-
-							parse(message);
+							parse(Packet(i, "02UUID"));
 						}
 						else {
 							// Unknown Error
@@ -271,15 +251,9 @@ void Server::listen() {
 
 						for (int c = 0; c < nbytes; c++) text += buf[c];
 
-						// Send Received Data To Peers
-						
-						Packet message(i, nbytes, &text[0]);
+						// Parse Received Message & Forward
 
-						send(message);
-
-						// Parse Or Store
-
-						parse(message);
+						parse(Packet(i, nbytes, &text[0]));
 				   	}
 			   	}
 		   	}
@@ -296,24 +270,40 @@ void Server::broadcast() {
 			Packet message = sendbuffer.front();
 			sendbuffer.pop();
 			sendmut.unlock();
+			
+			// Figure Out If Inclusive Or Exclusive
+
+			bool inclusive = true;
+			
+			if (message.socket < 0) {
+				inclusive = false;
+
+				message.socket = -message.socket;
+			}
+
+			// Send
 				
 			for(int i = 0; i <= sockmax; i++) {
-	   			if (i != message.socket && i != self && FD_ISSET(i, &sockets)) {
-					// Ensure No Data Is Omitted
+				if (i == self || !FD_ISSET(i, &sockets)) continue;
+
+				if (inclusive && i != message.socket) continue;
+
+				if (!inclusive && i == message.socket) continue;
+				
+				// Ensure No Data Is Omitted
 					
-					int len = message.text.length();
-					const char* txt = message.text.c_str();
+				int len = message.text.length();
+				const char* txt = message.text.c_str();
 
-					int total = 0;
+				int total = 0;
 
-					while (total < len) {
-						int ret = ::send(i, txt + total, len - total, 0);
+				while (total < len) {
+					int ret = ::send(i, txt + total, len - total, 0);
 						
-						if (ret < 0) break;
+					if (ret < 0) break;
 						
-						total += ret;
-					}
-	   			}
+					total += ret;
+				}
 			}
 		}
 
@@ -327,18 +317,12 @@ void Server::broadcast() {
 	}
 }
 
-void Server::send(const Packet& message, bool includeLocal) {
+void Server::send(const Packet& message) {
 	// Add To Send Queue In A Thread-Safe Manner
 
 	sendmut.lock();
 	sendbuffer.push(message);
 	sendmut.unlock();
-
-	if (includeLocal) {
-		recvmut.lock();
-		recvbuffer.push(message);
-		recvmut.unlock();
-	}
 
 	conditional.notify_one();
 }
@@ -359,19 +343,36 @@ bool Server::recv(Packet& message) {
 }
 
 void Server::parse(Packet message) {
-	BroadcastType target = (BroadcastType) (message.text[0] - '0');
+	// Forward Message To Peers
 
-	std::string target_str = target == 0 ? "GLBL" : "MSSG";
+	message.socket = -message.socket;
+
+	send(message);
+	
+	// Extract Type Data From Text
+
+	BroadcastType target = (BroadcastType) (message.text[0] - '0');
 
 	message.text.erase(message.text.begin());
 
 	PacketType type = (PacketType) (message.text[0] - '0');
 
-	std::string type_str = type == 0 ? "GAMEDAT" : type == 1 ? "NEWCONN" : type == 2 ? "REMCONN" : type == 3 ? "SETNAME" : type == 4 ? "SETIDIP" : "NETSTAT";
-
 	message.text.erase(message.text.begin());
 
+	// Parse Remaining Text Depending On Type Data
+
+	std::string target_str = target == 0 ? "GLBL" : target == 1 ? "MSSG" : "SNGL";
+	std::string type_str = type == 0 ? "GAMEDAT" : type == 1 ? "NEWCONN" : type == 2 ? "REMCONN" : type == 3 ? "SETUUID" : type == 4? "SETNAME" : type == 5 ? "SETIDIP" : "NETSTAT";
+
 	message.text = "[" + target_str + ":" + type_str + "]" + message.text;
+
+	// If Message Is GAMEDAT Add To Receive Queue
+
+	if (type == 0) {
+
+	}
+
+	// TMP Always Add
 
 	recvmut.lock();
 	recvbuffer.push(message);
