@@ -224,9 +224,13 @@ void Server::listen() {
 						
 						// TODO - Comply With Protocol : NEWCONN[PEERID>HOSTID]
 
-						Packet message(nbytes, "client connected");
+						Packet message(nbytes, "01UUIDIP");
 
 						send(message);
+
+						// Parse Or Store
+
+						parse(message);
 				   	}
 			   	}
 				else {
@@ -248,9 +252,13 @@ void Server::listen() {
 
 							// TODO - Comply With Protocol : CONNLOST[PEERID]
 
-							Packet message(i, "client disconnected");
+							Packet message(i, "02UUID");
 
 							send(message);
+
+							// Parse Or Store
+
+							parse(message);
 						}
 						else {
 							// Unknown Error
@@ -350,6 +358,22 @@ bool Server::recv(Packet& message) {
 	return false;
 }
 
-void Server::parse(const Packet& message) {
-	
+void Server::parse(Packet message) {
+	BroadcastType target = (BroadcastType) (message.text[0] - '0');
+
+	std::string target_str = target == 0 ? "GLBL" : "MSSG";
+
+	message.text.erase(message.text.begin());
+
+	PacketType type = (PacketType) (message.text[0] - '0');
+
+	std::string type_str = type == 0 ? "GAMEDAT" : type == 1 ? "NEWCONN" : type == 2 ? "REMCONN" : type == 3 ? "SETNAME" : type == 4 ? "SETIDIP" : "NETSTAT";
+
+	message.text.erase(message.text.begin());
+
+	message.text = "[" + target_str + ":" + type_str + "]" + message.text;
+
+	recvmut.lock();
+	recvbuffer.push(message);
+	recvmut.unlock();
 }

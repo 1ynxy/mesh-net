@@ -77,7 +77,7 @@ This project aims to develop and test a method for enabling the distributed proc
 
 representing network
 
-tree:  
+tree: 
 - each peer is a node
 - a node has one host & many children
 - most accurate view of network relationships
@@ -86,12 +86,12 @@ tree:
   - PREORDER
   - POSTORDER
 - every operation requires a traversal
-list:  
+list: 
 - simple list of nodes
 - simpler algorithmically
 - no indication of relationships : disconnects will not be accurate
 - much easier to traverse
-both:  
+both: 
 - easy to traverse
 - accurate view of network relationships
 - modification of peers requires multiple operations
@@ -105,6 +105,7 @@ fixed header:
 dynamic header:
 - more metadata
 - can support multiple layers
+- easier to implement changes later
 
 examples of dynamic header
 
@@ -116,6 +117,17 @@ SETIP PEERID PEERIP
 
 CONNLOST PEERID
 [8 CONNLOST 005]
+
+human readable vs machine readable
+
+human readable:
+- text in headers to indicate event types
+- easier to debug
+machine readable:
+- replaces text in header with event ids
+- smaller headers
+- easier to parse
+- requires more documentation
 
 peer structure
 

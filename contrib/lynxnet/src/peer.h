@@ -4,12 +4,6 @@
 #include <string>
 #include <vector>
 
-enum PortStat {
-	PORT_FORWARD,
-	PORT_BLOCK,
-	PORT_UNDEF
-};
-
 struct Peer {
 	// Member Variables
 
@@ -20,7 +14,7 @@ struct Peer {
 	std::string global = "";
 	std::string local = "";
 
-	PortStat stat = PORT_UNDEF;
+	// Network Tree
 
 	Peer* host = nullptr;
 	std::vector<Peer*> children = std::vector<Peer*>();

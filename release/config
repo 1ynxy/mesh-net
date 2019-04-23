@@ -1,5 +1,5 @@
 i:verbosity=0
-b:headless=false
+b:headless=true
 b:vsync=true
 i:fps-limit=60
 f:resource-timeout=10
