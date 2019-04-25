@@ -82,13 +82,13 @@ void Network::clr_peer(int uuid) {
 int Network::sock_to_uuid(int sock) {
 	Peer* peer = from_sock(sock);
 
-	return peer ? peer->uuid : -1;
+	return peer ? peer->uuid : 0;
 }
 
 int Network::uuid_to_sock(int uuid) {
 	Peer* peer = from_uuid(uuid);
 
-	return peer ? peer->socket : -1;
+	return peer ? peer->socket : 0;
 }
 
 std::string Network::serialise() {

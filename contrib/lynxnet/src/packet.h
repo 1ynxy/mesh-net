@@ -2,6 +2,7 @@
 #define packet_h
 
 #include <string>
+#include <vector>
 
 enum BroadcastType {
 	BROADCAST_GLBL = 0,
@@ -31,6 +32,10 @@ struct Packet {
 	Packet(int socket, int len, const char* text);
 	Packet(int socket, const std::string& text);
 	Packet(const Packet& packet);
+
+	// Member Functions
+
+	std::vector<Packet> split() const;
 };
 
 #endif

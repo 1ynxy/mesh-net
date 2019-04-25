@@ -232,11 +232,13 @@ void Server::listen() {
 
 						// Send Network Image Serialised
 
-						send_to(Packet(nbytes, "16" + network.serialise() + "\n"));
+						std::string net = network.serialise();
+
+						if (net != "") send_to(Packet(nbytes, "16" + net + '\n'));		
 
 						// Set Socket On Peer
 
-						send_to(Packet(nbytes, "13" + int_to_str(network.self->uuid, 3) + "\n"));
+						send_to(Packet(nbytes, "13" + int_to_str(network.self->uuid, 3) + '\n'));
 				   	}
 			   	}
 				else {
@@ -262,7 +264,7 @@ void Server::listen() {
 
 							// Forward Disconnect NetEvent
 
-							parse(Packet(i, "02" + uuid + "\n"));
+							parse(Packet(i, "02" + uuid + '\n'));
 						}
 						else {
 							// Unknown Error
@@ -375,6 +377,16 @@ bool Server::recv(std::string& text) {
 }
 
 void Server::parse(const Packet& message) {
+	// Split Merged Messages
+
+	std::vector<Packet> packets = message.split();
+	
+	if (packets.size() > 0) {
+		for (Packet& packet : packets) parse(packet);
+
+		return;
+	}
+
 	// Extract Type Data From Text
 
 	std::string text = message.text;
@@ -501,16 +513,16 @@ void Server::parse(const Packet& message) {
 
 		// Identify Host
 
-		// TODO : IDENTIFY HOST //
+		int host_uuid = network.sock_to_uuid(message.socket);
 
 		// Add Self To Network
 
 		int uuid = network.new_uuid();
 
-		parse(Packet(self, "01" + int_to_str(uuid, 3) + int_to_str(999, 3) + "\n"));
+		parse(Packet(self, "01" + int_to_str(uuid, 3) + int_to_str(host_uuid, 3) + '\n'));
 
 		// Set Sock On Host
 
-		send_to(Packet(host, "13" + int_to_str(uuid, 3) + "\n"));
+		send_to(Packet(host, "13" + int_to_str(uuid, 3) + '\n'));
 	}
 }

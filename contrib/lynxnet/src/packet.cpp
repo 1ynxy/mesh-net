@@ -17,3 +17,24 @@ Packet::Packet(int socket, const std::string& text) : socket(socket) {
 Packet::Packet(const Packet& packet) : socket(packet.socket) {
 	text = packet.text;
 }
+
+// Member Functions
+
+std::vector<Packet> Packet::split() const {
+	std::vector<Packet> packets = std::vector<Packet>();
+
+	std::string msg = text;
+
+	std::string buffer = "";
+
+	for (unsigned char chr : msg) {
+		if (chr == '\n') {
+			packets.push_back(Packet(socket, buffer));
+
+			buffer = "";
+		}
+		else buffer += chr;
+	}
+
+	return packets;
+}
