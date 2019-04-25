@@ -1,8 +1,6 @@
 #!/bin/bash
 
-if [ $1 == "clean" ]; then
-    rm -R build/*
-fi
+[[ -d dir ]] || mkdir -p build
 
 cd build
 
@@ -24,10 +22,6 @@ cd ..
 
 chmod u+x build/lynxgame
 
-if [ ! -d release ]; then
-    mkdir -p release
-fi
+[[ -d release ]] || mkdir -p release
 
-mv build/lynxgame release/lynxgame
-
-rsync release/lynxgame lynxy@192.168.0.15:/home/lynxy/lynxgame/lynxgame
+mv build/lynxgame release/lynxgame.out
