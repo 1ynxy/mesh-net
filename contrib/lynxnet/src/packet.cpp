@@ -17,7 +17,3 @@ Packet::Packet(int socket, const std::string& text) : socket(socket) {
 Packet::Packet(const Packet& packet) : socket(packet.socket) {
 	text = packet.text;
 }
-
-// Member Functions
-
-

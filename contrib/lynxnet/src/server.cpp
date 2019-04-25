@@ -234,7 +234,7 @@ void Server::listen() {
 
 						send_to(Packet(nbytes, "16" + network.serialise() + "\n"));
 
-						// Set Sock On Peer
+						// Set Socket On Peer
 
 						send_to(Packet(nbytes, "13" + int_to_str(network.self->uuid, 3) + "\n"));
 				   	}
@@ -256,9 +256,9 @@ void Server::listen() {
 
 							// Get UUID Of Peer
 
-							Peer* peer = network.get_peer_by_sock(i);
+							Peer* peer = network.from_sock(i);
 
-							std::string uuid = peer ? int_to_str(peer->uuid, 3) : "000";
+							std::string uuid = peer ? int_to_str(peer->uuid, 3) : "999";
 
 							// Forward Disconnect NetEvent
 
@@ -352,6 +352,8 @@ void Server::send_to(const Packet& message) {
 }
 
 void Server::send(const std::string& text) {
+	// Send To All Peers
+
 	send_to(Packet(-self, text));
 }
 
@@ -386,7 +388,7 @@ void Server::parse(const Packet& message) {
 	text.erase(text.begin());
 
 	// Debug Log
-
+	
 	std::string target_str = target == 0 ? "GLBL" : "MSSG";
 	std::string type_str = type == 0 ? "GAMEDAT" : type == 1 ? "NEWCONN" : type == 2 ? "REMCONN" : type == 3 ? "SETSOCK" : type == 4 ? "SETNAME" : type == 5 ? "SETIDIP" : "NETSTAT";
 
@@ -394,7 +396,7 @@ void Server::parse(const Packet& message) {
 	recvbuffer.push(Packet(self, "[" + target_str + ":" + type_str + "]" + text));
 	recvmut.unlock();
 
-	// If Broadcast Forward Message To Peers
+	// If Broadcast, Forward Message To Peers
 	
 	if (target == 0) send_to(Packet(-message.socket, message.text));
 
@@ -403,13 +405,9 @@ void Server::parse(const Packet& message) {
 	if (type == 0) {
 		// Add To Receive Queue
 
-		/*
-
 		recvmut.lock();
 		recvbuffer.push(Packet(self, text));
 		recvmut.unlock();
-
-		*/
 	}
 
 	// NEWCONN
@@ -425,7 +423,11 @@ void Server::parse(const Packet& message) {
 		int uuid = stoi(uuid_str);
 		int host = stoi(host_str);
 
-		network.add_peer(uuid, host);
+		Peer* peer = network.add_peer(uuid, host);
+
+		// Set Self
+
+		if (message.socket == self) network.self = peer;
 	}
 
 	// REMCONN
@@ -453,7 +455,7 @@ void Server::parse(const Packet& message) {
 
 		int uuid = stoi(uuid_str);
 
-		Peer* peer = network.get_peer_by_uuid(uuid);
+		Peer* peer = network.from_uuid(uuid);
 
 		if (peer) peer->socket = message.socket;
 	}
@@ -469,7 +471,7 @@ void Server::parse(const Packet& message) {
 
 		int uuid = stoi(uuid_str);
 
-		Peer* peer = network.get_peer_by_uuid(uuid);
+		Peer* peer = network.from_uuid(uuid);
 
 		if (peer) peer->name = text.substr(3, -1);
 	}
@@ -485,7 +487,7 @@ void Server::parse(const Packet& message) {
 
 		int uuid = stoi(uuid_str);
 
-		Peer* peer = network.get_peer_by_uuid(uuid);
+		Peer* peer = network.from_uuid(uuid);
 
 		if (peer) peer->address = text.substr(3, -1);
 	}
@@ -505,11 +507,7 @@ void Server::parse(const Packet& message) {
 
 		int uuid = network.new_uuid();
 
-		parse(Packet(self, "01" + int_to_str(uuid, 3) + int_to_str(0, 3) + "\n"));
-
-		// Set Self
-
-		network.self = network.get_peer_by_uuid(uuid);
+		parse(Packet(self, "01" + int_to_str(uuid, 3) + int_to_str(999, 3) + "\n"));
 
 		// Set Sock On Host
 

@@ -31,10 +31,6 @@ struct Packet {
 	Packet(int socket, int len, const char* text);
 	Packet(int socket, const std::string& text);
 	Packet(const Packet& packet);
-
-	// Member Functions
-
-	
 };
 
 #endif
