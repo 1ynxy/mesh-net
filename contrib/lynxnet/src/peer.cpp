@@ -2,7 +2,6 @@
 
 // Contructors & Destructors
 
-
-
-// Member Functions
-
+Peer::Peer(int uuid) : uuid(uuid) {
+	
+}

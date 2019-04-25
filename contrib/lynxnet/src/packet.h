@@ -5,8 +5,7 @@
 
 enum BroadcastType {
 	BROADCAST_GLBL = 0,
-	BROADCAST_MSSG = 1,
-	BROADCAST_SNGL = 2
+	BROADCAST_MSSG = 1
 };
 
 enum PacketType {

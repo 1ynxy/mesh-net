@@ -6,6 +6,7 @@ FIND_PACKAGE(Threads)
 
 add_library(lynxnet
   src/peer.cpp
+  src/network.cpp
   src/packet.cpp
   src/server.cpp
 )

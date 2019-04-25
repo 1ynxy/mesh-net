@@ -18,6 +18,7 @@
 #include <poll.h>
 
 #include <../src/peer.h>
+#include <../src/network.h>
 #include <../src/packet.h>
 
 class Server {
@@ -28,9 +29,9 @@ private:
 	int sockmax = 0;
 
 	int self = 0;
+	int host = 0;
 
-	Peer* root = nullptr;
-	Peer* peer = nullptr;
+	Network network;
 
 	std::atomic<bool> running;
 	std::thread listener;
@@ -62,10 +63,14 @@ public:
 
 	bool start();
 
-	void send(const Packet& message);
-	bool recv(Packet& message);
+	void send_to(const Packet& message);
 
-	void parse(Packet message);
+	void send(const std::string& text);
+	bool recv(std::string& text);
+
+	void parse(const Packet& message);
+
+	std::string int_to_str(int in, int length);
 };
 
 #endif

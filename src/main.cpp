@@ -67,9 +67,9 @@ void update() {
 
 	// Print Received Packets
 
-	Packet result;
+	std::string result;
 
-	while (server.recv(result)) debug.info(result.text);
+	while (server.recv(result)) debug.info(result);
 
 	// Rotate Object
 

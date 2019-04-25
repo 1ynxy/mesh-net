@@ -159,6 +159,8 @@ int Server::connect(const std::string& addr, const std::string& port) {
 
 	if (sock > sockmax) sockmax = sock;
 
+	host = sock;
+
 	return 1;
 }
 
@@ -216,9 +218,16 @@ void Server::listen() {
 
 						if (nbytes > sockmax) sockmax = nbytes;
 
-						// Inform New Peer Of UUID
+						// Generate New UUID
 
-						send(Packet(nbytes, "23UUID"));
+						std::string uuid = int_to_str(network.new_uuid(), 3);
+						std::string host = network.self ? int_to_str(network.self->uuid, 3) : "";
+
+						send_to(Packet(nbytes, "13" + uuid + host));
+
+						// Parse & Forward
+
+						parse(Packet(nbytes, "01" + uuid + host));
 				   	}
 			   	}
 				else {
@@ -236,9 +245,13 @@ void Server::listen() {
 
 							::close(i);
 
-							// Parse Connection Lost Message & Forward
+							// Get UUID Of Peer
 
-							parse(Packet(i, "02UUID"));
+							std::string uuid = int_to_str(1, 3);
+
+							// Parse & Forward
+
+							parse(Packet(i, "02" + uuid));
 						}
 						else {
 							// Unknown Error
@@ -247,13 +260,13 @@ void Server::listen() {
 					else {
 						// Packet Received From Peer
 
-						std::string text = "";
+						std::string msg = "";
 
-						for (int c = 0; c < nbytes; c++) text += buf[c];
+						for (int c = 0; c < nbytes; c++) msg += buf[c];
 
-						// Parse Received Message & Forward
+						// Parse & Forward
 
-						parse(Packet(i, nbytes, &text[0]));
+						parse(Packet(i, msg));
 				   	}
 			   	}
 		   	}
@@ -317,7 +330,7 @@ void Server::broadcast() {
 	}
 }
 
-void Server::send(const Packet& message) {
+void Server::send_to(const Packet& message) {
 	// Add To Send Queue In A Thread-Safe Manner
 
 	sendmut.lock();
@@ -327,14 +340,20 @@ void Server::send(const Packet& message) {
 	conditional.notify_one();
 }
 
-bool Server::recv(Packet& message) {
+void Server::send(const std::string& text) {
+	send_to(Packet(0, text));
+}
+
+bool Server::recv(std::string& text) {
 	// Get From Receive Queue In A Thread-Safe Manner
 
 	if (recvbuffer.size() > 0) {
 		recvmut.lock();
-		message = recvbuffer.front();
+		Packet message = recvbuffer.front();
 		recvbuffer.pop();
 		recvmut.unlock();
+
+		text = message.text;
 
 		return true;
 	}
@@ -342,39 +361,53 @@ bool Server::recv(Packet& message) {
 	return false;
 }
 
-void Server::parse(Packet message) {
-	// Forward Message To Peers
-
-	message.socket = -message.socket;
-
-	send(message);
-	
+void Server::parse(const Packet& message) {
 	// Extract Type Data From Text
 
-	BroadcastType target = (BroadcastType) (message.text[0] - '0');
+	std::string text = message.text;
 
-	message.text.erase(message.text.begin());
+	BroadcastType target = (BroadcastType) (text[0] - '0');
 
-	PacketType type = (PacketType) (message.text[0] - '0');
+	text.erase(text.begin());
 
-	message.text.erase(message.text.begin());
+	PacketType type = (PacketType) (text[0] - '0');
+
+	text.erase(text.begin());
+
+	// Forward Message To Peers
+
+	if (target == 0) send_to(Packet(-message.socket, message.text));
 
 	// Parse Remaining Text Depending On Type Data
 
-	std::string target_str = target == 0 ? "GLBL" : target == 1 ? "MSSG" : "SNGL";
+	if (type == 1 || type == 3) {
+
+
+	//	network.add_peer(uuid, host);
+	}
+
+	// Debug Log
+
+	std::string target_str = target == 0 ? "GLBL" : "MSSG";
 	std::string type_str = type == 0 ? "GAMEDAT" : type == 1 ? "NEWCONN" : type == 2 ? "REMCONN" : type == 3 ? "SETUUID" : type == 4? "SETNAME" : type == 5 ? "SETIDIP" : "NETSTAT";
 
-	message.text = "[" + target_str + ":" + type_str + "]" + message.text;
+	text = "[" + target_str + ":" + type_str + "]" + text;
 
 	// If Message Is GAMEDAT Add To Receive Queue
 
-	if (type == 0) {
+	//if (type == 0) {
+		recvmut.lock();
+		recvbuffer.push(Packet(self, text));
+		recvmut.unlock();
+	//}
 
-	}
+	
+}
 
-	// TMP Always Add
+std::string Server::int_to_str(int in, int length) {
+	std::string out = std::to_string(in);
 
-	recvmut.lock();
-	recvbuffer.push(message);
-	recvmut.unlock();
+	while (out.length() < length) out = "0" + out;
+
+	return out;
 }

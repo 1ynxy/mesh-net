@@ -41,7 +41,7 @@ Use of a program such as 'pngcheck -c [file]' is advised to ensure that all imag
 - [ ] post-processing effects
 - [x] creation of server+client instance
 - [x] connection to peers
-- [ ] protocol for data type differentiation
+- [x] protocol for data type differentiation
 - [ ] imaging of network structure
 - [ ] smart reconnection handling
 - [ ] smart network balancing
