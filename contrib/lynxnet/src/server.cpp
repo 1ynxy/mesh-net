@@ -178,11 +178,11 @@ bool Server::start() {
 	if (!running) {
 		running = true;
 
-		listener = std::thread(&Server::listen, this);
-		listener.detach();
-
 		broadcaster = std::thread(&Server::broadcast, this);
 		broadcaster.detach();
+
+		listener = std::thread(&Server::listen, this);
+		listener.detach();
 
 		// Setup If No Host
 
