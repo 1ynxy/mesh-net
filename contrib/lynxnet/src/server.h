@@ -60,6 +60,7 @@ public:
 
 	int bind(const std::string& port);
 	int connect(const std::string& addr, const std::string& port);
+	int disconnect(bool reconnect = false);
 
 	bool start();
 
@@ -69,8 +70,6 @@ public:
 	bool recv(std::string& text);
 
 	void parse(const Packet& message);
-
-	std::string int_to_str(int in, int length);
 };
 
 #endif

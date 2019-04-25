@@ -7,11 +7,12 @@
 struct Peer {
 	// Member Variables
 
-	int uuid = 0;
-	int socket = 0;
+	int uuid = -1;
+	int socket = -1;
 
-	std::string global = "";
-	std::string local = "";
+	std::string name = "unnamed";
+
+	std::string address = "1.0.0.1";
 
 	// Network Tree
 
@@ -20,7 +21,15 @@ struct Peer {
 
 	// Constructors & Destructors
 
-	Peer(int uuid);
+	Peer(int uuid, Peer* host = nullptr);
+
+	// Member Functions
+
+	std::string serialise();
 };
+
+// Global Functions
+
+std::string int_to_str(int in, int length);
 
 #endif

@@ -7,18 +7,18 @@ int Network::new_uuid() {
 
 	int uuid = 0;
 
-	Peer* peer = get_peer(uuid);
+	Peer* peer = get_peer_by_uuid(uuid);
 
 	while (peer) {
 		uuid ++;
 
-		peer = get_peer(uuid);
+		peer = get_peer_by_uuid(uuid);
 	}
 
 	return uuid;
 }
 
-Peer* Network::get_peer(int uuid) {
+Peer* Network::get_peer_by_uuid(int uuid) {
 	// Return First Peer With UUID
 
 	for (Peer* peer : peers) if (peer->uuid == uuid) return peer;
@@ -26,28 +26,38 @@ Peer* Network::get_peer(int uuid) {
 	return nullptr;
 }
 
-void Network::add_peer(int uuid, int host) {
-	// Create New Peer
+Peer* Network::get_peer_by_sock(int sock) {
+	// Return First Peer With Sock
 
-	Peer* newPeer = new Peer(uuid);
+	for (Peer* peer : peers) if (peer->socket == sock) return peer;
 
-	// Set Host To Host Peer
+	return nullptr;
+}
 
-	Peer* hostPeer = get_peer(host);
+Peer* Network::add_peer(int uuid, int host) {
+	// Find Host Peer
 
-	if (hostPeer) newPeer->host = hostPeer;
+	Peer* hostPeer = get_peer_by_uuid(host);
+	
+	// Create New Peer & Add To Peers
 
-	// Add To Peers List
+	Peer* peer = new Peer(uuid, hostPeer);
 
-	peers.push_back(newPeer);
+	if (hostPeer) hostPeer->children.push_back(peer);
+
+	peers.push_back(peer);
+
+	return peer;
 }
 
 void Network::clr_peer(int uuid) {
 	// Recursively Remove Peer & Children From List & Destroy
 
-	Peer* peer = get_peer(uuid);
+	Peer* peer = get_peer_by_uuid(uuid);
 
-	while (peer) {
+	Peer* host = peer ? peer->host : nullptr;
+
+	while (peer && peer != host) {
 		if (peer->children.size() > 0) peer = peer->children[0];
 		else {
 			// Remove From List
@@ -60,9 +70,82 @@ void Network::clr_peer(int uuid) {
 
 			Peer* host = peer->host;
 
+			if (host) {
+				std::vector<Peer*>::iterator iter = std::find(host->children.begin(), host->children.end(), peer);
+
+				host->children.erase(iter);
+			}
+
 			delete(peer);
 
 			peer = host;
 		}
+	}
+
+
+}
+
+int Network::sock_to_uuid(int sock) {
+	Peer* peer = get_peer_by_sock(sock);
+
+	return peer ? peer->uuid : -1;
+}
+
+int Network::uuid_to_sock(int uuid) {
+	Peer* peer = get_peer_by_uuid(uuid);
+
+	return peer ? peer->socket : -1;
+}
+
+std::string Network::serialise() {
+	if (peers.size() == 0) return "";
+
+	// Find Root Node
+
+	Peer* peer = peers[0];
+
+	while (peer->host) peer = peer->host;
+
+	// Recursively Serialise Peers Individually
+
+	return peer->serialise();
+}
+
+void Network::parse(const std::string& in) {
+	// Parse Received Data
+
+	std::string buffer = "";
+
+	int step = 0;
+
+	Peer* peer = nullptr;
+
+	int uuid = -1;
+	int host = -1;
+
+	for (unsigned char chr : in) {
+		if (chr == ':' || chr == ' ') {
+			if (step == 0) {
+				if (buffer != "") uuid = stoi(buffer);
+			}
+
+			if (step == 1) {
+				if (buffer != "") host = stoi(buffer);
+
+				peer = add_peer(uuid, host);
+			}
+
+			if (step == 2) peer->name = buffer;
+
+			if (step == 3) peer->address = buffer;
+
+			buffer = "";
+
+			step = chr == ' ' ? 0 : step + 1;
+
+			continue;
+		}
+
+		buffer += chr;
 	}
 }

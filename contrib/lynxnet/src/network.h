@@ -21,10 +21,17 @@ public:
 
 	int new_uuid();
 
-	Peer* get_peer(int uuid);
+	Peer* get_peer_by_uuid(int uuid);
+	Peer* get_peer_by_sock(int sock);
 
-	void add_peer(int uuid, int host);
+	Peer* add_peer(int uuid, int host = -1);
 	void clr_peer(int uuid);
+
+	int sock_to_uuid(int sock);
+	int uuid_to_sock(int uuid);
+
+	std::string serialise();
+	void parse(const std::string& in);
 };
 
 #endif
