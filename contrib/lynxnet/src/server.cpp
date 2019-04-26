@@ -190,11 +190,7 @@ bool Server::start() {
 
 		// Setup If No Host
 
-		if (!host_sock) {
-			network.self = network.add_peer(000);
-
-			network.self->socket = self_sock;
-		}
+		if (!host_sock) parse(Packet(self_sock, "17" + '\n'));
 
 		return true;
 	}
@@ -246,7 +242,7 @@ void Server::listen() {
 
 						// Set Socket On Peer
 
-						send_to(Packet(nbytes, "13" + int_to_str(network.self->uuid, 3) + '\n'));
+						send_to(Packet(nbytes, "13" + int_to_str(network.self->uuid, 3) + "1" + '\n'));
 				   	}
 			   	}
 				else {
@@ -467,11 +463,21 @@ void Server::parse(const Packet& message) {
 		
 		if (uuid_str == "") return;
 
-		int uuid = stoi(uuid_str);
+		int peer_uuid = stoi(uuid_str);
 
-		Peer* peer = network.from_uuid(uuid);
+		Peer* peer = network.from_uuid(peer_uuid);
 
 		if (peer) peer->socket = message.socket;
+
+		// Set Host On Network
+
+		int is_host = text[3] - '0';
+
+		if (is_host) {
+			int self_uuid = network.self->uuid;
+
+			parse(Packet(self_sock, "04" + int_to_str(self_uuid, 3) + int_to_str(peer_uuid, 3) + '\n'));
+		}
 	}
 
 	// SETHOST
@@ -484,13 +490,13 @@ void Server::parse(const Packet& message) {
 
 		if (uuid_str == "" || host_str == "") return;
 
-		int uuid = stoi(uuid_str);
+		int self_uuid = stoi(uuid_str);
 		int host_uuid = stoi(host_str);
 
-		Peer* peer = network.from_uuid(uuid);
+		Peer* self = network.from_uuid(self_uuid);
 		Peer* host = network.from_uuid(host_uuid);
 
-		if (peer && host) peer->host = host;
+		if (self && host) self->host = host;
 	}
 
 	// SETNAME
@@ -502,11 +508,11 @@ void Server::parse(const Packet& message) {
 
 		if (uuid_str == "") return;
 
-		int uuid = stoi(uuid_str);
+		int self_uuid = stoi(uuid_str);
 
-		Peer* peer = network.from_uuid(uuid);
+		Peer* self = network.from_uuid(self_uuid);
 
-		if (peer) peer->name = text.substr(3, -1);
+		if (self) self->name = text.substr(3, -1);
 	}
 
 	// SETIDIP
@@ -518,11 +524,11 @@ void Server::parse(const Packet& message) {
 
 		if (uuid_str == "") return;
 
-		int uuid = stoi(uuid_str);
+		int self_uuid = stoi(uuid_str);
 
-		Peer* peer = network.from_uuid(uuid);
+		Peer* self = network.from_uuid(self_uuid);
 
-		if (peer) peer->address = text.substr(3, -1);
+		if (self) self->address = text.substr(3, -1);
 	}
 
 	// NETSTAT
@@ -530,19 +536,17 @@ void Server::parse(const Packet& message) {
 	if (type == 7) {
 		// Parse Received Network Image
 
-		network.parse(text.substr(0, -1));
+		if (text != "") network.parse(text.substr(0, -1));
 
 		// Add Self To Network
 
-		int uuid = network.new_uuid();
-		int host_uuid = network.sock_to_uuid(message.socket);
+		int self_uuid = network.new_uuid();
 
-		parse(Packet(self_sock, "01" + int_to_str(uuid, 3) + '\n'));
-		parse(Packet(self_sock, "04" + int_to_str(uuid, 3) + int_to_str(host_uuid, 3) + '\n'));
-		parse(Packet(self_sock, "05" + int_to_str(uuid, 3) + name + '\n'));
+		parse(Packet(self_sock, "01" + int_to_str(self_uuid, 3) + '\n'));
+		parse(Packet(self_sock, "05" + int_to_str(self_uuid, 3) + name + '\n'));
 
 		// Set Sock On Host
 
-		send_to(Packet(host_sock, "13" + int_to_str(uuid, 3) + '\n'));
+		send_to(Packet(host_sock, "13" + int_to_str(self_uuid, 3) + "0" + '\n'));
 	}
 }
