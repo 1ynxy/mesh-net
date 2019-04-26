@@ -420,6 +420,8 @@ void Server::parse(const Packet& message) {
 
 	// GAMEDAT
 
+	text.erase(text.end() - 1);
+
 	if (type == 0) {
 		// Add To Receive Queue
 
@@ -514,7 +516,7 @@ void Server::parse(const Packet& message) {
 
 		Peer* self = network.from_uuid(self_uuid);
 
-		if (self) self->name = text.substr(3, -1);
+		if (self) self->name = text.substr(3);
 	}
 
 	// SETIDIP
@@ -530,7 +532,7 @@ void Server::parse(const Packet& message) {
 
 		Peer* self = network.from_uuid(self_uuid);
 
-		if (self) self->address = text.substr(3, -1);
+		if (self) self->address = text.substr(3);
 	}
 
 	// NETSTAT
@@ -538,7 +540,7 @@ void Server::parse(const Packet& message) {
 	if (type == 7) {
 		// Parse Received Network Image
 
-		if (text != ";") network.parse(text.substr(0, -1));
+		if (text != "") network.parse(text);
 
 		// Add Self To Network
 
