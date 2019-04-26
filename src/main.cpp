@@ -94,5 +94,7 @@ void update() {
 	Shared<Transform> transform = objent->get<Transform>();
 
 	if (transform) transform->rotate(timer.delta * 50, transform->up());
+
+	if (input.keyboard.key_up(GLFW_KEY_P)) debug.info(server.network.serialise());
 }
 

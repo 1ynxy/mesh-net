@@ -42,7 +42,8 @@ Use of a program such as 'pngcheck -c [file]' is advised to ensure that all imag
 - [x] creation of server+client instance
 - [x] connection to peers
 - [x] protocol for data type differentiation
-- [ ] imaging of network structure
+- [x] imaging of network structure
+- [ ] ip address grepping
 - [ ] smart reconnection handling
 - [ ] smart network balancing
 - [ ] game network data parsing

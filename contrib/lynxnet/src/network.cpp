@@ -39,8 +39,6 @@ Peer* Network::add_peer(int uuid, bool is_self) {
 
 	Peer* peer = new Peer(uuid);
 
-	if (peer->host) peer->host->children.push_back(peer);
-
 	if (is_self) self = peer;
 
 	peers.push_back(peer);
@@ -53,32 +51,7 @@ void Network::clr_peer(int uuid) {
 
 	Peer* peer = from_uuid(uuid);
 
-	Peer* host = peer ? peer->host : nullptr;
-
-	while (peer && peer != host) {
-		if (peer->children.size() > 0) peer = peer->children[0];
-		else {
-			// Remove From List
-
-			std::vector<Peer*>::iterator iter = std::find(peers.begin(), peers.end(), peer);
-
-			if (iter != peers.end()) peers.erase(iter);
-
-			// Destroy Peer
-
-			Peer* host = peer->host;
-
-			if (host) {
-				std::vector<Peer*>::iterator iter = std::find(host->children.begin(), host->children.end(), peer);
-
-				host->children.erase(iter);
-			}
-
-			delete(peer);
-
-			peer = host;
-		}
-	}
+	if (peer) peer->remove();
 }
 
 int Network::sock_to_uuid(int sock) {

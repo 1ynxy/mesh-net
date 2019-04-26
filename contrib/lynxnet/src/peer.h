@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <algorithm>
 
 struct Peer {
 	// Member Variables
@@ -26,6 +27,8 @@ struct Peer {
 	// Member Functions
 
 	std::string serialise();
+
+	void remove();
 };
 
 // Global Functions

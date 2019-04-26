@@ -33,8 +33,6 @@ private:
 	int self_sock = 0;
 	int host_sock = 0;
 
-	Network network;
-
 	std::atomic<bool> running;
 	std::thread listener;
 	std::thread broadcaster;
@@ -53,6 +51,10 @@ private:
 	void listen();
 	void broadcast();
 public:
+	// Member Variables
+
+	Network network;
+
 	// Constructors & Destructors
 
 	Server();

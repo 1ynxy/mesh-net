@@ -36,6 +36,20 @@ std::string Peer::serialise() {
 	return result;
 }
 
+void Peer::remove() {
+	// Recursively Remove Peer
+
+	while (children.size() > 0) children[0]->remove();
+
+	if (host) {
+		std::vector<Peer*>::iterator iter = std::find(host->children.begin(), host->children.end(), this);
+
+		host->children.erase(iter);
+	}
+
+	delete (this);
+}
+
 // Global Functions
 
 std::string int_to_str(int in, int length) {
