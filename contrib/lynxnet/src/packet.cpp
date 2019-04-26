@@ -23,11 +23,9 @@ Packet::Packet(const Packet& packet) : socket(packet.socket) {
 std::vector<Packet> Packet::split() const {
 	std::vector<Packet> packets = std::vector<Packet>();
 
-	std::string msg = text;
-
 	std::string buffer = "";
 
-	for (unsigned char chr : msg) {
+	for (char chr : text) {
 		buffer += chr;
 
 		if (chr == ';') {

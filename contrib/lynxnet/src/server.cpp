@@ -385,7 +385,7 @@ void Server::parse(const Packet& message) {
 
 	std::vector<Packet> packets = message.split();
 	
-	if (packets.size() > 0) {
+	if (packets.size() > 1) {
 		for (Packet& packet : packets) parse(packet);
 
 		return;
