@@ -190,7 +190,7 @@ bool Server::start() {
 
 		// Setup If No Host
 
-		if (!host_sock) parse(Packet(self_sock, "17" + '\n'));
+		if (!host_sock) parse(Packet(self_sock, "17;"));
 
 		return true;
 	}
@@ -238,11 +238,11 @@ void Server::listen() {
 
 						std::string net = network.serialise();
 
-						if (net != "") send_to(Packet(nbytes, "17" + net + '\n'));		
+						if (net != "") send_to(Packet(nbytes, "17" + net + ";"));		
 
 						// Set Socket On Peer
 
-						send_to(Packet(nbytes, "13" + int_to_str(network.self->uuid, 3) + "1" + '\n'));
+						send_to(Packet(nbytes, "13" + int_to_str(network.self->uuid, 3) + "1" + ";"));
 				   	}
 			   	}
 				else {
@@ -268,7 +268,7 @@ void Server::listen() {
 
 							// Forward Disconnect NetEvent
 
-							parse(Packet(i, "02" + uuid + '\n'));
+							parse(Packet(i, "02" + uuid + ";"));
 						}
 						else {
 							// Unknown Error
@@ -393,6 +393,8 @@ void Server::parse(const Packet& message) {
 
 	// Extract Type Data From Text
 
+	if (message.text.size() < 2) return;
+
 	std::string text = message.text;
 
 	BroadcastType target = (BroadcastType) (text[0] - '0');
@@ -476,7 +478,7 @@ void Server::parse(const Packet& message) {
 		if (is_host) {
 			int self_uuid = network.self->uuid;
 
-			parse(Packet(self_sock, "04" + int_to_str(self_uuid, 3) + int_to_str(peer_uuid, 3) + '\n'));
+			parse(Packet(self_sock, "04" + int_to_str(self_uuid, 3) + int_to_str(peer_uuid, 3) + ";"));
 		}
 	}
 
@@ -542,11 +544,11 @@ void Server::parse(const Packet& message) {
 
 		int self_uuid = network.new_uuid();
 
-		parse(Packet(self_sock, "01" + int_to_str(self_uuid, 3) + '\n'));
-		parse(Packet(self_sock, "05" + int_to_str(self_uuid, 3) + name + '\n'));
+		parse(Packet(self_sock, "01" + int_to_str(self_uuid, 3) + ";"));
+		parse(Packet(self_sock, "05" + int_to_str(self_uuid, 3) + name + ";"));
 
 		// Set Sock On Host
 
-		send_to(Packet(host_sock, "13" + int_to_str(self_uuid, 3) + "0" + '\n'));
+		send_to(Packet(host_sock, "13" + int_to_str(self_uuid, 3) + "0" + ";"));
 	}
 }

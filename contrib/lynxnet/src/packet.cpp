@@ -28,7 +28,7 @@ std::vector<Packet> Packet::split() const {
 	std::string buffer = "";
 
 	for (unsigned char chr : msg) {
-		if (chr == '\n') {
+		if (chr == ';') {
 			packets.push_back(Packet(socket, buffer));
 
 			buffer = "";
