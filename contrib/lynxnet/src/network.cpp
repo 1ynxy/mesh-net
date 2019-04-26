@@ -52,6 +52,18 @@ void Network::clr_peer(int uuid) {
 	Peer* peer = from_uuid(uuid);
 
 	if (peer) peer->remove();
+
+	for (unsigned int i = 0; i < peers.size(); i++) {
+		Peer* rem = peers[i];
+
+		if (rem->dead) {
+			peers.erase(peers.begin() + i);
+
+			delete(rem);
+
+			i--;
+		}
+	}
 }
 
 int Network::sock_to_uuid(int sock) {

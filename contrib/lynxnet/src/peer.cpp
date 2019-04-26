@@ -47,7 +47,7 @@ void Peer::remove() {
 		host->children.erase(iter);
 	}
 
-	delete (this);
+	dead = true;
 }
 
 // Global Functions

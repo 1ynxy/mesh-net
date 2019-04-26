@@ -15,6 +15,8 @@ struct Peer {
 
 	std::string address = "1.0.0.1";
 
+	bool dead = false;
+
 	// Network Tree
 
 	Peer* host = nullptr;
