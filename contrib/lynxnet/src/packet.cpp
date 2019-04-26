@@ -28,12 +28,13 @@ std::vector<Packet> Packet::split() const {
 	std::string buffer = "";
 
 	for (unsigned char chr : msg) {
+		buffer += chr;
+
 		if (chr == ';') {
 			packets.push_back(Packet(socket, buffer));
 
 			buffer = "";
 		}
-		else buffer += chr;
 	}
 
 	return packets;
