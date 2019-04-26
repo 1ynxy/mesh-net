@@ -24,7 +24,7 @@ public:
 	Peer* from_uuid(int uuid);
 	Peer* from_sock(int sock);
 
-	Peer* add_peer(int uuid, int host = -1);
+	Peer* add_peer(int uuid, bool is_self = false);
 	void clr_peer(int uuid);
 
 	int sock_to_uuid(int sock);

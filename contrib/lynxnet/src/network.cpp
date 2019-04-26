@@ -34,12 +34,14 @@ Peer* Network::from_sock(int sock) {
 	return nullptr;
 }
 
-Peer* Network::add_peer(int uuid, int host) {
+Peer* Network::add_peer(int uuid, bool is_self) {
 	// Create New Peer & Add To Peers
 
-	Peer* peer = new Peer(uuid, from_uuid(host));
+	Peer* peer = new Peer(uuid);
 
 	if (peer->host) peer->host->children.push_back(peer);
+
+	if (is_self) self = peer;
 
 	peers.push_back(peer);
 

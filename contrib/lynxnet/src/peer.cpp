@@ -2,7 +2,7 @@
 
 // Contructors & Destructors
 
-Peer::Peer(int uuid, Peer* host) : uuid(uuid), host(host) {
+Peer::Peer(int uuid) : uuid(uuid) {
 	
 }
 

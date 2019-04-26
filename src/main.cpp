@@ -34,6 +34,12 @@ void init() {
 
 	core.display.open(glm::vec2(600, 300), glm::vec2(500, 500), "window", Colour(40, 40, 40));
 
+	// Setup Server
+
+	std::string name = core.conf.get_string("name");
+
+	server.set_name(name != "" ? name : "unnamed");
+
 	// Start Up Server & Connect
 	
 	std::string addr = core.conf.get_string("addr");

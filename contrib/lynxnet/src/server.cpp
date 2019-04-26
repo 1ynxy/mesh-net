@@ -18,6 +18,10 @@ Server::~Server() {
 
 // Member Functions
 
+void Server::set_name(const std::string& name) {
+	this->name = name;
+}
+
 int Server::bind(const std::string& port) {
 	const char* port_c = port.c_str();
 
@@ -93,7 +97,7 @@ int Server::bind(const std::string& port) {
 
 	if (sock > sockmax) sockmax = sock;
 
-	self = sock;
+	self_sock = sock;
 
 	return 1;
 }
@@ -161,7 +165,7 @@ int Server::connect(const std::string& addr, const std::string& port) {
 
 	if (sock > sockmax) sockmax = sock;
 
-	host = sock;
+	host_sock = sock;
 
 	return 1;
 }
@@ -186,10 +190,10 @@ bool Server::start() {
 
 		// Setup If No Host
 
-		if (!host) {
+		if (!host_sock) {
 			network.self = network.add_peer(000);
 
-			network.self->socket = self;
+			network.self->socket = self_sock;
 		}
 
 		return true;
@@ -219,13 +223,13 @@ void Server::listen() {
 			if (FD_ISSET(i, &tmp)) {
 				// If Current Socket Is Self, Listen For New Connections
 
-			   	if (i == self) {
+			   	if (i == self_sock) {
 					// Peer Possibly Requested Connection
 
 					struct sockaddr_in clientaddr;
 					socklen_t clientaddr_size = sizeof(clientaddr);
 
-					nbytes = ::accept(self, (struct sockaddr*) &clientaddr, &clientaddr_size);
+					nbytes = ::accept(self_sock, (struct sockaddr*) &clientaddr, &clientaddr_size);
 
 				   	if (nbytes != -1) {
 						// Add To FileDescriptor Set
@@ -238,7 +242,7 @@ void Server::listen() {
 
 						std::string net = network.serialise();
 
-						if (net != "") send_to(Packet(nbytes, "16" + net + '\n'));		
+						if (net != "") send_to(Packet(nbytes, "17" + net + '\n'));		
 
 						// Set Socket On Peer
 
@@ -314,7 +318,7 @@ void Server::broadcast() {
 			// Send
 				
 			for(int i = 0; i <= sockmax; i++) {
-				if (i == self || !FD_ISSET(i, &sockets)) continue;
+				if (i == self_sock || !FD_ISSET(i, &sockets)) continue;
 
 				if (inclusive && i != message.socket) continue;
 
@@ -360,7 +364,7 @@ void Server::send_to(const Packet& message) {
 void Server::send(const std::string& text) {
 	// Send To All Peers
 
-	send_to(Packet(-self, text));
+	send_to(Packet(-self_sock, text));
 }
 
 bool Server::recv(std::string& text) {
@@ -406,10 +410,10 @@ void Server::parse(const Packet& message) {
 	// Debug Log
 	
 	std::string target_str = target == 0 ? "GLBL" : "MSSG";
-	std::string type_str = type == 0 ? "GAMEDAT" : type == 1 ? "NEWCONN" : type == 2 ? "REMCONN" : type == 3 ? "SETSOCK" : type == 4 ? "SETNAME" : type == 5 ? "SETIDIP" : "NETSTAT";
+	std::string type_str = type == 0 ? "GAMEDAT" : type == 1 ? "NEWCONN" : type == 2 ? "REMCONN" : type == 3 ? "SETSOCK" : type == 4 ? "SETHOST" : type == 5 ? "SETNAME" : type == 6 ? "SETIDIP" : "NETSTAT";
 
 	recvmut.lock();
-	recvbuffer.push(Packet(self, "[" + target_str + ":" + type_str + "]" + text));
+	recvbuffer.push(Packet(self_sock, "[" + target_str + ":" + type_str + "]" + text));
 	recvmut.unlock();
 
 	// If Broadcast, Forward Message To Peers
@@ -422,7 +426,7 @@ void Server::parse(const Packet& message) {
 		// Add To Receive Queue
 
 		recvmut.lock();
-		recvbuffer.push(Packet(self, text));
+		recvbuffer.push(Packet(self_sock, text));
 		recvmut.unlock();
 	}
 
@@ -432,18 +436,12 @@ void Server::parse(const Packet& message) {
 		// Add To Network Image
 
 		std::string uuid_str = text.substr(0, 3);
-		std::string host_str = text.substr(3, 6);
 
-		if (uuid_str == "" || host_str == "") return;
+		if (uuid_str == "") return;
 
 		int uuid = stoi(uuid_str);
-		int host = stoi(host_str);
 
-		Peer* peer = network.add_peer(uuid, host);
-
-		// Set Self
-
-		if (message.socket == self) network.self = peer;
+		network.add_peer(uuid, true);
 	}
 
 	// REMCONN
@@ -466,7 +464,7 @@ void Server::parse(const Packet& message) {
 		// Assign Socket Number To Peer
 
 		std::string uuid_str = text.substr(0, 3);
-
+		
 		if (uuid_str == "") return;
 
 		int uuid = stoi(uuid_str);
@@ -476,9 +474,28 @@ void Server::parse(const Packet& message) {
 		if (peer) peer->socket = message.socket;
 	}
 
-	// SETNAME
+	// SETHOST
 
 	if (type == 4) {
+		// Assign Host UUID To Peer
+
+		std::string uuid_str = text.substr(0, 3);
+		std::string host_str = text.substr(3, 6);
+
+		if (uuid_str == "" || host_str == "") return;
+
+		int uuid = stoi(uuid_str);
+		int host_uuid = stoi(host_str);
+
+		Peer* peer = network.from_uuid(uuid);
+		Peer* host = network.from_uuid(host_uuid);
+
+		if (peer && host) peer->host = host;
+	}
+
+	// SETNAME
+
+	if (type == 5) {
 		// Assign Name To Peer
 		
 		std::string uuid_str = text.substr(0, 3);
@@ -494,7 +511,7 @@ void Server::parse(const Packet& message) {
 
 	// SETIDIP
 
-	if (type == 5) {
+	if (type == 6) {
 		// Assign IP To Peer
 
 		std::string uuid_str = text.substr(0, 3);
@@ -510,23 +527,22 @@ void Server::parse(const Packet& message) {
 
 	// NETSTAT
 
-	if (type == 6) {
+	if (type == 7) {
 		// Parse Received Network Image
 
 		network.parse(text.substr(0, -1));
 
-		// Identify Host
-
-		int host_uuid = network.sock_to_uuid(message.socket);
-
 		// Add Self To Network
 
 		int uuid = network.new_uuid();
+		int host_uuid = network.sock_to_uuid(message.socket);
 
-		parse(Packet(self, "01" + int_to_str(uuid, 3) + int_to_str(host_uuid, 3) + '\n'));
+		parse(Packet(self_sock, "01" + int_to_str(uuid, 3) + '\n'));
+		parse(Packet(self_sock, "04" + int_to_str(uuid, 3) + int_to_str(host_uuid, 3) + '\n'));
+		parse(Packet(self_sock, "05" + int_to_str(uuid, 3) + name + '\n'));
 
 		// Set Sock On Host
 
-		send_to(Packet(host, "13" + int_to_str(uuid, 3) + '\n'));
+		send_to(Packet(host_sock, "13" + int_to_str(uuid, 3) + '\n'));
 	}
 }

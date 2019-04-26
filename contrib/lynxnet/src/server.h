@@ -25,11 +25,13 @@ class Server {
 private:
 	// Member Variables
 
+	std::string name = "";
+
 	fd_set sockets;
 	int sockmax = 0;
 
-	int self = 0;
-	int host = 0;
+	int self_sock = 0;
+	int host_sock = 0;
 
 	Network network;
 
@@ -57,6 +59,8 @@ public:
 	~Server();
 
 	// Member Functions
+
+	void set_name(const std::string& name);
 
 	int bind(const std::string& port);
 	int connect(const std::string& addr, const std::string& port);

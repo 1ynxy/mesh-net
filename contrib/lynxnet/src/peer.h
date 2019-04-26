@@ -21,7 +21,7 @@ struct Peer {
 
 	// Constructors & Destructors
 
-	Peer(int uuid, Peer* host = nullptr);
+	Peer(int uuid);
 
 	// Member Functions
 
