@@ -538,7 +538,7 @@ void Server::parse(const Packet& message) {
 	if (type == 7) {
 		// Parse Received Network Image
 
-		if (text != "") network.parse(text.substr(0, -1));
+		if (text != ";") network.parse(text.substr(0, -1));
 
 		// Add Self To Network
 
