@@ -500,7 +500,11 @@ void Server::parse(const Packet& message) {
 		Peer* self = network.from_uuid(self_uuid);
 		Peer* host = network.from_uuid(host_uuid);
 
-		if (self && host) self->host = host;
+		if (self && host) {
+			self->host = host;
+
+			host->children.push_back(self);
+		}
 	}
 
 	// SETNAME
