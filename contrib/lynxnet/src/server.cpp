@@ -186,7 +186,11 @@ bool Server::start() {
 
 		// Setup If No Host
 
-		if (!host) network.self = network.add_peer(000);
+		if (!host) {
+			network.self = network.add_peer(000);
+
+			network.self->socket = self;
+		}
 
 		return true;
 	}
