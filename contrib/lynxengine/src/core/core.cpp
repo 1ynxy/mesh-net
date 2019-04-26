@@ -72,7 +72,7 @@ void Core::init() {
 	
 	// Do Gameloop
 	
-	while (true) {
+	while (running) {
 		timer.update();
 
 		// Do Update Step
@@ -111,6 +111,10 @@ void Core::init() {
 	// Terminate GLFW
 	
 	glfwTerminate();
+}
+
+void Core::exit() {
+	running = false;
 }
 
 bool Core::load_conf(const std::string& name) {

@@ -50,6 +50,7 @@ public:
 	// Member Functions
 	
 	void init();
+	void exit();
 
 	bool load_conf(const std::string& name);
 };

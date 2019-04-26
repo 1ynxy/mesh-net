@@ -41,13 +41,25 @@ void init() {
 
 	int stat = 0;
 
-	if ((stat = server.bind(port)) != 1) debug.warn("failed to bind listener : " + std::to_string(stat));
+	if ((stat = server.bind(port)) != 1) {
+		debug.error("failed to bind listener : " + std::to_string(stat));
+
+		core.exit();
+
+		return;
+	}
 	else debug.info("bound listener");
 
 	if ((stat = server.connect(addr, port)) != 1) debug.warn("failed to connect to host : " + std::to_string(stat));
 	else debug.info("connected to host");
 
-	if ((stat = server.start()) != 1) debug.error("failed to start server");
+	if ((stat = server.start()) != 1) {
+		debug.error("failed to start server");
+
+		core.exit();
+
+		return;
+	}
 	else debug.info("started server");
 
 	// Set Up Camera & Default Object
