@@ -244,8 +244,6 @@ void Server::listen() {
 
 						int self_uuid = network.self->uuid;
 
-						std::cout << self_uuid << std::endl;
-
 						send_to(Packet(nbytes, "13" + int_to_str(self_uuid, 3) + "1" + ";"));
 				   	}
 			   	}
@@ -445,7 +443,7 @@ void Server::parse(const Packet& message) {
 
 		int uuid = stoi(uuid_str);
 
-		network.add_peer(uuid, true);
+		network.add_peer(uuid, false);
 	}
 
 	// REMCONN
@@ -556,6 +554,12 @@ void Server::parse(const Packet& message) {
 
 		parse(Packet(self_sock, "01" + int_to_str(self_uuid, 3) + ";"));
 		parse(Packet(self_sock, "05" + int_to_str(self_uuid, 3) + name + ";"));
+
+		// Set Self
+
+		Peer* self = network.from_uuid(self_uuid);
+
+		network.self = self;
 
 		// Set Sock On Host
 
