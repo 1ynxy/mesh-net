@@ -242,7 +242,11 @@ void Server::listen() {
 
 						// Set Socket On Peer
 
-						send_to(Packet(nbytes, "13" + int_to_str(network.self->uuid, 3) + "1" + ";"));
+						int self_uuid = network.self->uuid;
+
+						std::cout << self_uuid << std::endl;
+
+						send_to(Packet(nbytes, "13" + int_to_str(self_uuid, 3) + "1" + ";"));
 				   	}
 			   	}
 				else {
