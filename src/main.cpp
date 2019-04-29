@@ -68,6 +68,10 @@ void init() {
 	}
 	else debug.info("started server");
 
+	// Test Network
+
+	server.send("00This is a Test Packet;");
+
 	// Set Up Camera & Default Object
 
 	cament = scene.instantiate("camera", glm::vec3(), glm::vec3(0, 0, 0));

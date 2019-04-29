@@ -76,27 +76,15 @@ This project aims to develop and test a method for enabling the distributed proc
 
 ## methodology
 
-representing network
+In order to create a fully decentralised mesh network all members of the network must be treated the same. Each node in the network will have to be as self-sufficient as possible. There is no one device that allocates identification numbers or target nodes to new connections. There is no one device that handles user input from each peer. There is no one source of information on the network structure. Instead, these tasks will have to be accomplished collaboratively, using a range of handshaking techniques designed to communicate information in the correct order.
 
-tree: 
-- each peer is a node
-- a node has one host & many children
-- most accurate view of network relationships
-- innefficient to traverse : depth first techniques:
-  - INORDER
-  - PREORDER
-  - POSTORDER
-- every operation requires a traversal
-list: 
-- simple list of nodes
-- simpler algorithmically
-- no indication of relationships : disconnects will not be accurate
-- much easier to traverse
-both: 
-- easy to traverse
-- accurate view of network relationships
-- modification of peers requires multiple operations
-- list can be used for traversal, then acted upon as a tree node
+The complexity of a mesh network is largely due to the need for all data to be synced between all peers that are connected, including data that was sent prior to a peer's connection. When a new device connects to the network it must somehow receive all of the game state changes so far so that it can catch up. The same method can be used to keep all members of the network up to date on the network structure itself. A range of methods for storing and transmitting this data present themselves, each with pros and cons.
+
+The first, and most intuitive, method for storing this network image during runtime is that of a tree data structure. As each member of the network is a node with a single parent and multiple children this method seems ideal, but it does present complications when attempting to quickly navigate the structure. Although use of pointers and references in the C++ language improves memory management, as, unlike a std::vector data type, when the structure is modified the memory does not necessarily have to be reallocated, the structure itself can be navigated bidirectionally. Unlike with a list, which would only have to be navigated in a single direction, a tree can be traversed in multiple ways, which both complicates algorithms and decreases efficiency of even simple tasks such as searching for a node with a certain identifying feature. Tree traversal methods include depth-first techniques, such as inorder, preorder and postorder.
+
+One counter-argument to the memory management advantages that such a data structure provides is the use of linked lists, which work in a similar fashion, but reduce the number of possible children to one, eliminating the need for complex traversal algorithms. Unfortunately, using only a list type structure does not allow for much indication of network relationships, resulting in a list of peers without discernable parents or children.
+
+A potential compromise comprises of a hybrid structure. A tree can be created, and each element of the tree can be also stored in a list for efficient information grepping. Duplicate data can be eliminated through the use of C++ pointers, although this can introduce problems with dangling pointers if not handled cautiously. A dangling pointer is a pointer which no longer point to a valid object of the appropriate type, most likely because the target object has been deleted. This method does introduce complexities in that a single modification of the network would require multiple operations to be correctly reflected in the data structures.
 
 protocol
 
