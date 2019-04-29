@@ -101,21 +101,30 @@ void Network::parse(const std::string& in) {
 
 	Peer* peer = nullptr;
 
-	int uuid = -1;
-	int host = -1;
+	int self_uuid = -1;
+	int host_uuid = -1;
 
 	for (unsigned char chr : in) {
 		if (chr == ':' || chr == ' ') {
 			if (step == 0) {
-				if (buffer != "") uuid = stoi(buffer);
-			}
-			if (step == 1) {
-				if (buffer != "") host = stoi(buffer);
+				if (buffer != "") self_uuid = stoi(buffer);
 
-				peer = add_peer(uuid, host);
+				peer = add_peer(self_uuid);
 			}
+			
 
 			if (peer) {
+				if (step == 1) {
+					if (buffer != "") host_uuid = stoi(buffer);
+
+					Peer* host = from_uuid(host_uuid);
+
+					if (host) {
+						peer->host = host;
+
+						host->children.push_back(peer);
+					}
+				}
 				if (step == 2) peer->name = buffer;
 				if (step == 3) peer->address = buffer;
 			}
@@ -127,8 +136,8 @@ void Network::parse(const std::string& in) {
 			if (chr == ' ') {
 				peer = nullptr;
 
-				uuid = -1;
-				host = -1;
+				self_uuid = -1;
+				host_uuid = -1;
 
 				step = 0;
 			}

@@ -45,6 +45,8 @@ void Peer::remove() {
 		std::vector<Peer*>::iterator iter = std::find(host->children.begin(), host->children.end(), this);
 
 		host->children.erase(iter);
+
+		host = nullptr;
 	}
 
 	dead = true;
