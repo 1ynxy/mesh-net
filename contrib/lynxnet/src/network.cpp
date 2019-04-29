@@ -5,7 +5,7 @@
 int Network::new_uuid() {
 	// Generate A New UUID
 
-	int uuid = 0;
+	int uuid = 1;
 
 	Peer* peer = from_uuid(uuid);
 
@@ -100,31 +100,39 @@ void Network::parse(const std::string& in) {
 	int step = 0;
 
 	Peer* peer = nullptr;
-
-	int self_uuid = -1;
-	int host_uuid = -1;
+	Peer* host = nullptr;
 
 	for (unsigned char chr : in) {
 		if (chr == ':' || chr == ' ') {
+			// If Step One Add New Peer To Network
+
 			if (step == 0) {
-				if (buffer != "") self_uuid = stoi(buffer);
+				if (buffer != "") {
+					int peer_uuid = stoi(buffer);
 
-				peer = add_peer(self_uuid);
+					peer = add_peer(peer_uuid);
+				}
 			}
-			
 
-			if (peer) {
-				if (step == 1) {
-					if (buffer != "") host_uuid = stoi(buffer);
+			// If Step Two Set New Peer Host
 
-					Peer* host = from_uuid(host_uuid);
+			if (step == 1) {
+				if (buffer != "") {
+					int host_uuid = stoi(buffer);
 
-					if (host) {
+					host = from_uuid(host_uuid);
+
+					if (peer && host) {
 						peer->host = host;
 
 						host->children.push_back(peer);
 					}
 				}
+			}
+
+			// Fill In Other Peer Information
+			
+			if (peer) {
 				if (step == 2) peer->name = buffer;
 				if (step == 3) peer->address = buffer;
 			}
@@ -135,9 +143,7 @@ void Network::parse(const std::string& in) {
 
 			if (chr == ' ') {
 				peer = nullptr;
-
-				self_uuid = -1;
-				host_uuid = -1;
+				host = nullptr;
 
 				step = 0;
 			}
