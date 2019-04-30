@@ -50,6 +50,14 @@ Use of a program such as 'pngcheck -c [file]' is advised to ensure that all imag
 - [ ] basic player interactions | chat functions
 - [ ] persistent data loading from existing peers
 
+# standard project
+
+## front cover
+
+// INSERT FRONT COVER & DISCLAIMER //
+
+## acknowledgements
+
 ## abstract
 
 One of the primary costs associated with developing large scale online video games is that of continued hosting of non-community run game servers. Often, these are the only type of server available, as it allows the company more authority over how the servers are interacted with by the players.
@@ -58,21 +66,25 @@ This project aims to develop and test a method for enabling the distributed proc
 
 ## contents
 
+- front cover
+- disclaimer
 - abstract
 - contents
 - introduction
 - literature review
 - methodology
+- testing & evaluation
 - conclusion
-- references 
+- references
+- appendices
 
-## introduction
+## introduction, aims & objectives
 
-// put introduction here
+// 
 
-## literature review
+## literature review, theory & design
 
-// put literature review here
+//
 
 ## methodology
 
@@ -130,10 +142,18 @@ enum port status { PORT_FORWARD, PORT_BLOCK, PORT_UNDEF }
 peer* host  
 list peer* children  
 
+## testing & evaluation
+
+//
+
 ## conclusion
 
-// put conclusion here
+//
 
 ## references
 
-// put references here
+//
+
+## appendices
+
+//
