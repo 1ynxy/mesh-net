@@ -487,6 +487,10 @@ void Server::parse(const Packet& message) {
 			int self_uuid = network.self->uuid;
 
 			parse(Packet(self_sock, "04" + int_to_str(self_uuid, 3) + int_to_str(peer_uuid, 3) + ";"));
+
+			// Set Host IP From Memory
+
+			parse(Packet(self_sock, "06" + int_to_str(peer_uuid, 3) + target_ip + ";"));
 		}
 	}
 
@@ -568,9 +572,5 @@ void Server::parse(const Packet& message) {
 		// Set Sock On Host
 
 		send_to(Packet(host_sock, "13" + int_to_str(self_uuid, 3) + "0" + ";"));
-
-		// Set Host IP From Memory
-
-		parse(Packet(self_sock, "06" + target_ip + ";"));
 	}
 }
