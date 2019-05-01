@@ -82,7 +82,9 @@ This project aims to develop and test a method for enabling the distributed proc
 
 ## introduction, aims & objectives
 
-// 
+The library will provide a "plug & play" capable solution to handling dynamic mesh networks for communicating game state data. In this instance a mesh network is that which does not contain any central device for data collation or connection handling. All peers are equal, and might be connected to the network through any existing, accessible node.
+
+In order to provide a library that is as easy as possible to use for programmers who might not have studied network programming certain aspects will be abstracted. Sockets, for example, will be hidden, and peers will instead be addressed using Unique User Identification Numbers (UUIDs) which are consistent accross the network. Events will be reduced to connections and disconnections. Reconnections will be handled as automomously as possible, requiring no, or little, intervention by the user of the library. The primary protocol that differentiates network events and game data, and communicates message targets and sources,  will be hidden. Although this has the potential to reduce the capabilities of the library as a whole, it will hopefully open up use to programmers with less experience in the lower level handling of such systems.
 
 ## literature review, theory & design
 
@@ -99,6 +101,19 @@ The first, and most intuitive, method for storing this network image during runt
 One counter-argument to the memory management advantages that such a data structure provides is the use of linked lists, which work in a similar fashion, but reduces the number of child nodes to one, eliminating the need for complex traversal algorithms. Unfortunately, using only a list type structure does not allow for an accurate indication of network relationships, resulting in a list of peers without a discernable hierarchy.
 
 A potential compromise comprises of a hybrid structure. A tree can be created, and each element of the tree can be also stored in a list for efficient information grepping. Duplicate data can be eliminated through the use of C++ pointers, although this can introduce problems with dangling pointers if not handled cautiously. A dangling pointer is a pointer which no longer point to a valid object of the appropriate type, most likely because the target object has been deleted. This method does introduce complexities in that a single modification of the network would require multiple operations to be correctly reflected in the data structures.
+
+A peer in this network structure will have to contain all of the information required for identification and connection. It might also contain meta-data such as the peer name. An association must be made between the socket of the peer, if the peer is a direct connection, and the unique user identification number of the peer.
+
+Peer {
+    int uuid;				// unique user identification number
+    int sock;				// socket of connection
+
+    string name;			// name of peer
+    string addr;			// ip address of peer
+
+    Peer* host; 			// the peer that this peer is connected to
+    std::vector<Peer*> children; 	// the peers that are connected to this peer
+};
 
 protocol
 
