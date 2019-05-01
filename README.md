@@ -99,7 +99,7 @@ One counter-argument to the memory management advantages that such a data struct
 
 A potential compromise comprises of a hybrid structure. A tree can be created, and each element of the tree can be also stored in a list for efficient information grepping. Duplicate data can be eliminated through the use of C++ pointers, although this can introduce problems with dangling pointers if not handled cautiously. A dangling pointer is a pointer which no longer point to a valid object of the appropriate type, most likely because the target object has been deleted. This method does introduce complexities in that a single modification of the network would require multiple operations to be correctly reflected in the data structures.
 
-A peer in this network structure will have to contain all of the information required for identification and connection. It might also contain meta-data such as the peer name. An association must be made between the socket of the peer, if the peer is a direct connection, and the unique user identification number of the peer.
+A peer in this network structure will have to contain all of the information required for identification and connection. It might also contain meta-data such as the peer name and client version number. An association must be made between the socket of the peer, if the peer is a direct connection, and the unique user identification number of the peer.
 
     Peer {
         int uuid;				// unique user identification number
@@ -120,39 +120,13 @@ The User Datagram Protocol is a protocol for communicating datagrams between dev
 
 In this use-case it would be best to create a protocol one layer under TCP. Reliability of communication is important, as a single lost packet could result in a desynced network image which could cause problems further into development. When it comes to developing a protocol there are a number of considerations to be made when designing the header, such as whether it is human readable or not, or whether it is a dynamic or fixed length. These options can influence network reliability, extensibility, speed, and efficiency, so it is important to find the correct balance.
 
-protocol
+A fixed header length simplifies the process and improves parsing speed for each packet transmitted. Less data is required to transmit the same header information, improving efficiency, but later modifications to the header structure can cause complications. If more header space is required at any point the result will no longer be compatible with older versions of the program. This header structure must be modified in every instance of code which either serialises or parses a packet, which can become time consuming.
 
-fixed header:
-- simpler to parse
-- smaller header
+A dynamic header, however, is easily extensible. If maintaining compatibility between versions of the program is important, as it might well be when it comes to persistent networks, then a dynamic header might be the better choice. The possibility of incompatibilities opens up a discussion into the value of allowing multiple iterations of the tool to connect to the same network, which will be saved for later.
 
-dynamic header:
-- more metadata
-- can support multiple layers
-- easier to implement changes later
+The most sensible choice for development of a protocol, and a tool which impliments said protocol, appears to be that of human readable headers over the alternative. This will greatly simplify debugging, as flaws in packet transmission or handling are immediately obvious, but the decision also ties into the choice between fixed and dynamic headers. Human readable information may differ in length, making fixed headers a limitation rather than an advantage. Instead, information such as data type can be stored as enumerable values, so that they can be parsed from machine readable data to human readable values more easily. Enumerating data also greatly improves efficiency, as assigning a single number to what would otherwise consist of multiple characters reduces the space the data takes up considerably. One dissadvantage of this approach is that packet header structure must be documented thoroughly so that tools which capture packets for debugging purposes are not rendered useless, or at the very least more difficult to use.
 
-examples of dynamic header
-
-NEWCONN PEERID HOSTID
-[7 NEWCONN 005 002]
-
-SETIP PEERID PEERIP
-[5 SETIP 005 192.168.0.15]
-
-CONNLOST PEERID
-[8 CONNLOST 005]
-
-human readable vs machine readable
-
-human readable:
-- text in headers to indicate event types
-- easier to debug
-
-machine readable:
-- replaces text in header with event ids
-- smaller headers
-- easier to parse
-- requires more documentation 
+One of the main goals of this project is to reduce the cost of server hosting. The main way in which this will be accomplished is by delegating the task of hosting to the users of the network, but that does not mean the program can then be innefficient when it comes to data usage. Not only will reducing the data transmission improve performance, but considering the user's situation is also important. Users might be subject to data caps or limits and so reducing the burden on them as much as possible is also a priority. Because of this, a fixed header with non-human readable data will be used, as this offers the greatest efficiency and speed when it comes to transmitting and parsing packets.
 
 ## testing & evaluation
 
