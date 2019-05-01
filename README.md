@@ -104,16 +104,16 @@ A potential compromise comprises of a hybrid structure. A tree can be created, a
 
 A peer in this network structure will have to contain all of the information required for identification and connection. It might also contain meta-data such as the peer name. An association must be made between the socket of the peer, if the peer is a direct connection, and the unique user identification number of the peer.
 
-Peer {
-    int uuid;				// unique user identification number
-    int sock;				// socket of connection
+    Peer {
+        int uuid;				// unique user identification number
+        int sock;				// socket of connection
 
-    string name;			// name of peer
-    string addr;			// ip address of peer
+        string name;				// name of peer
+        string addr;				// ip address of peer
 
-    Peer* host; 			// the peer that this peer is connected to
-    std::vector<Peer*> children; 	// the peers that are connected to this peer
-};
+        Peer* host;				// the peer that this peer is connected to
+        vector<Peer*> children;			// the peers that are connected to this peer
+    };
 
 protocol
 
