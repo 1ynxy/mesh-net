@@ -83,7 +83,7 @@ This project aims to develop and test a method for enabling the distributed proc
 
 The library will provide a "plug & play" capable solution to handling dynamic mesh networks for communicating game state data. In this instance a mesh network is that which does not contain any central device for data collation or connection handling. All peers are equal, and might be connected to the network through any existing, accessible node.
 
-In order to provide a library that is as easy as possible to use for programmers who might not have studied network programming certain aspects will be abstracted. Sockets, for example, will be hidden, and peers will instead be addressed using Unique User Identification Numbers (UUIDs) which are consistent accross the network. Events will be reduced to connections and disconnections. Reconnections will be handled as automomously as possible, requiring no, or little, intervention by the user of the library. The primary protocol that differentiates network events and game data, and communicates message targets and sources,  will be hidden. Although this has the potential to reduce the capabilities of the library as a whole, it will hopefully open up use to programmers with less experience in the lower level handling of such systems.
+In order to provide a library that is as easy as possible to use for programmers who might not have studied network programming certain aspects will be abstracted. Sockets, for example, will be hidden, and peers will instead be addressed using Unique User Identification Numbers (UUIDs) which are consistent across the network. Events will be reduced to connections and disconnections. Reconnections will be handled as autonomously as possible, requiring no, or little, intervention by the user of the library. The primary protocol that differentiates network events and game data, and communicates message targets and sources,  will be hidden. Although this has the potential to reduce the capabilities of the library as a whole, it will hopefully open up use to programmers with less experience in the lower level handling of such systems.
 
 ## theory, design, & methodology
 
@@ -93,9 +93,9 @@ The complexity of a mesh network is largely due to the need for all data to be s
 
 ### network structure
 
-The first, and most intuitive, method for storing this network image during runtime is that of a tree data structure. As each member of the network is a node with a single parent and multiple children this method seems ideal, but it does present complications when attempting to quickly navigate the structure. Although use of pointers and references in the C++ language improves memory management, as, unlike a std::vector data type, when the structure is modified the memory does not necessarily have to be reallocated, the structure itself can be navigated bidirectionally. Unlike with a list, which would only have to be navigated in a single direction, a tree can be traversed in multiple ways, which both complicates algorithms and decreases efficiency of even simple tasks such as searching for a node with a certain identifying feature. Tree traversal methods include depth-first techniques, such as inorder, preorder and postorder.
+The first, and most intuitive, method for storing this network image during run-time is that of a tree data structure. As each member of the network is a node with a single parent and multiple children this method seems ideal, but it does present complications when attempting to quickly navigate the structure. Although use of pointers and references in the C++ language improves memory management, as, unlike a std::vector data type, when the structure is modified the memory does not necessarily have to be reallocated, the structure itself can be navigated bidirectionally. Unlike with a list, which would only have to be navigated in a single direction, a tree can be traversed in multiple ways, which both complicates algorithms and decreases efficiency of even simple tasks such as searching for a node with a certain identifying feature. Tree traversal methods include depth-first techniques, such as inorder, preorder and postorder.
 
-One counter-argument to the memory management advantages that such a data structure provides is the use of linked lists, which work in a similar fashion, but reduces the number of child nodes to one, eliminating the need for complex traversal algorithms. Unfortunately, using only a list type structure does not allow for an accurate indication of network relationships, resulting in a list of peers without a discernable hierarchy.
+One counter-argument to the memory management advantages that such a data structure provides is the use of linked lists, which work in a similar fashion, but reduces the number of child nodes to one, eliminating the need for complex traversal algorithms. Unfortunately, using only a list type structure does not allow for an accurate indication of network relationships, resulting in a list of peers without a discernible hierarchy.
 
 A potential compromise comprises of a hybrid structure. A tree can be created, and each element of the tree can be also stored in a list for efficient information grepping. Duplicate data can be eliminated through the use of C++ pointers, although this can introduce problems with dangling pointers if not handled cautiously. A dangling pointer is a pointer which no longer point to a valid object of the appropriate type, most likely because the target object has been deleted. This method does introduce complexities in that a single modification of the network would require multiple operations to be correctly reflected in the data structures.
 
@@ -114,11 +114,11 @@ A peer in this network structure will have to contain all of the information req
 
 ### protocol
 
-In order to keep the network structure up to date a distinction must be made between packets which contain game state data, and packets which contain network event data. This is achieved using a protocol, or a layer in which the data is wrapped with a header which describes it. Examples of protocols include Transfer Control Protocol (TCP) and User Datagram Protocol (UDP). Both of these protocols act upon the same layer, and each have their advantages and disadvatages.
+In order to keep the network structure up to date a distinction must be made between packets which contain game state data, and packets which contain network event data. This is achieved using a protocol, or a layer in which the data is wrapped with a header which describes it. Examples of protocols include Transfer Control Protocol (TCP) and User Datagram Protocol (UDP). Both of these protocols act upon the same layer, and each have their advantages and disadvantages.
 
-The User Datagram Protocol is a protocol for communicating datagrams between devices. A datagram is a set of information, potentially split into multiple packets, which is broadcast at the target device. No response is expected, meaning that this protocol does not open and maintain a connection between two devices. The sender does not know if the receiver has received the information, and as such, packet loss can occur. Packets can be received out-of-order, or not at all, but they will always contain the correct information. More light weight than TCP, and quicker due to the communication not requiring multiple steps, this protocol is often used when packet loss is acceptable and speed is important.
+The User Datagram Protocol is a protocol for communicating datagrams between devices. A datagram is a set of information, potentially split into multiple packets, which is broadcast at the target device. No response is expected, meaning that this protocol does not open and maintain a connection between two devices. The sender does not know if the receiver has received the information, and as such, packet loss can occur. Packets can be received out-of-order, or not at all, but they will always contain the correct information. More light weight than TCP, and quicker due to the communication not requiring multiple steps, this protocol is often used when packet loss is acceptable and speed is important. The Transfer Control Protocol is a protocol for reliable two-way communication of data between multiple devices. A connection can be made and maintained, and while this connection is open any data can be sent and received through it. No packet loss will occur, and packets will arrive in the correct order.
 
-The Transfer Control Protocol is a protocol for 
+In this use-case it would be best to create a protocol one layer under TCP. Reliability of communication is important, as a single lost packet could result in a desynced network image which could cause problems further into development. When it comes to developing a protocol there are a number of considerations to be made when designing the header, such as whether it is human readable or not, or whether it is a dynamic or fixed length. These options can influence network reliability, extensibility, speed, and efficiency, so it is important to find the correct balance.
 
 protocol
 
@@ -152,17 +152,7 @@ machine readable:
 - replaces text in header with event ids
 - smaller headers
 - easier to parse
-- requires more documentation
-
-peer structure
-
-integer unique user identification [UUID]  
-integer socket number  
-string global ip  
-string local ip  
-enum port status { PORT_FORWARD, PORT_BLOCK, PORT_UNDEF }  
-peer* host  
-list peer* children  
+- requires more documentation 
 
 ## testing & evaluation
 
