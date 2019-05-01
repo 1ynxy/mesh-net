@@ -58,6 +58,8 @@ Use of a program such as 'pngcheck -c [file]' is advised to ensure that all imag
 
 ## acknowledgements
 
+//
+
 ## abstract
 
 One of the primary costs associated with developing large scale online video games is that of continued hosting of non-community run game servers. Often, these are the only type of server available, as it allows the company more authority over how the servers are interacted with by the players.
@@ -94,7 +96,7 @@ The complexity of a mesh network is largely due to the need for all data to be s
 
 The first, and most intuitive, method for storing this network image during runtime is that of a tree data structure. As each member of the network is a node with a single parent and multiple children this method seems ideal, but it does present complications when attempting to quickly navigate the structure. Although use of pointers and references in the C++ language improves memory management, as, unlike a std::vector data type, when the structure is modified the memory does not necessarily have to be reallocated, the structure itself can be navigated bidirectionally. Unlike with a list, which would only have to be navigated in a single direction, a tree can be traversed in multiple ways, which both complicates algorithms and decreases efficiency of even simple tasks such as searching for a node with a certain identifying feature. Tree traversal methods include depth-first techniques, such as inorder, preorder and postorder.
 
-One counter-argument to the memory management advantages that such a data structure provides is the use of linked lists, which work in a similar fashion, but reduce the number of possible children to one, eliminating the need for complex traversal algorithms. Unfortunately, using only a list type structure does not allow for much indication of network relationships, resulting in a list of peers without discernable parents or children.
+One counter-argument to the memory management advantages that such a data structure provides is the use of linked lists, which work in a similar fashion, but reduces the number of child nodes to one, eliminating the need for complex traversal algorithms. Unfortunately, using only a list type structure does not allow for an accurate indication of network relationships, resulting in a list of peers without a discernable hierarchy.
 
 A potential compromise comprises of a hybrid structure. A tree can be created, and each element of the tree can be also stored in a list for efficient information grepping. Duplicate data can be eliminated through the use of C++ pointers, although this can introduce problems with dangling pointers if not handled cautiously. A dangling pointer is a pointer which no longer point to a valid object of the appropriate type, most likely because the target object has been deleted. This method does introduce complexities in that a single modification of the network would require multiple operations to be correctly reflected in the data structures.
 

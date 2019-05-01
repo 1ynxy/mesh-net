@@ -167,6 +167,10 @@ int Server::connect(const std::string& addr, const std::string& port) {
 
 	host_sock = sock;
 
+	// Store Target IP
+
+	target_ip = addr;
+
 	return 1;
 }
 
@@ -564,5 +568,9 @@ void Server::parse(const Packet& message) {
 		// Set Sock On Host
 
 		send_to(Packet(host_sock, "13" + int_to_str(self_uuid, 3) + "0" + ";"));
+
+		// Set Host IP From Memory
+
+		parse(Packet(self_sock, "06" + target_ip + ";"));
 	}
 }

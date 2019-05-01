@@ -26,6 +26,7 @@ private:
 	// Member Variables
 
 	std::string name = "";
+	std::string target_ip = "";
 
 	fd_set sockets;
 	int sockmax = 0;
