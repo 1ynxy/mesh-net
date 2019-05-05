@@ -81,6 +81,17 @@ This project aims to develop and test a method for enabling the distributed proc
 
 ## introduction, aims & objectives
 
+Although the most commonly implemented network structure in the industry is that of a typical single-server many-client instance, this was not the only viable structure, even during the inception of networked video games. Games would often provide a two-player co-op mode which would require two clients to be linked together without some form of dedicated host, which is a good example of how a very basic mesh network might operate.
+
+// describe traditional network structure
+// describe types of mesh network structure
+// justify choice of network structure
+// explain idea of data persistence in a mesh network
+// describe uses of data persistence
+// outline general methodology for data persistence
+// explain autonomous net events - reconnection, load balancing
+// point out issues with client based authority over server authority
+
 The library will provide a "plug & play" capable solution to handling dynamic mesh networks for communicating game state data. In this instance a mesh network is that which does not contain any central device for data collation or connection handling. All peers are equal, and might be connected to the network through any existing, accessible node.
 
 In order to provide a library that is as easy as possible to use for programmers who might not have studied network programming certain aspects will be abstracted. Sockets, for example, will be hidden, and peers will instead be addressed using Unique User Identification Numbers (UUIDs) which are consistent across the network. Events will be reduced to connections and disconnections. Reconnections will be handled as autonomously as possible, requiring no, or little, intervention by the user of the library. The primary protocol that differentiates network events and game data, and communicates message targets and sources,  will be hidden. Although this has the potential to reduce the capabilities of the library as a whole, it will hopefully open up use to programmers with less experience in the lower level handling of such systems.
@@ -130,7 +141,14 @@ One of the main goals of this project is to reduce the cost of server hosting. T
 
 ## testing & evaluation
 
-//
+- difference in data throughput compared to a normal network structure
+- difference in number of connections handled compared to a normal network structure
+- robustness of network image and autonomous reconnection handling
+- difficulties arising from interaction between LAN & WAN networks
+- estimated load and connection capacities
+- possible techniques for improving efficiency provided by new network structure
+- discussion of handling simultaneous network disconnection events
+- outlier scenarios, such as root node disconnecting
 
 ## conclusion
 
