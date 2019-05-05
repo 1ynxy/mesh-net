@@ -81,16 +81,20 @@ This project aims to develop and test a method for enabling the distributed proc
 
 ## introduction, aims & objectives
 
-Although the most commonly implemented network structure in the industry is that of a typical single-server many-client instance, this was not the only viable structure, even during the inception of networked video games. Games would often provide a two-player co-op mode which would require two clients to be linked together without some form of dedicated host, which is a good example of how a very basic mesh network might operate.
+Traditional video game networks are single-host many-client constructs. This requires the host to act differently to the clients in that it accepts connections, collates information, and handles client inputs. Not only does this result in more work, in order to keep both server and client programs up to date and compatible, but also the server instance has to be hosted temporarily, or in some cases indefinitely, by either the developers of the game or by the players themselves. This latter option is often referred to as community hosted server solutions. Both options have advantages and disadvantages for both the developers and the users.
 
-// describe traditional network structure
-// describe types of mesh network structure
-// justify choice of network structure
-// explain idea of data persistence in a mesh network
-// describe uses of data persistence
-// outline general methodology for data persistence
-// explain autonomous net events - reconnection, load balancing
-// point out issues with client based authority over server authority
+Many developers do not opt to offer these server programs to the community, such as in Grand Theft Auto Five, because the design of the game requires more control over how the game is interacted with. Widely distributed server software that allows any user to host a game often is quickly reverse-engineered or modified in order to influence the gameplay or virtual world. In situations in which advantages can be gained through microtransactions such modifications can negate the need to pay, resulting in a loss of profit. Server software modification by users can also be advantageous. In the case of games such as Minecraft, especially the Java based client, user modification is a major selling point offering many times more hours of gameplay than vanilla gameplay can. User modifications can add missing features, fix bugs, improve performance, or substitute gameplay modes entirely.
+
+Whether developer hosted or community hosted, in this form of network the server is nearly always authoritive. This means that information received from a client is not regarded as truth, but checked against peer inputs and other factors. If a client is found to be sending inputs which do not seem legitimate and might give the player an unfair advantage over other players they can be singled out and either reprimanded or removed from the network. The server is much less likely to be modified in order to give false information than the server is.
+
+// describe traditional network structure 
+// describe types of mesh network structure 
+// justify choice of network structure 
+// explain idea of data persistence in a mesh network 
+// describe uses of data persistence 
+// outline general methodology for data persistence 
+// explain autonomous net events - reconnection, load balancing 
+// point out issues with client based authority over server authority 
 
 The library will provide a "plug & play" capable solution to handling dynamic mesh networks for communicating game state data. In this instance a mesh network is that which does not contain any central device for data collation or connection handling. All peers are equal, and might be connected to the network through any existing, accessible node.
 
