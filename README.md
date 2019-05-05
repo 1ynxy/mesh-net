@@ -83,7 +83,7 @@ This project aims to develop and test a method for enabling the distributed proc
 
 Traditional video game networks are single-host many-client constructs. This requires the host to act differently to the clients in that it handles new connections and disconnects, collates information, and acts upon client input. Not only does this result in more work for developers, in order to keep both server and client programs up to date and compatible, but also the server instance has to be hosted temporarily, or in some cases indefinitely, by either the developers of the game or by the players themselves. This latter option is often referred to as community hosted server solutions. Both options have advantages and disadvantages for both the developers and the users.
 
-# INSERT DIAGRAM OF TRADITIONAL HOST-CLIENTS NETWORK STRUCTURE
+// INSERT DIAGRAM OF TRADITIONAL HOST-CLIENTS NETWORK STRUCTURE
 
 Many developers do not opt to offer these server programs to the community, such as in Grand Theft Auto Five, because the design of the game requires more control over how the game is interacted with. Widely distributed server software that allows any user to host a game often is quickly reverse-engineered or modified in order to influence the gameplay or virtual world. In situations in which advantages can be gained through micro-transactions such modifications can negate the need to pay, resulting in a loss of profit, but server software modification by users can also be advantageous. In the case of games such as Minecraft, especially the Java based client, user modification is a major selling point offering many times more hours of gameplay than vanilla gameplay can. User modifications can add missing features, fix bugs, improve performance, or substitute gameplay modes entirely.
 
@@ -91,7 +91,7 @@ Whether developer hosted or community hosted, in this form of network the server
 
 An alternative network structure is that of a mesh network. In a mesh network there is no central host; all peers are connected directly to each other or to another peer that is connected to the network. In a full mesh network each and every peer is connected to each other, creating a large number of redundant connections, but ensuring connection at all times to every other member of the network. In a partial mesh network some peers may be connected to other peers directly, but not to all. All data must then be forwarded around the network until every member has received it. Although this latter option reduces the number of connections that each peer has to handle at any one time, the amount of time processing the data transmitted is increased as they have to both receive and forward packets. A single dropped connection can also isolate a single peer, or even a number of peers, if no redundant connections are made. With the right information a reconnection attempt can be made, but this might still result in missed packets or downtime for the disconnected peer.
 
-# INSERT DIAGRAM OF MESH-NETWORK BOTH FULL & PARTIAL
+// INSERT DIAGRAM OF MESH-NETWORK BOTH FULL & PARTIAL
 
 The target of this project is to construct a partial mesh network without redundancies, instead including network imaging that allows for reconnection attempts to be made. This will reduce the number of connections each peer has to handle, but might introduce unreliable aspects to the network. As this is only a demonstration the aim is not to be completely reliable, but to prove that this structure is fast enough, yet light enough, to run on user machines without impacting performance unacceptably.
 
@@ -103,11 +103,11 @@ There are multiple major pitfalls with both this network architecture and the me
 
 A second hurdle which will not be solved is a problem with handling connections between devices that are on different networks and devices that are on the same network, or devices on Local Area Network (LAN) versus devices on Wide Area Network (WAN). Any users that wish to be accessible from outside of their local network must port-forward the connection on their router. The only way to test if this port forward is active is to connect to the device from outside of the network, which complicates the process considerably. Listing device accessibility in the network image is a must, as this information is required when picking a new target for reconnection. A number of complex scenarios can arise from this problem, one of which is described below.
 
-# INSERT DIAGRAM & EXPLANATION OF PORT-FORWARDED ROOT-HOST|CHILD RECONNECTION
+// INSERT DIAGRAM & EXPLANATION OF PORT-FORWARDED ROOT-HOST|CHILD RECONNECTION
 
 Another major problem occurs when the root, or first, node disconnects from the network. As this is the first node to join the network it should be at the top of the hierarchy. If it has multiple children, a race condition of sorts will be created, as each of the children search for a new host. In particularly unfortunate circumstances each peer might attempt to connect to a node that is lower in the hierarchy of each other, creating a loop in which messages might get trapped. The first solution that comes to mind is for each host to elect a child to take its position should it disconnect, or to rank children by the order in which position inheritance should occur.
 
-# INSERT DIAGRAM OF PEER RECONNECT RACE CONDITION
+// INSERT DIAGRAM OF PEER RECONNECT RACE CONDITION
 
 This project aims to provide a "plug & play" capable solution to handling dynamic mesh networks for communicating game state data. In this instance a mesh network is that which does not contain any central device for data collation or connection handling. All peers are equal, and might be connected to the network through any existing, accessible node.
 
@@ -158,14 +158,14 @@ One of the main goals of this project is to reduce the cost of server hosting. T
 
 ## testing & evaluation
 
-- difference in data throughput compared to a normal network structure
-- difference in number of connections handled compared to a normal network structure
-- robustness of network image and autonomous reconnection handling
-- difficulties arising from interaction between LAN & WAN networks
-- estimated load and connection capacities
-- possible techniques for improving efficiency provided by new network structure
-- discussion of handling simultaneous network disconnection events
-- outlier scenarios, such as root node disconnecting
+// difference in data throughput compared to a normal network structure
+// difference in number of connections handled compared to a normal network structure
+// robustness of network image and autonomous reconnection handling
+// difficulties arising from interaction between LAN & WAN networks
+// estimated load and connection capacities
+// possible techniques for improving efficiency provided by new network structure
+// discussion of handling simultaneous network disconnection events
+// outlier scenarios, such as root node disconnecting
 
 ## conclusion
 
