@@ -158,14 +158,14 @@ One of the main goals of this project is to reduce the cost of server hosting. T
 
 ## testing & evaluation
 
-// difference in data throughput compared to a normal network structure
-// difference in number of connections handled compared to a normal network structure
-// robustness of network image and autonomous reconnection handling
-// difficulties arising from interaction between LAN & WAN networks
-// estimated load and connection capacities
-// possible techniques for improving efficiency provided by new network structure
-// discussion of handling simultaneous network disconnection events
-// outlier scenarios, such as root node disconnecting
+// difference in data throughput compared to a normal network structure  
+// difference in number of connections handled compared to a normal network structure  
+// robustness of network image and autonomous reconnection handling  
+// difficulties arising from interaction between LAN & WAN networks  
+// estimated load and connection capacities  
+// possible techniques for improving efficiency provided by new network structure  
+// discussion of handling simultaneous network disconnection events  
+// outlier scenarios, such as root node disconnecting  
 
 ## conclusion
 
