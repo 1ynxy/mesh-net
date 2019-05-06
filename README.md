@@ -16,6 +16,7 @@ Use of a program such as 'pngcheck -c [file]' is advised to ensure that all imag
 
 ## progress
 
+artifact  
 - [x] file loading & saving
 - [x] configuration loading
 - [x] thread safe debug logging
@@ -50,6 +51,45 @@ Use of a program such as 'pngcheck -c [file]' is advised to ensure that all imag
 - [ ] basic player interactions | chat functions
 - [ ] persistent data loading from existing peers
 
+dissertation  
+- [x] abstract: scenario
+- [x] abstract: proposition
+- [x] introduction: host-clients structure
+- [x] introduction: dedicated versus community
+- [x] introduction: server authoritive
+- [x] introduction: mesh-network architecture
+- [ ] introduction: mesh-network potential pitfalls
+- [ ] introduction: network architecture justification
+- [ ] introduction: project goals
+- [ ] introduction: unattainable targets
+- [ ] introduction: deliverables
+- [ ] methodology: target device architecture
+- [ ] methodology: required libraries
+- [ ] methodology: posix vs win32
+- [ ] methodology: socket handling
+- [ ] methodology: file descriptors - select vs poll
+- [ ] methodology: threading & blocking
+- [ ] methodology: network structure
+- [ ] methodology: mesh protocol
+- [ ] methodology: network event breakdown
+- [ ] methodology: connection handshake
+- [ ] methodology: basic network imaging
+- [ ] methodology: ip address grepping
+- [ ] methodology: reconnection events
+- [ ] methodology: load balancing
+- [ ] methodology: architecture cross-compatibility
+- [ ] evaluation: data throughput
+- [ ] evaluation: socket load
+- [ ] evaluation: computational load
+- [ ] evaluation: debugging process
+- [ ] evaluation: example scenario
+- [ ] evaluation: discussion on reliability
+- [ ] evaluation: alternative potential use cases
+- [ ] conclusion: evaluation of progress
+- [ ] conclusion: target vs result
+- [ ] conclusion: were I given a redo
+- [ ] conclusion: viability of idea
+
 # standard project
 
 ## front cover
@@ -62,9 +102,9 @@ Use of a program such as 'pngcheck -c [file]' is advised to ensure that all imag
 
 ## abstract
 
-One of the primary costs associated with developing large scale online video games is that of continued hosting of non-community run game servers. Often, these are the only type of server available, as it allows the company more authority over how the servers are interacted with by the players.
+One of the primary costs associated with developing multi-player online video games is that of dedicated server hosting. Ranging from short-lived competitive or co-op game instances to massive multi-player multi-instanced virtual worlds, these servers require both large amounts of computational power, and a high data throughput.
 
-This project aims to develop and test a method for enabling the distributed processing and hosting of virtual game worlds in which all clients act as equal nodes in the network. An attempt will also be made to introduce data persistence and load balancing to the resulting mesh network. The result will be a module written in C++, integrated loosely with a simple, custom, 3D capable game engine. This module will abstract all network events and methods in a way that can be utilised by any program, rather than being tied to a particular game engine.
+This project aims to develop and test a method for enabling the distributed processing and hosting of virtual game worlds in which all clients act as equal nodes in the network. An attempt will also be made to introduce data persistence and load balancing to the resulting mesh network. The result will be a module written in C++, integrated loosely with a simple, custom, 3D capable game engine. This module will abstract all network events and methods in a way that can be utilised by any program, rather than being tied to a particular tool.
 
 ## contents
 
