@@ -2,7 +2,7 @@
 
 Dissertation project on peer-to-peer network architectures for procedurally generated voxel worlds in C++.
 
-When running on a headless server it must be run using a virtual framebuffer so that GLFW can initialise correctly.
+When running on a headless server it must be run using a virtual frame buffer so that GLFW can initialise correctly.
 This can be achieved using Xvfb.
 
 Use of a program such as 'pngcheck -c [file]' is advised to ensure that all image assets pass CRC checks.
@@ -16,7 +16,7 @@ Use of a program such as 'pngcheck -c [file]' is advised to ensure that all imag
 
 ## progress
 
-artifact  
+artefact  
 - [x] file loading & saving
 - [x] configuration loading
 - [x] thread safe debug logging
@@ -29,7 +29,7 @@ artifact
 - [x] resource loading : meshes
 - [ ] resource loading : samples
 - [x] resource creation : sprites
-- [x] resource creation : rendertextures
+- [x] resource creation : render textures
 - [ ] basic sprite rendering
 - [ ] gui interaction
 - [ ] text rendering
@@ -37,7 +37,7 @@ artifact
 - [x] mesh texture application
 - [ ] mesh dynamic lighting
 - [x] basic component-entity system
-- [x] base components : transform, camera, meshrenderer
+- [x] base components : transform, camera, mesh renderer
 - [ ] camera compositing
 - [ ] post-processing effects
 - [x] creation of server+client instance
@@ -45,7 +45,7 @@ artifact
 - [x] protocol for data type differentiation
 - [x] imaging of network structure
 - [x] ip address grepping
-- [ ] smart reconnection handling
+- [ ] smart reconnect handling
 - [ ] smart network balancing
 - [ ] game network data parsing
 - [ ] basic player interactions | chat functions
@@ -56,26 +56,26 @@ dissertation
 - [x] abstract: proposition
 - [x] introduction: host-clients structure
 - [x] introduction: dedicated versus community
-- [x] introduction: server authoritive
+- [x] introduction: server authoritative
 - [x] introduction: mesh-network architecture
-- [ ] introduction: mesh-network potential pitfalls
+- [x] introduction: mesh-network potential pitfalls
 - [ ] introduction: network architecture justification
-- [ ] introduction: project goals
+- [x] introduction: project goals
 - [ ] introduction: unattainable targets
-- [ ] introduction: deliverables
+- [ ] introduction: deliverable
 - [ ] methodology: target device architecture
+- [ ] methodology: posix versus win32
 - [ ] methodology: required libraries
-- [ ] methodology: posix vs win32
-- [ ] methodology: socket handling
-- [ ] methodology: file descriptors - select vs poll
+- [ ] methodology: sockets & file descriptors
 - [ ] methodology: threading & blocking
 - [ ] methodology: network structure
 - [ ] methodology: mesh protocol
 - [ ] methodology: network event breakdown
-- [ ] methodology: connection handshake
 - [ ] methodology: basic network imaging
+- [ ] methodology: connection handshake
+- [ ] methodology: addressing peers
 - [ ] methodology: ip address grepping
-- [ ] methodology: reconnection events
+- [ ] methodology: reconnect events
 - [ ] methodology: load balancing
 - [ ] methodology: architecture cross-compatibility
 - [ ] evaluation: data throughput
@@ -86,7 +86,7 @@ dissertation
 - [ ] evaluation: discussion on reliability
 - [ ] evaluation: alternative potential use cases
 - [ ] conclusion: evaluation of progress
-- [ ] conclusion: target vs result
+- [ ] conclusion: target versus result
 - [ ] conclusion: were I given a redo
 - [ ] conclusion: viability of idea
 
@@ -102,9 +102,13 @@ dissertation
 
 ## abstract
 
-One of the primary costs associated with developing multi-player online video games is that of dedicated server hosting. Ranging from short-lived competitive or co-op game instances to massive multi-player multi-instanced virtual worlds, these servers require both large amounts of computational power, and a high data throughput.
+### scenario
 
-This project aims to develop and test a method for enabling the distributed processing and hosting of virtual game worlds in which all clients act as equal nodes in the network. An attempt will also be made to introduce data persistence and load balancing to the resulting mesh network. The result will be a module written in C++, integrated loosely with a simple, custom, 3D capable game engine. This module will abstract all network events and methods in a way that can be utilised by any program, rather than being tied to a particular tool.
+One of the primary costs associated with developing multi-player online video games is that of dedicated server hosting. Ranging from short-lived competitive or co-op game instances to massive multi-player multi-instanced virtual worlds, these servers require both large amounts of computational power and a high data throughput. The large sums of money set aside for these dedicated hosting devices can affect both the game's development and its lifetime significantly.
+
+### proposition
+
+This project aims to develop and test a method for enabling the distributed processing and hosting of virtual game worlds in which all clients act as equal nodes in the network. The result will be compared to a more traditional network architecture and the viability of the mesh network will be evaluated. An attempt will also be made to introduce data persistence and load balancing to the resulting mesh network. The result will be a module written in C++, integrated loosely with a simple, custom, 3D capable game engine. This module will abstract all network events and methods in a way that can be utilised by any program, rather than being tied to a particular tool.
 
 ## contents
 
@@ -121,39 +125,151 @@ This project aims to develop and test a method for enabling the distributed proc
 
 ## introduction, aims & objectives
 
+### host-clients structure
+
 Traditional video game networks are single-host many-client constructs. This requires the host to act differently to the clients in that it handles new connections and disconnects, collates information, and acts upon client input. Not only does this result in more work for developers, in order to keep both server and client programs up to date and compatible, but also the server instance has to be hosted temporarily, or in some cases indefinitely, by either the developers of the game or by the players themselves. This latter option is often referred to as community hosted server solutions. Both options have advantages and disadvantages for both the developers and the users.
 
 // INSERT DIAGRAM OF TRADITIONAL HOST-CLIENTS NETWORK STRUCTURE
 
+### dedicated versus community
+
 Many developers do not opt to offer these server programs to the community, such as in Grand Theft Auto Five, because the design of the game requires more control over how the game is interacted with. Widely distributed server software that allows any user to host a game often is quickly reverse-engineered or modified in order to influence the gameplay or virtual world. In situations in which advantages can be gained through micro-transactions such modifications can negate the need to pay, resulting in a loss of profit, but server software modification by users can also be advantageous. In the case of games such as Minecraft, especially the Java based client, user modification is a major selling point offering many times more hours of gameplay than vanilla gameplay can. User modifications can add missing features, fix bugs, improve performance, or substitute gameplay modes entirely.
+
+### server authoritative
 
 Whether developer hosted or community hosted, in this form of network the server is nearly always authoritative. This means that information received from a client is not regarded as truth, but checked against peer inputs and other factors. If a client is found to be sending inputs which do not seem legitimate and might give the player an unfair advantage over other players they can be singled out and either reprimanded or removed from the network. The server is much less likely to be modified in order to give false information than a client is, which improves the security of this network structure significantly over alternatives.
 
-An alternative network structure is that of a mesh network. In a mesh network there is no central host; all peers are connected directly to each other or to another peer that is connected to the network. In a full mesh network each and every peer is connected to each other, creating a large number of redundant connections, but ensuring connection at all times to every other member of the network. In a partial mesh network some peers may be connected to other peers directly, but not to all. All data must then be forwarded around the network until every member has received it. Although this latter option reduces the number of connections that each peer has to handle at any one time, the amount of time processing the data transmitted is increased as they have to both receive and forward packets. A single dropped connection can also isolate a single peer, or even a number of peers, if no redundant connections are made. With the right information a reconnection attempt can be made, but this might still result in missed packets or downtime for the disconnected peer.
+### mesh-network architecture
+
+An alternative network structure is that of a mesh network. In a mesh network there is no central host; all peers are connected directly to each other or to another peer that is connected to the network. In a full mesh network each and every peer is connected to each other, creating a large number of redundant connections, but ensuring connection at all times to every other member of the network. In a partial mesh network some peers may be connected to other peers directly, but not to all. All data must then be forwarded around the network until every member has received it. Although this latter option reduces the number of connections that each peer has to handle at any one time, the amount of time processing the data transmitted is increased as they have to both receive and forward packets. A single dropped connection can also isolate a single peer, or even a number of peers, if no redundant connections are made. With the right information a reconnect attempt can be made, but this can still result in missed packets or downtime for the disconnected peer.
 
 // INSERT DIAGRAM OF MESH-NETWORK BOTH FULL & PARTIAL
 
-The target of this project is to construct a partial mesh network without redundancies, instead including network imaging that allows for reconnection attempts to be made. This will reduce the number of connections each peer has to handle, but might introduce unreliable aspects to the network. As this is only a demonstration the aim is not to be completely reliable, but to prove that this structure is fast enough, yet light enough, to run on user machines without impacting performance unacceptably.
-
-This network imaging will require the development of a protocol that will run on top of TCP or UDP that can differentiate game data and network packets. These network packets will be utilised in the construction of a network tree on each peer that will provide the required information for message targeting and autonomous reconnection handling. This network tree will have to be persistent across the network, meaning that new connections must be able to receive the serialised network image, parse it, and then add themselves to the network, broadcasting this event to the rest of the network. This is a basic form of data persistence in a mesh network; a concept which will also be employed in the game state syncing itself. This network image could potentially also be used to reduce the amount of data bouncing around the network. If each packet includes target and source identification it can be forwarded only to peers which are in the direct path to the target peer. In this way an advantage can be gained over traditional network structures.
-
-Using this constructed network image, the library will handle reconnection and load balancing autonomously. Information on an active peer's address, port forward status, and current load can be used to pick an appropriate target to attempt reconnection. Any children that the disconnected peer owns will have to be serialised and sent to the new host if connection is regained, eliminating the need for all disconnected peers in the hierarchy to reconnect. The amount of time that this operation takes is important, as it will determine the number of packets missed. It might instead be possible for disconnected peers to drop persistent data and request a new game state image upon reconnection to the network. This will negate the potential issues that reconnection presents, but will increase the load upon the new host and the network as a whole as more data is transmitted.
+### mesh-network potential pitfalls
 
 There are multiple major pitfalls with both this network architecture and the method used that will be addressed but not solved in the demonstration. The first is the issue of authority. As there is no one central device that is not a user, there is no viable peer that can be selected as an authoritative member of the network. Every peer has the same level of trust, and so the network is open to exploitation. One potential solution to this problem is to provide versions of the client which do not act as in-game entities, but continue to interact with the network as is normal. These clients will be able to compare and analyse inputs from all peers connected to the network and will be able to single out potential malicious devices. Other solutions include industry standard methods of anti-tampering, such as hashing game files and comparing results with expected hashes or those of peers in the network. Unfortunately a number of these methods are no longer applicable with no central authority.
 
-A second hurdle which will not be solved is a problem with handling connections between devices that are on different networks and devices that are on the same network, or devices on Local Area Network (LAN) versus devices on Wide Area Network (WAN). Any users that wish to be accessible from outside of their local network must port-forward the connection on their router. The only way to test if this port forward is active is to connect to the device from outside of the network, which complicates the process considerably. Listing device accessibility in the network image is a must, as this information is required when picking a new target for reconnection. A number of complex scenarios can arise from this problem, one of which is described below.
+A second hurdle which will not be solved is a problem with handling connections between devices that are on different networks and devices that are on the same network, or devices on Local Area Network (LAN) versus devices on Wide Area Network (WAN). Any users that wish to be accessible from outside of their local network must port-forward the connection on their router. The only way to test if this port forward is active is to connect to the device from outside of the network, which complicates the process considerably. Listing device accessibility in the network image is a must, as this information is required when picking a new target for reconnect. A number of complex scenarios can arise from this problem, one of which is described below.
 
-// INSERT DIAGRAM & EXPLANATION OF PORT-FORWARDED ROOT-HOST|CHILD RECONNECTION
+// INSERT DIAGRAM & EXPLANATION OF PORT-FORWARDED ROOT-HOST|CHILD RECONNECT
 
 Another major problem occurs when the root, or first, node disconnects from the network. As this is the first node to join the network it should be at the top of the hierarchy. If it has multiple children, a race condition of sorts will be created, as each of the children search for a new host. In particularly unfortunate circumstances each peer might attempt to connect to a node that is lower in the hierarchy of each other, creating a loop in which messages might get trapped. The first solution that comes to mind is for each host to elect a child to take its position should it disconnect, or to rank children by the order in which position inheritance should occur.
 
 // INSERT DIAGRAM OF PEER RECONNECT RACE CONDITION
 
-This project aims to provide a "plug & play" capable solution to handling dynamic mesh networks for communicating game state data. In this instance a mesh network is that which does not contain any central device for data collation or connection handling. All peers are equal, and might be connected to the network through any existing, accessible node.
+### network architecture justification
 
-In order to provide a library that is as easy as possible to use for programmers who might not have studied network programming certain aspects will be abstracted. Sockets, for example, will be hidden, and peers will instead be addressed using Unique User Identification Numbers (UUIDs) which are consistent across the network. Events will be reduced to connections and disconnections. Reconnections will be handled as autonomously as possible, requiring no, or little, intervention by the user of the library. The primary protocol that differentiates network events and game data, and communicates message targets and sources,  will be hidden. Although this has the potential to reduce the capabilities of the library as a whole, it will hopefully open up use to programmers with less experience in the lower level handling of such systems.
+//
+
+### project goals
+
+The target of this project is to construct a partial mesh network without redundancies, instead including network imaging that allows for reconnect attempts to be made. This will reduce the number of connections each peer has to handle, but might introduce unreliable aspects to the network. As this is only a demonstration the aim is not to be completely reliable, but to prove that this structure is fast enough, yet light enough, to run on user machines without impacting performance unacceptably.
+
+This network imaging will require the development of a protocol that will run on top of TCP or UDP that can differentiate game data and network packets. These network packets will be utilised in the construction of a network tree on each peer that will provide the required information for message targeting and autonomous reconnect handling. This network tree will have to be persistent across the network, meaning that new connections must be able to receive the serialised network image, parse it, and then add themselves to the network, broadcasting this event to the rest of the network. This is a basic form of data persistence in a mesh network; a concept which will also be employed in the game state syncing itself. This network image could potentially also be used to reduce the amount of data bouncing around the network. If each packet includes target and source identification it can be forwarded only to peers which are in the direct path to the target peer. In this way an advantage can be gained over traditional network structures.
+
+Using this constructed network image, the library will handle reconnect and load balancing autonomously. Information on an active peer's address, port forward status, and current load can be used to pick an appropriate target to attempt reconnect. Any children that the disconnected peer owns will have to be serialised and sent to the new host if connection is regained, eliminating the need for all disconnected peers in the hierarchy to reconnect. The amount of time that this operation takes is important, as it will determine the number of packets missed. It might instead be possible for disconnected peers to drop persistent data and request a new game state image upon reconnect to the network. This will negate the potential issues that reconnect presents, but will increase the load upon the new host and the network as a whole as more data is transmitted.
+
+This project aims to provide a "plug & play" solution to handling dynamic mesh networks for communicating game state data. In order to provide a library that is as accessible as possible certain aspects will be abstracted. Sockets, for example, will be hidden, and peers will instead be addressed using Unique User Identification Numbers (UUIDs) which are consistent across the network. Events will be reduced to connections and disconnections. Reconnecting will be handled as autonomously as possible, requiring little or no intervention by the user. The primary protocol that differentiates network events and game data and communicates message targets and sources will be hidden. Although this has the potential to reduce the flexibility of the library it will hopefully open up use to programmers with less experience in the lower level handling of such systems.
+
+### unattainable targets
+
+// 
+
+### deliverable
+
+// 
 
 ## theory, design, & methodology
+
+### target device architecture
+
+// discussion of language & build tools  
+// 
+
+### posix versus win32
+
+// compatibility with architectures & availability  
+// differences in implementation  
+// 
+
+### required libraries
+
+// window handling & graphics / opengl  
+// sockets & file descriptors  
+// architecture agnostic  
+// 
+
+### socket handling & file descriptors
+
+// file descriptor sets  
+// server & client merger  
+// select versus poll  
+// 
+
+### threading & blocking
+
+// non-blocking calls  
+// multi-threaded using conditional variables  
+// mutex protections  
+// 
+
+### network structure
+
+// list versus tree  
+// individual nodes  
+// 
+
+### mesh protocol
+
+// fixed versus dynamic header  
+// human readable  
+// targets and sources  
+// packet types  
+// 
+
+### network event breakdown
+
+// list of network events and ids  
+// description of each  
+// 
+
+### basic network imaging
+
+// serialisation & parsing  
+// 
+
+### connection handshake
+
+// packet order in back and forth upon new connection  
+// initiator  
+// 
+
+### addressing peers
+
+// local sockets to unique user identification numbers  
+// 
+
+### ip address grepping
+
+// new connection informing network of used target address  
+// range of methods for getting an ip address  
+// 
+
+### reconnect events
+
+// picking appropriate targets  
+// managing skipped packets  
+// options for handling children  
+// 
+
+### load balancing
+
+// picking appropriate targets  
+// similarities to handling reconnects  
+// advantages over losing and regaining connection  
+// 
+
+### TO BE REORDERED
 
 In order to create a fully decentralised mesh network all members of the network must be treated the same. Each node in the network will have to be as self-sufficient as possible. There is no one device that allocates identification numbers or target nodes to new connections. There is no one device that handles user input from each peer. There is no one source of information on the network structure. Instead, these tasks will have to be accomplished collaboratively, using a range of handshaking techniques designed to communicate information in the correct order.
 
@@ -186,7 +302,7 @@ In order to keep the network structure up to date a distinction must be made bet
 
 The User Datagram Protocol is a protocol for communicating datagrams between devices. A datagram is a set of information, potentially split into multiple packets, which is broadcast at the target device. No response is expected, meaning that this protocol does not open and maintain a connection between two devices. The sender does not know if the receiver has received the information, and as such, packet loss can occur. Packets can be received out-of-order, or not at all, but they will always contain the correct information. More light weight than TCP, and quicker due to the communication not requiring multiple steps, this protocol is often used when packet loss is acceptable and speed is important. The Transfer Control Protocol is a protocol for reliable two-way communication of data between multiple devices. A connection can be made and maintained, and while this connection is open any data can be sent and received through it. No packet loss will occur, and packets will arrive in the correct order.
 
-In this use-case it would be best to create a protocol one layer under TCP. Reliability of communication is important, as a single lost packet could result in a desynced network image which could cause problems further into development. Speed of transmission is not so important in this demonstration, although in a full commercial product it would be a significant discussion point. Many fast paced first person shooter games have picked UDP over TCP in order to reduce latency of packets, such as Quake 3. When it comes to developing a protocol there are a number of considerations to be made when designing the header, such as whether it is human readable or not, or whether it is a dynamic or fixed length. These options can influence network reliability, extensibility, speed, and efficiency, so it is important to find the correct balance.
+In this use-case it would be best to create a protocol one layer under TCP. Reliability of communication is important, as a single lost packet could result in a de-synced network image which could cause problems further into development. Speed of transmission is not so important in this demonstration, although in a full commercial product it would be a significant discussion point. Many fast paced first person shooter games have picked UDP over TCP in order to reduce latency of packets, such as Quake 3. When it comes to developing a protocol there are a number of considerations to be made when designing the header, such as whether it is human readable or not, or whether it is a dynamic or fixed length. These options can influence network reliability, extensibility, speed, and efficiency, so it is important to find the correct balance.
 
 A fixed header length simplifies the process and improves parsing speed for each packet transmitted. Less data is required to transmit the same header information, improving efficiency, but later modifications to the header structure can cause complications. If more header space is required at any point the result will no longer be compatible with older versions of the program. This header structure must be modified in every instance of code which either serialises or parses a packet, which can become time consuming.
 
@@ -198,18 +314,63 @@ One of the main goals of this project is to reduce the cost of server hosting. T
 
 ## testing & evaluation
 
+### data throughput
+
 // difference in data throughput compared to a normal network structure  
+// possible techniques for improving efficiency provided by new network structure  
+// 
+
+### socket load
+
 // difference in number of connections handled compared to a normal network structure  
-// robustness of network image and autonomous reconnection handling  
+// 
+
+### computational load
+
+// discussion of increased computational load trade-off  
+// 
+
+### debugging process
+
+// use of netcat & other tools  
+// 
+
+### example scenario
+
+// evaluation of health of test setup  
+// 
+
+### discussion of reliability
+
+// robustness of network image and autonomous reconnect handling  
 // difficulties arising from interaction between LAN & WAN networks  
 // estimated load and connection capacities  
-// possible techniques for improving efficiency provided by new network structure  
-// discussion of handling simultaneous network disconnection events  
 // outlier scenarios, such as root node disconnecting  
+// discussion of handling simultaneous network disconnection events  
+// 
+
+### alternative potential use cases
+
+// other uses for mesh network architecture  
+// 
 
 ## conclusion
 
-//
+### evaluation of progress
+
+// 
+
+### target versus result
+
+// 
+
+### were I given a redo
+
+// 
+
+### viability of idea
+
+// 
 
 ## references
 
