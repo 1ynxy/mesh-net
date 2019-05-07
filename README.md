@@ -60,9 +60,8 @@ dissertation
 - [x] introduction: mesh-network architecture
 - [x] introduction: mesh-network potential pitfalls
 - [ ] introduction: network architecture justification
-- [x] introduction: project goals
+- [x] introduction: project goals & deliverable
 - [ ] introduction: unattainable targets
-- [ ] introduction: deliverable
 - [ ] methodology: target device architecture
 - [ ] methodology: posix versus win32
 - [ ] methodology: required libraries
@@ -127,13 +126,13 @@ This project aims to develop and test a method for enabling the distributed proc
 
 ### host-clients structure
 
-Traditional video game networks are single-host many-client constructs. This requires the host to act differently to the clients in that it handles new connections and disconnects, collates information, and acts upon client input. Not only does this result in more work for developers, in order to keep both server and client programs up to date and compatible, but also the server instance has to be hosted temporarily, or in some cases indefinitely, by either the developers of the game or by the players themselves. This latter option is often referred to as community hosted server solutions. Both options have advantages and disadvantages for both the developers and the users.
+Traditional video game networks are single-host many-client constructs. A server is created which can then be connected to by any number of clients. This server is often distributed and run as a separate tool to the client software. Not only does this result in more work for developers, in order to keep both server and client programs up to date and compatible, but also the server instance has to be hosted temporarily, or in some cases indefinitely, by either the developers of the game or by the players themselves. This latter option is often referred to as community hosted server solutions. Both options have advantages and disadvantages for both the developers and the users.
 
 // INSERT DIAGRAM OF TRADITIONAL HOST-CLIENTS NETWORK STRUCTURE
 
 ### dedicated versus community
 
-Many developers do not opt to offer these server programs to the community, such as in Grand Theft Auto Five, because the design of the game requires more control over how the game is interacted with. Widely distributed server software that allows any user to host a game often is quickly reverse-engineered or modified in order to influence the gameplay or virtual world. In situations in which advantages can be gained through micro-transactions such modifications can negate the need to pay, resulting in a loss of profit, but server software modification by users can also be advantageous. In the case of games such as Minecraft, especially the Java based client, user modification is a major selling point offering many times more hours of gameplay than vanilla gameplay can. User modifications can add missing features, fix bugs, improve performance, or substitute gameplay modes entirely.
+Many developers do not opt to offer these server programs to the community, such as in Grand Theft Auto Five, because the design of the game requires more control over how the game is interacted with. Widely distributed server software that allows any user to host a game often is quickly reverse-engineered or modified in order to influence the gameplay or virtual world. In situations in which advantages can be gained through micro-transactions such modifications can negate the need to pay, resulting in a loss of profit, but server software modification by users can also be advantageous. In the case of games such as Minecraft, especially the Java based client, user modification is a major selling point offering many times more hours of gameplay than the vanilla client can. User modifications can add missing features, fix bugs, improve performance, or substitute gameplay modes entirely.
 
 ### server authoritative
 
@@ -141,19 +140,19 @@ Whether developer hosted or community hosted, in this form of network the server
 
 ### mesh-network architecture
 
-An alternative network structure is that of a mesh network. In a mesh network there is no central host; all peers are connected directly to each other or to another peer that is connected to the network. In a full mesh network each and every peer is connected to each other, creating a large number of redundant connections, but ensuring connection at all times to every other member of the network. In a partial mesh network some peers may be connected to other peers directly, but not to all. All data must then be forwarded around the network until every member has received it. Although this latter option reduces the number of connections that each peer has to handle at any one time, the amount of time processing the data transmitted is increased as they have to both receive and forward packets. A single dropped connection can also isolate a single peer, or even a number of peers, if no redundant connections are made. With the right information a reconnect attempt can be made, but this can still result in missed packets or downtime for the disconnected peer.
+An alternative network structure is that of a mesh network. In a mesh network there is no central host; all peers are connected directly to each other or to another peer that is connected to the network. In a full mesh network each and every peer is connected to each other, creating a large number of redundant connections, but ensuring connection at all times to every other member of the network. In a partial mesh network some clients may be connected to other peers directly, but not to all. All data must then be forwarded around the network until every member has received it. Although this latter option reduces the number of connections that each peer has to handle at any one time, the amount of time processing the data transmitted is increased as they have to both receive and forward packets. A single dropped connection can also isolate a single peer, or even a number of peers, if no redundant connections are made. With the right information a reconnect attempt can be made, but this can still result in missed packets or downtime for the disconnected peer.
 
 // INSERT DIAGRAM OF MESH-NETWORK BOTH FULL & PARTIAL
 
 ### mesh-network potential pitfalls
 
-There are multiple major pitfalls with both this network architecture and the method used that will be addressed but not solved in the demonstration. The first is the issue of authority. As there is no one central device that is not a user, there is no viable peer that can be selected as an authoritative member of the network. Every peer has the same level of trust, and so the network is open to exploitation. One potential solution to this problem is to provide versions of the client which do not act as in-game entities, but continue to interact with the network as is normal. These clients will be able to compare and analyse inputs from all peers connected to the network and will be able to single out potential malicious devices. Other solutions include industry standard methods of anti-tampering, such as hashing game files and comparing results with expected hashes or those of peers in the network. Unfortunately a number of these methods are no longer applicable with no central authority.
+There are multiple major pitfalls with both this network architecture and the method used that will be addressed but not all will solved in the demonstration. The first is the issue of authority. As there is no one central device that is not a user, there is no viable peer that can be selected as an authoritative member of the network. Every peer has the same level of trust, and so the network is open to exploitation. One potential solution to this problem is to provide versions of the client which do not act as in-game entities, but continue to interact with the network as is normal. These clients will be able to compare and analyse inputs from all peers connected to the network and will be able to single out potential malicious devices. Other solutions include industry standard methods of anti-tampering, such as hashing game files and comparing results with expected hashes or those of peers in the network. Unfortunately a number of these methods are no longer applicable with no central authority.
 
 A second hurdle which will not be solved is a problem with handling connections between devices that are on different networks and devices that are on the same network, or devices on Local Area Network (LAN) versus devices on Wide Area Network (WAN). Any users that wish to be accessible from outside of their local network must port-forward the connection on their router. The only way to test if this port forward is active is to connect to the device from outside of the network, which complicates the process considerably. Listing device accessibility in the network image is a must, as this information is required when picking a new target for reconnect. A number of complex scenarios can arise from this problem, one of which is described below.
 
 // INSERT DIAGRAM & EXPLANATION OF PORT-FORWARDED ROOT-HOST|CHILD RECONNECT
 
-Another major problem occurs when the root, or first, node disconnects from the network. As this is the first node to join the network it should be at the top of the hierarchy. If it has multiple children, a race condition of sorts will be created, as each of the children search for a new host. In particularly unfortunate circumstances each peer might attempt to connect to a node that is lower in the hierarchy of each other, creating a loop in which messages might get trapped. The first solution that comes to mind is for each host to elect a child to take its position should it disconnect, or to rank children by the order in which position inheritance should occur.
+Another major problem occurs when the root, or first node disconnects from the network. As this is the first node to join the network it should be at the top of the hierarchy. If it has multiple children, a race condition of sorts will be created, as each of the children search for a new host. In particularly unfortunate circumstances each peer might attempt to connect to a node that is lower in the hierarchy of another, creating a loop in which messages might get caught indefinitely. The first solution that comes to mind is for each host to elect a child to take its position should it disconnect, or to rank children by the order in which position inheritance should occur.
 
 // INSERT DIAGRAM OF PEER RECONNECT RACE CONDITION
 
@@ -161,7 +160,7 @@ Another major problem occurs when the root, or first, node disconnects from the 
 
 //
 
-### project goals
+### project goals & deliverable
 
 The target of this project is to construct a partial mesh network without redundancies, instead including network imaging that allows for reconnect attempts to be made. This will reduce the number of connections each peer has to handle, but might introduce unreliable aspects to the network. As this is only a demonstration the aim is not to be completely reliable, but to prove that this structure is fast enough, yet light enough, to run on user machines without impacting performance unacceptably.
 
@@ -175,15 +174,13 @@ This project aims to provide a "plug & play" solution to handling dynamic mesh n
 
 // 
 
-### deliverable
-
-// 
-
 ## theory, design, & methodology
 
 ### target device architecture
 
 // discussion of language & build tools  
+// linux versus windows versus mac  
+// advantage availability of unix systems  
 // 
 
 ### posix versus win32
