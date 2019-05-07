@@ -44,7 +44,7 @@ artefact
 - [x] connection to peers
 - [x] protocol for data type differentiation
 - [x] imaging of network structure
-- [x] ip address grepping
+- [-] ip address grepping
 - [ ] smart reconnect handling
 - [ ] smart network balancing
 - [ ] game network data parsing
@@ -59,19 +59,19 @@ dissertation
 - [x] introduction: server authoritative
 - [x] introduction: mesh-network architecture
 - [x] introduction: mesh-network potential pitfalls
-- [ ] introduction: network architecture justification
+- [-] introduction: network architecture justification
 - [x] introduction: project goals & deliverable
-- [ ] introduction: unattainable targets
-- [ ] methodology: target device architecture
-- [ ] methodology: posix versus win32
-- [ ] methodology: required libraries
+- [-] introduction: unattainable targets
+- [x] methodology: target device architecture
+- [x] methodology: posix versus win32
+- [x] methodology: required libraries
 - [ ] methodology: sockets & file descriptors
 - [ ] methodology: threading & blocking
-- [ ] methodology: network structure
-- [ ] methodology: mesh protocol
+- [x] methodology: network structure
+- [x] methodology: mesh protocol
 - [ ] methodology: network event breakdown
-- [ ] methodology: basic network imaging
-- [ ] methodology: connection handshake
+- [-] methodology: basic network imaging
+- [-] methodology: connection handshake
 - [ ] methodology: addressing peers
 - [ ] methodology: ip address grepping
 - [ ] methodology: reconnect events
