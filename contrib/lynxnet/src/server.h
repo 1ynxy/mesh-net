@@ -9,13 +9,9 @@
 #include <mutex>
 #include <condition_variable>
 
-#include <sys/types.h>
 #include <sys/socket.h>
-#include <arpa/inet.h>
-#include <ifaddrs.h>
-#include <netdb.h>
 #include <unistd.h>
-#include <poll.h>
+#include <netdb.h>
 
 #include <../src/peer.h>
 #include <../src/network.h>
