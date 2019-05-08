@@ -66,13 +66,12 @@ dissertation
 - [x] methodology: posix versus win32
 - [x] methodology: required libraries
 - [x] methodology: sockets & file descriptors
-- [ ] methodology: threading & blocking
+- [x] methodology: threading & blocking
 - [x] methodology: network structure
 - [x] methodology: mesh protocol
-- [ ] methodology: network event breakdown
+- [x] methodology: network event breakdown
 - [x] methodology: basic network imaging
 - [x] methodology: connection handshake
-- [ ] methodology: addressing peers
 - [ ] methodology: ip address grepping
 - [ ] methodology: reconnect events
 - [ ] methodology: load balancing
@@ -255,7 +254,9 @@ In order to keep this network structure up to date a distinction must be made be
 
 The User Datagram Protocol is a protocol for communicating datagrams between devices. A datagram is a set of information, potentially split into multiple packets, which is broadcast at the target device. No response is expected, meaning that this protocol does not usually open and maintain a connection between two devices, and is known as a connectionless protocol. The sender does not know if the receiver has received the information, and as such, packet loss can occur. Packets can be received out-of-order, or not at all, but they will always contain the correct information. More light weight than TCP, and quicker due to the communication not requiring multiple steps, this protocol is often used when packet loss is acceptable and speed is important. The Transfer Control Protocol is a protocol for reliable two-way communication of data between multiple devices. A connection can be made and maintained, and while this connection is open any data can be sent and received through it. No packet loss will occur, and packets will arrive in the correct order.
 
-In this use-case it would be best to create a protocol one layer under TCP. Reliability of communication is important, as a single lost packet could result in a de-synced network image which could cause problems further into development. Speed of transmission is not so important in this demonstration, although in a full commercial product it would be a significant discussion point. Many fast paced first person shooter games have picked UDP over TCP in order to reduce latency of packets, such as Quake 3. When it comes to developing a protocol there are a number of considerations to be made when designing the header, such as whether it is human readable or not, or whether it is a dynamic or fixed length. These options can influence network reliability, extensibility, speed, and efficiency so it is important to find the correct balance.
+In this use-case it would be best to create a protocol one layer under TCP. Reliability of communication is important, as a single lost packet could result in a de-synced network image which could cause problems further into development. Speed of transmission is not so important in this demonstration, although in a full commercial product it would be a significant discussion point. Many fast paced first person shooter games have picked UDP over TCP in order to reduce latency of packets, such as Quake 3. An ideal solution would be to utilise UDP while giving packets priorities. Packets with a certain priority will be stored in a buffer until a response with that packet identification is received. After a certain amount of time without this response the packet will be re-broadcast. This means that with relatively unimportant packets you would still get the advantage of speed that UDP provides but with packets which must be received there is a safety net to prevent packet loss.
+
+When it comes to developing a protocol there are a number of considerations to be made when designing the header, such as whether it is human readable or not, or whether it is a dynamic or fixed length. These options can influence network reliability, extensibility, speed, and efficiency so it is important to find the correct balance.
 
 A fixed header length simplifies the process and improves parsing speed for each packet transmitted. Less data is required to transmit the same header information, improving efficiency, but later modifications to the header structure can cause complications. If more header space is required at any point the result will no longer be compatible with older versions of the program. This header structure must be modified in every instance of code which either serialises or parses a packet, which can become time consuming.
 
@@ -271,9 +272,36 @@ One of the main goals of this project is to reduce the cost of server hosting. T
 
 ### network event breakdown
 
-// list of network events and ids  
-// description of each  
-// 
+All network packets contain a header that is setup as follows:
+
+TARGET_UUID:SOURCE_UUID:BROADCAST_TYPE:PACKET_TYPE:PACKET_DATA
+
+UUIDs are always three characters long, and so they must be padded with zeros if the number is too small. If the packet is a global broadcast then the UUID of 000 can be used. In this way packets can be associated with a source peer and can be forwarded smartly to reduce the amount of redundant data transmitted.
+
+The broadcast type can be either message or global. A message will not be forwarded any further, whereas a global packet will be.
+
+The packet type can be one of the following:
+
+GAMEDAT == 0:  
+This packet is just game data. It will be forwarded around the network but not parsed and acted upon.
+
+NEWCONN == 1:  
+Contains a HOST_UUID that must be associated with the SOURCE_UUID and added to the network image.
+
+REMCONN == 2:  
+Contains a PEER_UUID of the peer that has lost connection to the network and should be removed.
+
+SETSOCK == 3:  
+Contains no information, as the SOURCE_UUID can be obtained from the header information.
+
+SETNAME == 4:  
+Contains a dynamically sized string containing the connection name to be associated with the SOURCE_UUID in the header.
+
+SETIDIP == 5:  
+Contains the connection IP Address to be associated with the SOURCE_UUID in the header.
+
+NETSTAT == 6:  
+Contains a serialised network image or a portion of a serialised network image to be parsed.
 
 ### basic network imaging
 
@@ -286,22 +314,16 @@ The complexity of a mesh network is largely due to the need for all data to be s
 
 In order to create a fully decentralised mesh network all members of the network must be treated the same. Each node in the network will have to be as self-sufficient as possible. There is no one device that allocates identification numbers or target nodes to new connections. There is no one device that handles user input from each peer. There is no one source of information on the network structure. Instead, these tasks will have to be accomplished collaboratively, using a range of handshaking techniques designed to communicate information in the correct order.
 
-One consideration to make is to decide which device is the initiator when a new client joins the network. Either the host or the client could opt to inform the network, but only one can correctly assign a new, unused user identification number due to the availability of the information on which are already in use. This means that the host has to make the first move: to inform the new client of the current network structure.
+One consideration to make is to decide which device is the initiator when a new client joins the network. Either the host or the client could opt to inform the network, but only one can correctly assign a new, unused user identification number due to the availability of the information on which are already in use. This means that the host has to make the first move: to inform the new client of the current network structure. The handshake goes like this:
 
 - Client attempts connection to the network
 - Host accepts new connection
 - Host serialises and sends the network image directly to the new client
 - Client receives and parses this network image, making a note of the socket it was received from
-- Client 
+- Client generates new UUID and broadcasts itself as a new connection
+- Client sends UUID directly to host so it can associate the socket number with the UUID
 
-// packet order in back and forth upon new connection  
-// initiator  
-// 
-
-### addressing peers
-
-// local sockets to unique user identification numbers  
-// 
+In this way every user in the network has knowledge of the new connection, their UUID, and which host they are connected to. The UUID generated by the new client is valid, as they have the whole network image to base it off of. Both the host and the child have associated the correct socket numbers with the correct UUIDs so that they may direct messages correctly and identify received packet sources.
 
 ### ip address grepping
 
