@@ -72,10 +72,9 @@ dissertation
 - [x] methodology: network event breakdown
 - [x] methodology: basic network imaging
 - [x] methodology: connection handshake
-- [ ] methodology: ip address grepping
+- [x] methodology: ip address grepping
 - [ ] methodology: reconnect events
 - [ ] methodology: load balancing
-- [ ] methodology: architecture cross-compatibility
 - [ ] evaluation: data throughput
 - [ ] evaluation: socket load
 - [ ] evaluation: computational load
@@ -274,11 +273,9 @@ One of the main goals of this project is to reduce the cost of server hosting. T
 
 All network packets contain a header that is setup as follows:
 
-TARGET_UUID:SOURCE_UUID:BROADCAST_TYPE:PACKET_TYPE:PACKET_DATA
+TARGET_UUID:SOURCE_UUID:PACKET_TYPE:PACKET_DATA
 
-UUIDs are always three characters long, and so they must be padded with zeros if the number is too small. If the packet is a global broadcast then the UUID of 000 can be used. In this way packets can be associated with a source peer and can be forwarded smartly to reduce the amount of redundant data transmitted.
-
-The broadcast type can be either message or global. A message will not be forwarded any further, whereas a global packet will be.
+UUIDs are always three characters long, and so they must be padded with zeros if the number is too small. If the packet is a global broadcast then the UUID of 000 can be used. In this way packets can be associated with a source peer and can be forwarded smartly to reduce the amount of redundant data transmitted. A global packet will always be forwarded throughout the network whereas a packet with a specific target UUID will be sent only through the correct path to the target.
 
 The packet type can be one of the following:
 
@@ -303,12 +300,15 @@ Contains the connection IP Address to be associated with the SOURCE_UUID in the 
 NETSTAT == 6:  
 Contains a serialised network image or a portion of a serialised network image to be parsed.
 
+A combination of these network event packets in the correct order results in a persistent image of the network structure on each client connected.
+
 ### basic network imaging
 
 The complexity of a mesh network is largely due to the need for all data to be synced between all peers that are connected, including data that was sent prior to a peer's connection. When a new device connects to the network it must somehow receive all of the game state changes so far so that it can catch up. The same method can be used to keep all members of the network up to date on the network structure itself. A range of methods for storing and transmitting this data present themselves, each with pros and cons.
 
-// serialisation & parsing  
-// 
+The simplest way to handle this task is to send the whole network state or game state every frame. This is slow, and incredibly inefficient. The amount of data sent each frame will increase with the size of the network or the complexity of the game state. A much more efficient alternative is to send only the difference between frames or states. In order to quickly catch any new peers up the game state or network state must be serialised by the host of the new connection, sent in a single target message to the new client, and parsed correctly. This is likely the least data efficient part of the process, but it only has to happen once, every time a new peer joins or rejoins the network.
+
+Network structure serialisation is relatively simple. The root node must be found, and then all child nodes are recursively serialised and added to a string, separated by a special character. Starting at the root node means that when the string is parsed in no node will be added to the network structure that does not have a valid host already added. This reduces potential errors during the parsing process. To parse the serialised data the string is split on the same special characters as before and then each set of node data are added to the network as if they were a new connection.
 
 ### connection handshake
 
@@ -327,9 +327,11 @@ In this way every user in the network has knowledge of the new connection, their
 
 ### ip address grepping
 
-// new connection informing network of used target address  
-// range of methods for getting an ip address  
-// 
+To find a device's IP address is not simple as a device might have multiple addresses depending on the hardware available. Simply looping through all internet enabled hardware modules and picking the most likely address is not a reliable method. This method will also only return the device's local IP address at best, which is only useful if connecting from inside the local network.
+
+The most reliable method of finding the IP address of a machine involves connecting to another device, preferably outside of the local network, and asking it what IP address the device connected from. In a normal host-clients structured network the host can be used to figure out the address, but in a mesh network there might not always be a host device. In order to make each client as independent as possible it would be preferable if they could connect to a third party service in order to determine their own IP addresses. A service such as Amazon Cloud or Google Search is very unlikely to go down anytime soon, which is good for ensuring the lifetime of the product. If longevity is the target, though, the best option might be to instead delegate IP address handling to the writer of the tool that utilises this library. If the IP address of the current device could be passed in when the server instance is created it would allow the user to pick a more up-to-date service or alternate method for finding addresses.
+
+One final method that can be used is to have new peers communicate which IP address they used to connect to the network, associating the host peer with the given address. This might not be reliable as if the new peer connected over the local network with a local IP address the network will associate the local address with the host, which is not ideal. One upside to this method is that you know for sure that the address is correct in some way, as the peer managed to connect using it.
 
 ### reconnect events
 
