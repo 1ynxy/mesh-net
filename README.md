@@ -148,9 +148,7 @@ There are multiple major pitfalls with both this network architecture and the me
 
 The first is the issue of authority. As there is no one central device that is not a user, there is no viable peer that can be selected as an authoritative member of the network. Every peer has the same level of trust, and so the network is open to exploitation. One potential solution to this problem is to provide versions of the client which do not act as in-game entities, but continue to interact with the network as is normal. These clients will be able to compare and analyse inputs from all peers connected to the network and will be able to single out potential malicious devices. Other solutions include industry standard methods of anti-tampering, such as hashing game files and comparing results with expected hashes or those of peers in the network. Unfortunately a number of these methods are no longer applicable with no central authority.
 
-A second hurdle which will not be solved is a problem with handling connections between devices that are on different networks and devices that are on the same network, or devices on Local Area Network (LAN) versus devices on Wide Area Network (WAN). Any users that wish to be accessible from outside of their local network must port-forward the connection on their router. The only way to test if this port forward is active is to connect to the device from outside of the network, which complicates the process considerably. Listing device accessibility in the network image is a must, as this information is required when picking a new target for reconnect. A number of complex scenarios can arise from this problem, one of which is described below.
-
-// INSERT DIAGRAM & EXPLANATION OF PORT-FORWARDED ROOT-HOST|CHILD RECONNECT
+A second hurdle which will not be solved is a problem with handling connections between devices that are on different networks and devices that are on the same network, or devices on Local Area Network (LAN) versus devices on Wide Area Network (WAN). Any users that wish to be accessible from outside of their local network must port-forward the connection on their router. The only way to test if this port forward is active is to connect to the device from outside of the network, which complicates the process considerably. Listing device accessibility in the network image is a must, as this information is required when picking a new target for reconnect. 
 
 Another major problem occurs when the root, or first node disconnects from the network. As this is the first node to join the network it should be at the top of the hierarchy. If it has multiple children, a race condition of sorts will be created, as each of the children search for a new host. In particularly unfortunate circumstances each peer might attempt to connect to a node that is lower in the hierarchy of another, creating a loop in which messages might get caught indefinitely. The first solution that comes to mind is for each host to elect a child to take its position should it disconnect, or to rank children by the order in which position inheritance should occur.
 
@@ -335,10 +333,17 @@ One final method that can be used is to have new peers communicate which IP addr
 
 ### reconnect events
 
-// picking appropriate targets  
-// managing skipped packets  
-// options for handling children  
-// 
+One of the main uses of the network image construction is for autonomous reconnecting to the network should a host peer drop connection. Once a peer has all of the information on the network structure picking an appropriate target to reconnect to is relatively simple, although it depends on a few factors. Reconnect events can promote network load balancing if done correctly as when the choice of a new host is made the current load on each peer can be taken into account. Other factors which are important when selecting a new host are whether there is a host that is on the same network, which would improve network latency and performance, and which peers are accessible from outside of their own networks, as not every user might have port forwarded their connection.
+
+As noted above, the amount of time it takes for this reconnect process to complete is important. The longer it takes, the more packets might be missed, resulting in an incomplete network image or skipped game state data. One solution suggested in the introduction is that of requesting the complete game state or network image serialised from the new host, as if connecting to the network for the first time. This increases the amount of data transmitted but does not reduce reliability.
+
+// INSERT DIAGRAM OF PORT-FORWARDED ROOT-HOST|CHILD RECONNECT PROBLEM
+
+There are a large number of edge cases in this network structure, and one of the most complex shows itself when managing disconnected peers. In this scenario there are three nodes in the network. The first node that started the mesh network is not port forwarded, yet it is connected to by another peer that is part of the same local network. This second node is port forwarded, allowing the third peer to connect from outside of the local network. If the second peer then disconnects the third peer will search for a node to reconnect to, finding the first node, and attempt to reconnect. Unfortunately, because the first peer is not accessible from outside the network the reconnect fails and the third node fails to rejoin the network.
+
+// INSERT DIAGRAM OF ROOT-NODE DISCONNECT PROBLEM
+
+In another scenario in which a node that has multiple children disconnects there is a scramble to find a new host to connect to. If the node that has disconnected is the root node it results in a network split. None of the child nodes can find a node further up in the hierarchy to connect to, and they cannot attempt to connect to each other as this would create a circular structure which might capture and trap packets. A potential solution is to force each host that has multiple children to nominate a child peer to inherit its position in the network should it disconnect. All other children of the disconnected node would then attempt to connect to one single child, while this child becomes the new root node.
 
 ### load balancing
 
