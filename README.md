@@ -59,19 +59,19 @@ dissertation
 - [x] introduction: server authoritative
 - [x] introduction: mesh-network architecture
 - [x] introduction: mesh-network potential pitfalls
-- [-] introduction: network architecture justification
+- [x] introduction: network architecture justification
 - [x] introduction: project goals & deliverable
-- [-] introduction: unattainable targets
+- [x] introduction: unattainable targets
 - [x] methodology: target device architecture
 - [x] methodology: posix versus win32
 - [x] methodology: required libraries
-- [ ] methodology: sockets & file descriptors
+- [x] methodology: sockets & file descriptors
 - [ ] methodology: threading & blocking
 - [x] methodology: network structure
 - [x] methodology: mesh protocol
 - [ ] methodology: network event breakdown
-- [-] methodology: basic network imaging
-- [-] methodology: connection handshake
+- [x] methodology: basic network imaging
+- [x] methodology: connection handshake
 - [ ] methodology: addressing peers
 - [ ] methodology: ip address grepping
 - [ ] methodology: reconnect events
@@ -86,7 +86,7 @@ dissertation
 - [ ] evaluation: alternative potential use cases
 - [ ] conclusion: evaluation of progress
 - [ ] conclusion: target versus result
-- [ ] conclusion: were I given a redo
+- [ ] conclusion: future work
 - [ ] conclusion: viability of idea
 
 # standard project
@@ -202,10 +202,11 @@ System socket, netdb, and unistd libraries will be used for the bulk of the netw
 
 ### socket handling & file descriptors
 
-// file descriptor sets  
-// server & client merger  
-// select versus poll  
-// 
+There are two main methods for handling multiple sockets or file descriptors at a time. Sockets are treated as file descriptors in Unix systems, and can be read from, written to, and can throw exceptions. The older method of the two is the select function which takes a file descriptor set and waits for one or multiple to be readable or writable, then returns. This is normally a blocking function, but it can be set to time out. This is part of the Posix specification and so is implemented in the largest number of platforms and architectures, but the implementation may not always be exactly the same in all. For example, in some implementations the timing data structure passed to the select function is modified to return the time left on the timer, whereas in others it is not. Select will check all file descriptors in a set, even if they are not set.
+
+The second, and newer, method for handling many sockets at one time is the poll function from the Single Unix Specification and the Unix 95/98 standard. Although the poll function is less wide-spread, it provides a faster method of handling many connections at once. It is more efficient in that it scales better with higher numbers of sockets and it also does not destructively check the file descriptors in a set, unlike the select function which requires rebuilding of the set each time it is called. The poll function also allows for a higher number of file descriptors, as it is not constrained by the same rules select is. By default the select function can handle up to 1024 connections as it utilises fixed sized bitmasks for file descriptor info.
+
+Due to a mesh network node combining the concept of a host and a client both the sockets for the host peer and any child peers are stored in the same file descriptor set. This means that the network image must be used to differentiate data received from children from data received from the host, as disconnection events from each must be handled differently.
 
 ### threading & blocking
 
@@ -365,7 +366,7 @@ One consideration to make is to decide which device is the initiator when a new 
 
 // 
 
-### were I given a redo
+### future work
 
 // 
 
