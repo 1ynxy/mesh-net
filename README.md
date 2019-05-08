@@ -347,10 +347,7 @@ In another scenario in which a node that has multiple children disconnects there
 
 ### load balancing
 
-// picking appropriate targets  
-// similarities to handling reconnects  
-// advantages over losing and regaining connection  
-// 
+Although reconnect events give the network a chance to re-balance itself somewhat, it might be necessary even when no disconnects happen because a user might connect to a heavily loaded node manually. Fortunately, performing load balancing that is not triggered by a disconnect is a better position to be in, as you can create the new connection before disconnecting or being disconnected from the network, resulting in no loss of packets. The solutions suggested for avoiding such a loss of data in the reconnect section are no longer needed, improving efficiency. Other than that, load balancing is pretty similar to a reconnect event.
 
 ## testing & evaluation
 
