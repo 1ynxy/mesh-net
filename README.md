@@ -107,27 +107,31 @@ One of the primary costs associated with developing multi-player online video ga
 
 ### 1.2 proposition
 
-This project aims to develop and test a method for enabling the distributed processing and hosting of virtual game worlds in which all clients act as equal nodes in the network. The result will be compared to a more traditional network design and the viability of the network architecture will be evaluated. An attempt will also be made to introduce data persistence and load balancing to the resulting partial mesh network. The result will be a module written in C++, integrated loosely with a simple, custom, 3D capable game engine.
+This project aims to develop and test a method for enabling the distributed processing and hosting of virtual game worlds in which all clients act as equal nodes in the network. Eliminating as many aspects of the centralised network architecture is important; complete independence from any third party is a major factor in the development of this project. The result will be compared to a more traditional network design and the viability of the network architecture will be evaluated. An attempt will also be made to introduce data persistence and load balancing to the resulting partial mesh network. The deliverable will be a module written in C++, integrated loosely with a simple, custom, 3D capable game engine in order to display the library's capabilities.
 
 ## chapter 2 : introduction, aims & objectives
 
 ### 2.1 background
 
+Not long after the introduction of the very first commercially available computer games came the internet. This was not the invention of multiplayer video game interaction, which happened early in the arcade era, with two or more players constrained to a single machine with multiple inputs. This was a progression from local multiplayer to a more connected audience. Soon came ARPANET, or the Advanced Research Projects Agency Network, and the introduction of TCP/IP, a communications model that set the standards for local network data transmission. The internet as we know it was born.
 
+Since then it has expanded massively. According to the Internet World Stats, March 2019 [1], 56.1% of the world's population has access to the internet, including up to 81% of the developed world. With such a large audience accessing the internet on devices ranging from mobile phones to desktop computers the potential market value is incomprehensible. The internet has become a tool for communication, research, media consumption and entertainment. A number of these uses are relatively latency agnostic, but for those that aren't, and with such large distances separating many users of the internet, many different solutions for reducing the impact of high latency have been suggested.
+
+Multiplayer games are one area in which time is an important factor. Improving latency and data throughput without sacrificing reliability of information transfer is a difficult task, but is essential for the development of complex real time virtual worlds. Not only must all interactions occur as instantaneously as possible, but there must be little, or no, chance of data loss in order for all users to share a common view of the world. In order to perform this task multiple different network architectures have been developed with differing requirements in mind.
 
 ### 2.2 host-clients structure
 
-Traditional video game networks are single-host many-client constructs. A server is created which can then be connected to by any number of clients. This server is often distributed and run as a separate tool to the client software. Not only does this result in more work for developers, in order to keep both server and client programs up to date and compatible, but also the server instance has to be hosted temporarily, or in some cases indefinitely, by either the developers of the game or by the players themselves. This latter option is often referred to as community hosted server solutions. Both options have advantages and disadvantages for both the developers and the users.
+Traditional video game networks are single-server many-client constructs. A server is created which can be connected to by any number of clients. This server is often distributed and run as a separate tool to the client software. Not only does this result in more work for developers, in order to keep both server and client programs up to date and compatible, but also the server instance has to be hosted temporarily, or in some cases indefinitely, by either the developers of the game or by the players themselves. This latter option is often referred to as a community hosted server. Both options have advantages and disadvantages for both the developers and the users.
 
 // INSERT DIAGRAM OF TRADITIONAL HOST-CLIENTS NETWORK STRUCTURE
 
 ### dedicated versus community
 
-Many developers do not opt to offer these server programs to the community, such as in Grand Theft Auto Five, because the design of the game requires more control over how the game is interacted with. Widely distributed server software that allows any user to host a game often is quickly reverse-engineered or modified in order to influence the gameplay or virtual world. In situations in which advantages can be gained through micro-transactions such modifications can negate the need to pay, resulting in a loss of profit, but server software modification by users can also be advantageous. In the case of games such as Minecraft, especially the Java based client, user modification is a major selling point offering many times more hours of gameplay than the vanilla client can. User modifications can add missing features, fix bugs, improve performance, or substitute gameplay modes entirely.
+Many developers do not opt to offer these server programs to the community, such as in Grand Theft Auto Five, because the design of the game requires more control over how the game is interacted with. Widely distributed server software that allows any user to host a game often is quickly reverse-engineered or modified in order to influence the gameplay or virtual world. In situations in which advantages can be gained through micro-transactions such modifications can negate the need to pay, resulting in a loss of profit, but server software modification by users can also be advantageous. In the case of games such as Minecraft, especially the Java based client, user modification is a major selling point offering many times more hours of gameplay than the vanilla client can. User modifications can add missing features, fix bugs, improve performance, or substitute gameplay modes entirely. The distribution of community focused server software can also positively impact the game's lifetime, even past the lifetime of the company that produced it.
 
 ### server authoritative
 
-Whether developer hosted or community hosted, in this form of network the server is nearly always authoritative. This means that information received from a client is not regarded as truth, but checked against peer inputs and other factors. If a client is found to be sending inputs which do not seem legitimate and might give the player an unfair advantage over other players they can be singled out and either reprimanded or removed from the network. The server is much less likely to be modified in order to give false information than a client is, which improves the security of this network structure significantly over alternatives.
+Whether developer hosted or community hosted, in this form of network the server is nearly always authoritative. This means that information received from a client is not regarded as truth, but checked against peer inputs and other factors. If a client is found to be sending inputs which do not seem legitimate and might give the player an unfair advantage over other players they can be singled out and either reprimanded or removed from the network. The server is much less likely to be modified in order to give false information than a client is, which improves the security of this network architecture significantly over alternatives.
 
 ### mesh-network architecture
 
@@ -400,8 +404,12 @@ One final method that can be used is to have new peers communicate which IP addr
 
 ## references
 
-//
+[1] Internetworldstats.com. (2019). World Internet Users Statistics and 2019 World Population Stats. [online] Available at: https://www.internetworldstats.com/stats.htm [Accessed 9 May 2019].
 
-## appendices
+[2] 
 
-//
+[3] 
+
+[4] 
+
+[5] 
