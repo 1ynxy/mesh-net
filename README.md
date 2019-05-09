@@ -1,6 +1,6 @@
 # mesh-net
 
-Dissertation project on peer-to-peer network architectures for procedurally generated voxel worlds in C++.
+Dissertation project on persistent data synchronisation in peer-to-peer network architectures.
 
 When running on a headless server it must be run using a virtual frame buffer so that GLFW can initialise correctly.
 This can be achieved using Xvfb.
@@ -52,40 +52,46 @@ artefact
 - [ ] persistent data loading from existing peers
 
 dissertation  
-- [x] abstract: scenario
-- [x] abstract: proposition
-- [x] introduction: host-clients structure
-- [x] introduction: dedicated versus community
-- [x] introduction: server authoritative
-- [x] introduction: mesh-network architecture
-- [x] introduction: mesh-network potential pitfalls
-- [x] introduction: network architecture justification
-- [x] introduction: project goals & deliverable
-- [x] introduction: unattainable targets
-- [x] methodology: target device architecture
-- [x] methodology: posix versus win32
-- [x] methodology: required libraries
-- [x] methodology: sockets & file descriptors
-- [x] methodology: threading & blocking
-- [x] methodology: network structure
-- [x] methodology: mesh protocol
-- [x] methodology: network event breakdown
-- [x] methodology: basic network imaging
-- [x] methodology: connection handshake
-- [x] methodology: ip address grepping
-- [ ] methodology: reconnect events
-- [ ] methodology: load balancing
-- [ ] evaluation: data throughput
-- [ ] evaluation: socket load
-- [ ] evaluation: computational load
-- [ ] evaluation: debugging process
-- [ ] evaluation: example scenario
-- [ ] evaluation: discussion on reliability
-- [ ] evaluation: alternative potential use cases
-- [ ] conclusion: evaluation of progress
-- [ ] conclusion: target versus result
-- [ ] conclusion: future work
-- [ ] conclusion: viability of idea
+- chapter 1 : abstract
+- [x] abstract 1.1: scenario
+- [x] abstract 1.2: proposition
+- chapter 2 : introduction
+- [ ] introduction 2.1: background
+- [x] introduction 2.2: client-server architectures
+- [x] introduction 2.2.1: dedicated versus community
+- [x] introduction 2.2.2: server authoritative
+- [x] introduction 2.3: mesh-network architecture
+- [x] introduction 2.3.1: mesh-network potential pitfalls
+- [x] introduction 2.3.2: network architecture justification
+- [x] introduction 2.4: project goals & deliverable
+- [x] introduction 2.4.1: unattainable targets
+- chapter 3 : methodology
+- [x] methodology 3.1: target device architecture
+- [x] methodology 3.1.1: posix versus win32
+- [x] methodology 3.2: required libraries
+- [x] methodology 3.2.1: sockets & file descriptors
+- [x] methodology 3.3: threading & blocking
+- [x] methodology 3.4: network structure
+- [x] methodology 3.5: mesh protocol
+- [x] methodology 3.6: network event breakdown
+- [x] methodology 3.6.1: connection handshake
+- [ ] methodology 3.6.2: reconnect events
+- [ ] methodology 3.6.3: load balancing
+- [x] methodology 3.7: basic network imaging
+- [x] methodology 3.7.1: ip address grepping
+- chapter 4 : evaluation
+- [ ] evaluation 4.1: data throughput
+- [ ] evaluation 4.2: socket load
+- [ ] evaluation 4.3: computational load
+- [ ] evaluation 4.4: debugging process
+- [ ] evaluation 4.5: example scenario
+- [ ] evaluation 4.6: discussion on reliability
+- [ ] evaluation 4.7: alternative potential use cases
+- chapter 5 : conclusion
+- [ ] conclusion 5.1: evaluation of progress
+- [ ] conclusion 5.2: target versus result
+- [ ] conclusion 5.3: future work
+- chapter 6 : 
 
 # standard project
 
@@ -93,36 +99,23 @@ dissertation
 
 // INSERT FRONT COVER & DISCLAIMER //
 
-## acknowledgements
+## chapter 1 : abstract
 
-//
+### 1.1 scenario
 
-## abstract
+One of the primary costs associated with developing multi-player online video games is that of dedicated server hosting. Ranging from short-lived competitive or co-op game instances to massive multi-instanced virtual worlds, these servers require both large amounts of computational power and a high data throughput. The onus of providing these servers as a service is often on the developers or publishers, resulting in a lack of player control over the lifetime of the game.
 
-### scenario
+### 1.2 proposition
 
-One of the primary costs associated with developing multi-player online video games is that of dedicated server hosting. Ranging from short-lived competitive or co-op game instances to massive multi-instanced virtual worlds, these servers require both large amounts of computational power and a high data throughput. The large sums of money set aside for these dedicated hosting devices can affect both the game's development and its viable lifetime significantly.
+This project aims to develop and test a method for enabling the distributed processing and hosting of virtual game worlds in which all clients act as equal nodes in the network. The result will be compared to a more traditional network design and the viability of the network architecture will be evaluated. An attempt will also be made to introduce data persistence and load balancing to the resulting partial mesh network. The result will be a module written in C++, integrated loosely with a simple, custom, 3D capable game engine.
 
-### proposition
+## chapter 2 : introduction, aims & objectives
 
-This project aims to develop and test a method for enabling the distributed processing and hosting of virtual game worlds in which all clients act as equal nodes in the network. The result will be compared to a more traditional network architecture and the viability of the mesh network will be evaluated. An attempt will also be made to introduce data persistence and load balancing to the resulting mesh network. The result will be a module written in C++, integrated loosely with a simple, custom, 3D capable game engine. This module will abstract all network events and methods in a way that can be utilised by any program, rather than being tied to a particular tool.
+### 2.1 background
 
-## contents
 
-- front cover
-- disclaimer
-- abstract
-- contents
-- introduction
-- methodology
-- testing & evaluation
-- conclusion
-- references
-- appendices
 
-## introduction, aims & objectives
-
-### host-clients structure
+### 2.2 host-clients structure
 
 Traditional video game networks are single-host many-client constructs. A server is created which can then be connected to by any number of clients. This server is often distributed and run as a separate tool to the client software. Not only does this result in more work for developers, in order to keep both server and client programs up to date and compatible, but also the server instance has to be hosted temporarily, or in some cases indefinitely, by either the developers of the game or by the players themselves. This latter option is often referred to as community hosted server solutions. Both options have advantages and disadvantages for both the developers and the users.
 
@@ -300,14 +293,6 @@ Contains a serialised network image or a portion of a serialised network image t
 
 A combination of these network event packets in the correct order results in a persistent image of the network structure on each client connected.
 
-### basic network imaging
-
-The complexity of a mesh network is largely due to the need for all data to be synced between all peers that are connected, including data that was sent prior to a peer's connection. When a new device connects to the network it must somehow receive all of the game state changes so far so that it can catch up. The same method can be used to keep all members of the network up to date on the network structure itself. A range of methods for storing and transmitting this data present themselves, each with pros and cons.
-
-The simplest way to handle this task is to send the whole network state or game state every frame. This is slow, and incredibly inefficient. The amount of data sent each frame will increase with the size of the network or the complexity of the game state. A much more efficient alternative is to send only the difference between frames or states. In order to quickly catch any new peers up the game state or network state must be serialised by the host of the new connection, sent in a single target message to the new client, and parsed correctly. This is likely the least data efficient part of the process, but it only has to happen once, every time a new peer joins or rejoins the network.
-
-Network structure serialisation is relatively simple. The root node must be found, and then all child nodes are recursively serialised and added to a string, separated by a special character. Starting at the root node means that when the string is parsed in no node will be added to the network structure that does not have a valid host already added. This reduces potential errors during the parsing process. To parse the serialised data the string is split on the same special characters as before and then each set of node data are added to the network as if they were a new connection.
-
 ### connection handshake
 
 In order to create a fully decentralised mesh network all members of the network must be treated the same. Each node in the network will have to be as self-sufficient as possible. There is no one device that allocates identification numbers or target nodes to new connections. There is no one device that handles user input from each peer. There is no one source of information on the network structure. Instead, these tasks will have to be accomplished collaboratively, using a range of handshaking techniques designed to communicate information in the correct order.
@@ -322,14 +307,6 @@ One consideration to make is to decide which device is the initiator when a new 
 - Client sends UUID directly to host so it can associate the socket number with the UUID
 
 In this way every user in the network has knowledge of the new connection, their UUID, and which host they are connected to. The UUID generated by the new client is valid, as they have the whole network image to base it off of. Both the host and the child have associated the correct socket numbers with the correct UUIDs so that they may direct messages correctly and identify received packet sources.
-
-### ip address grepping
-
-To find a device's IP address is not simple as a device might have multiple addresses depending on the hardware available. Simply looping through all internet enabled hardware modules and picking the most likely address is not a reliable method. This method will also only return the device's local IP address at best, which is only useful if connecting from inside the local network.
-
-The most reliable method of finding the IP address of a machine involves connecting to another device, preferably outside of the local network, and asking it what IP address the device connected from. In a normal host-clients structured network the host can be used to figure out the address, but in a mesh network there might not always be a host device. In order to make each client as independent as possible it would be preferable if they could connect to a third party service in order to determine their own IP addresses. A service such as Amazon Cloud or Google Search is very unlikely to go down anytime soon, which is good for ensuring the lifetime of the product. If longevity is the target, though, the best option might be to instead delegate IP address handling to the writer of the tool that utilises this library. If the IP address of the current device could be passed in when the server instance is created it would allow the user to pick a more up-to-date service or alternate method for finding addresses.
-
-One final method that can be used is to have new peers communicate which IP address they used to connect to the network, associating the host peer with the given address. This might not be reliable as if the new peer connected over the local network with a local IP address the network will associate the local address with the host, which is not ideal. One upside to this method is that you know for sure that the address is correct in some way, as the peer managed to connect using it.
 
 ### reconnect events
 
@@ -348,6 +325,22 @@ In another scenario in which a node that has multiple children disconnects there
 ### load balancing
 
 Although reconnect events give the network a chance to re-balance itself somewhat, it might be necessary even when no disconnects happen because a user might connect to a heavily loaded node manually. Fortunately, performing load balancing that is not triggered by a disconnect is a better position to be in, as you can create the new connection before disconnecting or being disconnected from the network, resulting in no loss of packets. The solutions suggested for avoiding such a loss of data in the reconnect section are no longer needed, improving efficiency. Other than that, load balancing is pretty similar to a reconnect event.
+
+### basic network imaging
+
+The complexity of a mesh network is largely due to the need for all data to be synced between all peers that are connected, including data that was sent prior to a peer's connection. When a new device connects to the network it must somehow receive all of the game state changes so far so that it can catch up. The same method can be used to keep all members of the network up to date on the network structure itself. A range of methods for storing and transmitting this data present themselves, each with pros and cons.
+
+The simplest way to handle this task is to send the whole network state or game state every frame. This is slow, and incredibly inefficient. The amount of data sent each frame will increase with the size of the network or the complexity of the game state. A much more efficient alternative is to send only the difference between frames or states. In order to quickly catch any new peers up the game state or network state must be serialised by the host of the new connection, sent in a single target message to the new client, and parsed correctly. This is likely the least data efficient part of the process, but it only has to happen once, every time a new peer joins or rejoins the network.
+
+Network structure serialisation is relatively simple. The root node must be found, and then all child nodes are recursively serialised and added to a string, separated by a special character. Starting at the root node means that when the string is parsed in no node will be added to the network structure that does not have a valid host already added. This reduces potential errors during the parsing process. To parse the serialised data the string is split on the same special characters as before and then each set of node data are added to the network as if they were a new connection.
+
+### ip address grepping
+
+To find a device's IP address is not simple as a device might have multiple addresses depending on the hardware available. Simply looping through all internet enabled hardware modules and picking the most likely address is not a reliable method. This method will also only return the device's local IP address at best, which is only useful if connecting from inside the local network.
+
+The most reliable method of finding the IP address of a machine involves connecting to another device, preferably outside of the local network, and asking it what IP address the device connected from. In a normal host-clients structured network the host can be used to figure out the address, but in a mesh network there might not always be a host device. In order to make each client as independent as possible it would be preferable if they could connect to a third party service in order to determine their own IP addresses. A service such as Amazon Cloud or Google Search is very unlikely to go down anytime soon, which is good for ensuring the lifetime of the product. If longevity is the target, though, the best option might be to instead delegate IP address handling to the writer of the tool that utilises this library. If the IP address of the current device could be passed in when the server instance is created it would allow the user to pick a more up-to-date service or alternate method for finding addresses.
+
+One final method that can be used is to have new peers communicate which IP address they used to connect to the network, associating the host peer with the given address. This might not be reliable as if the new peer connected over the local network with a local IP address the network will associate the local address with the host, which is not ideal. One upside to this method is that you know for sure that the address is correct in some way, as the peer managed to connect using it.
 
 ## testing & evaluation
 
@@ -402,10 +395,6 @@ Although reconnect events give the network a chance to re-balance itself somewha
 // 
 
 ### future work
-
-// 
-
-### viability of idea
 
 // 
 
