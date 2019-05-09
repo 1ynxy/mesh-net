@@ -62,7 +62,6 @@ dissertation
 - [x] introduction 2.2.2: server authoritative
 - [x] introduction 2.3: mesh-network architecture
 - [x] introduction 2.3.1: mesh-network potential pitfalls
-- [x] introduction 2.3.2: network architecture justification
 - [x] introduction 2.4: project goals & deliverable
 - [x] introduction 2.4.1: unattainable targets
 - chapter 3 : methodology
@@ -119,47 +118,37 @@ Since then it has expanded massively. According to the Internet World Stats, Mar
 
 Multiplayer games are one area in which time is an important factor. Improving latency and data throughput without sacrificing reliability of information transfer is a difficult task, but is essential for the development of complex real time virtual worlds. Not only must all interactions occur as instantaneously as possible, but there must be little, or no, chance of data loss in order for all users to share a common view of the world. In order to perform this task multiple different network architectures have been developed with differing requirements in mind.
 
-### 2.2 host-clients structure
+### 2.2 client-server architecture
 
-Traditional video game networks are single-server many-client constructs. A server is created which can be connected to by any number of clients. This server is often distributed and run as a separate tool to the client software. Not only does this result in more work for developers, in order to keep both server and client programs up to date and compatible, but also the server instance has to be hosted temporarily, or in some cases indefinitely, by either the developers of the game or by the players themselves. This latter option is often referred to as a community hosted server. Both options have advantages and disadvantages for both the developers and the users.
+Traditional video game networks are single-server many-client constructs. A central server is hosted which can be connected to by any number of clients. This server is often distributed and run as a separate tool to the client software. Not only does this result in more work for developers, in order to keep both server and client programs up to date and compatible, but also the server instance has to be hosted temporarily, or in some cases indefinitely, by either the developers of the game or by the players themselves. This latter option is often referred to as a community hosted server.
 
 // INSERT DIAGRAM OF TRADITIONAL HOST-CLIENTS NETWORK STRUCTURE
 
-### dedicated versus community
+### 2.2.1 dedicated versus community
 
-Many developers do not opt to offer these server programs to the community, such as in Grand Theft Auto Five, because the design of the game requires more control over how the game is interacted with. Widely distributed server software that allows any user to host a game often is quickly reverse-engineered or modified in order to influence the gameplay or virtual world. In situations in which advantages can be gained through micro-transactions such modifications can negate the need to pay, resulting in a loss of profit, but server software modification by users can also be advantageous. In the case of games such as Minecraft, especially the Java based client, user modification is a major selling point offering many times more hours of gameplay than the vanilla client can. User modifications can add missing features, fix bugs, improve performance, or substitute gameplay modes entirely. The distribution of community focused server software can also positively impact the game's lifetime, even past the lifetime of the company that produced it.
+Many developers do not opt to offer these server programs to the community, such as in Grand Theft Auto Five, because the design of the game requires more control over how the game is interacted with. Widely distributed server software that allows any user to host a game often is quickly reverse-engineered or modified in order to influence the gameplay or virtual world. In situations in which advantages can be gained through micro-transactions such modifications can negate the need to pay, resulting in a loss of profit, but server software modification by users can also be advantageous. In the case of games such as Minecraft, especially the Java based client, user modification is a major selling point offering many times more hours of gameplay than the vanilla client can. The distribution of community focused server software can also positively impact the game's lifetime, even past the lifetime of the company that produced it.
 
-### server authoritative
+### 2.2.2 server authoritative
 
 Whether developer hosted or community hosted, in this form of network the server is nearly always authoritative. This means that information received from a client is not regarded as truth, but checked against peer inputs and other factors. If a client is found to be sending inputs which do not seem legitimate and might give the player an unfair advantage over other players they can be singled out and either reprimanded or removed from the network. The server is much less likely to be modified in order to give false information than a client is, which improves the security of this network architecture significantly over alternatives.
 
-### mesh-network architecture
+### 2.3 mesh-network architecture
 
-An alternative network structure is that of a mesh network. In a mesh network there is no central host; all peers are connected directly to each other or to another peer that is connected to the network. In a full mesh network each and every peer is connected to each other, creating a large number of redundant connections, but ensuring connection at all times to every other member of the network. In a partial mesh network some clients may be connected to other peers directly, but not to all. All data must then be forwarded around the network until every member has received it. Although this latter option reduces the number of connections that each peer has to handle at any one time, the amount of time processing the data transmitted is increased as they have to both receive and forward packets. A single dropped connection can isolate one or more peers if no redundant connections are made. With the right information a reconnect attempt can be made, but this can still result in missed packets or downtime for the disconnected peer.
+An alternative network structure is that of a mesh network. In a mesh network there is no central host; all peers are connected directly to each other or to another peer that is connected to the network. In a full mesh network each and every peer is connected to each other, creating a large number of redundant connections, but ensuring connection at all times to every other member of the network. In a partial mesh network clients may not be connected to all other peers, but connected to a single peer which forwards packets to it. Although this latter option reduces the number of connections that each peer has to handle at any one time, the amount of time processing the data transmitted is increased as packets have to be received, parsed, and forwarded multiple times. A single dropped connection can isolate one or more peers if no redundant connections are made. With the right data a reconnect attempt can be made but this can still result in missed packets during the downtime.
 
 // INSERT DIAGRAM OF MESH-NETWORK BOTH FULL & PARTIAL
 
-### mesh-network potential pitfalls
+### 2.3.1 mesh-network potential pitfalls
 
-There are multiple major pitfalls with both this network architecture and the method used that will be addressed but not all will solved in the demonstration.
+The first pitfall the one might encounter with this architecture is the issue of authority. As there is no one central device that is not a user there is no viable peer that can be selected as an authoritative member of the network. Every peer has the same level of trust, and so the network is open to exploitation. One potential solution to this problem is to provide versions of the client which do not act as in-game entities, but continue to interact with the network as is normal. These clients will be able to compare and analyse inputs from all peers connected to the network and will be able to single out potential malicious devices. Other solutions include industry standard methods of anti-tampering, such as hashing game files and comparing results with expected hashes or those of peers in the network. Unfortunately a number of these methods are no longer applicable with no central authority.
 
-The first is the issue of authority. As there is no one central device that is not a user, there is no viable peer that can be selected as an authoritative member of the network. Every peer has the same level of trust, and so the network is open to exploitation. One potential solution to this problem is to provide versions of the client which do not act as in-game entities, but continue to interact with the network as is normal. These clients will be able to compare and analyse inputs from all peers connected to the network and will be able to single out potential malicious devices. Other solutions include industry standard methods of anti-tampering, such as hashing game files and comparing results with expected hashes or those of peers in the network. Unfortunately a number of these methods are no longer applicable with no central authority.
+A second hurdle which is that of a problem with handling connections between devices on Local Area Network (LAN) versus devices on Wide Area Network (WAN). Any users that wish to be accessible from outside of their local network must port-forward the connection on their router. The only way to test if this port forward is active is to connect to the device from outside of the network, which complicates the process considerably. Listing device accessibility in the network image is a must, as this information is required when picking a new target for reconnecting. 
 
-A second hurdle which will not be solved is a problem with handling connections between devices that are on different networks and devices that are on the same network, or devices on Local Area Network (LAN) versus devices on Wide Area Network (WAN). Any users that wish to be accessible from outside of their local network must port-forward the connection on their router. The only way to test if this port forward is active is to connect to the device from outside of the network, which complicates the process considerably. Listing device accessibility in the network image is a must, as this information is required when picking a new target for reconnect. 
+Another major problem occurs when the root, or first, node disconnects from the network. As this is the first node to join the network it should be at the top of the hierarchy. If it has multiple children, a race condition of sorts will be created, as each of the children search for a new host. In particularly unfortunate circumstances each peer might attempt to connect to a node that is lower in the hierarchy of another, creating a loop in which messages might get caught indefinitely. The first solution that comes to mind is for each host to elect a child to take its position should it disconnect, or to rank children by the order in which position inheritance should occur.
 
-Another major problem occurs when the root, or first node disconnects from the network. As this is the first node to join the network it should be at the top of the hierarchy. If it has multiple children, a race condition of sorts will be created, as each of the children search for a new host. In particularly unfortunate circumstances each peer might attempt to connect to a node that is lower in the hierarchy of another, creating a loop in which messages might get caught indefinitely. The first solution that comes to mind is for each host to elect a child to take its position should it disconnect, or to rank children by the order in which position inheritance should occur.
+### 2.4 project goals & deliverable
 
-// INSERT DIAGRAM OF PEER RECONNECT RACE CONDITION
-
-### network architecture justification
-
-The target is to create a mesh network which can easily be implemented into any game or library without much prior knowledge of network structures, socket handling and data transfer. The focus of the project is primarily on that of a partial mesh network over a full mesh network. This is due to the need to keep the program light weight, which would be compromised by the creation of a connection for each peer in the network, and the simplicity of a tree structured network. A full mesh network design would introduce a number of complexities which would reduce the amount of time allotted for testing the network capabilities.
-
-// REWORD / REWRITE ABOVE
-
-### project goals & deliverable
-
-The target of this project is to construct a partial mesh network without redundancies, instead including network imaging that allows for reconnect attempts to be made. This will reduce the number of connections each peer has to handle, but might introduce unreliable aspects to the network. As this is only a demonstration the aim is not to be completely reliable, but to prove that this structure is fast enough, yet light enough, to run on user machines without impacting performance unacceptably.
+The target of this project is to construct a partial mesh network without excessive redundant connections, instead including network imaging that allows for reconnect attempts to be made. This will reduce the number of connections each peer has to handle, but might exacerbate unreliable aspects of the network. As this is only a demonstration the aim is not to be completely reliable, but to prove that this structure is fast enough, yet light enough, to run on user machines without impacting performance unacceptably.
 
 This network imaging will require the development of a protocol that will run on top of TCP or UDP that can differentiate game data and network packets. These network packets will be utilised in the construction of a network tree on each peer that will provide the required information for message targeting and autonomous reconnect handling. This network tree will have to be persistent across the network, meaning that new connections must be able to receive the serialised network image, parse it, and then add themselves to the network, broadcasting this event to the rest of the network. This is a basic form of data persistence in a mesh network; a concept which will also be employed in the game state syncing itself. This network image could potentially also be used to reduce the amount of data bouncing around the network. If each packet includes target and source identification it can be forwarded only to peers which are in the direct path to the target peer. In this way an advantage can be gained over traditional network structures.
 
@@ -169,25 +158,25 @@ Using this constructed network image, the library will handle reconnect and load
 
 This project aims to provide a "plug & play" solution to handling dynamic mesh networks for communicating game state data. In order to provide a library that is as accessible as possible certain aspects will be abstracted. Sockets, for example, will be hidden, and peers will instead be addressed using Unique User Identification Numbers (UUIDs) which are consistent across the network. Events will be reduced to connections and disconnections. Reconnecting will be handled as autonomously as possible, requiring little or no intervention by the user. The primary protocol that differentiates network events and game data and communicates message targets and sources will be hidden. Although this has the potential to reduce the flexibility of the library it will hopefully open up use to programmers with less experience in the lower level handling of such systems.
 
-### unattainable targets
+### 2.4.1 unattainable targets
 
 The time given for this project is limited and existing expertise when it comes to network handling is minimal. Because of this there are a number of tasks which might not be completed by the deadline. These tasks may compromise the reliability of the network but should not prevent a basic demonstration of the concept from running. Hurdles that might not be overcome include handling of the disparity between WAN and LAN networks, as this requires a larger amount of IP address handling and comparison, and the persistence of game state data itself, as this utilises the same principles as persistent network imaging does, only on a different layer of the network. Anti-cheat and exploitation methods will also very likely not be implemented, as they are not necessary for the operation of the network and involve multiple other disciplines in programming that have not been explored.
 
-The resulting library with likely work either solely on WAN or over LAN, but will not handle a combination of the two reliably. To do so would require another module to handle ip addresses in more depth, able to differentiate between a local device and a connection from outside the network, and able to determine port forward availability. In order to reduce the difficulties in testing the network will likely only be tested across a range of local machines, although this does not provide an accurate real world scenario as latency times will be much lower; a factor which might greatly influence the reliability of the network.
+The resulting library with likely work either solely on WAN or over LAN, but will not handle a combination of the two reliably. To do so would require another module to handle ip addresses in more depth, able to differentiate between a local device and a connection from outside the network, and able to determine port forward availability. In order to reduce the difficulties in testing, the network will likely only be tested across a range of local machines, although this does not provide an accurate real world scenario as latency times will be much lower; a factor which might greatly influence the reliability of the network.
 
-## theory, design, & methodology
+## chapter 3 : theory, design, & methodology
 
-### target device architecture
+### 3.1 target device architecture
 
 The eventual goal is to write the library to be as portable as possible, but due to the difference in the way sockets behave between platforms and architectures there will always be some outliers. The most popular systems include Windows, Linux, and MacOS, but these can provide overlap with alternative, similarly structured systems. Programs that will build for Linux will often also build for MacOS and OpenBSD or FreeBSD, for example. Because of this, Linux seems to be the best target architecture that will allow for the largest number of potential devices. A choice should be made between the different CPU architectures, such as x86-x64, x86, and ARM, with the potential inclusion of newer architectures such as Risc-V. Because x86-x64 based machines often are more capable than the alternatives it might be easiest to develop solely for this architecture, especially as most development machines will also be compatible, but this does not mean that the library can't be test built for a lower-power architecture such as ARM. The addition of ARM devices decreases the cost of testing, as they often are cheap to purchase and set up, allowing for a small debugging network to be constructed easily. Windows is a lot less easily available on ARM devices than Linux or OpenBSD is, which also negatively effects the cost of development for Windows systems.
 
 To aide in multi-platform development the language used will be C++. Unlike a lot of languages which compile to byte-code and which must be interpreted by the system or by a virtual environment, such as with C# or Java, C++ is compiled into machine code which can run anywhere (or at least anywhere it is compiled for). C++ also provides good implementations of the Posix compliant and WinSock libraries for network construction, as well as a range of tools and data structures which will be useful. As the platform chosen is Linux and the language is C++ it becomes obvious that the build system will be GCC. The construction of Makefiles can be simplified using tools such as CMake.
 
-### posix versus win32
+### 3.1.1 posix versus win32
 
-Nearly all platforms aside from Windows are Posix compliant. These include MacOS, Android, FreeBSD, most flavours of Linux, and OpenBSD. Recently Microsoft released the Windows Subsystem for Linux, or WSL, which provides a compatibility layer between Linux and Windows, allowing for Unix sockets support among other tools. Due to this, and the choice of Linux as a development system, Posix is the best target for development, although some flavours of Linux and some more obscure Unix based operating systems implement aspects of socket handling in mildly different ways, complicating things a little.
+Nearly all platforms aside from Windows are Posix compliant. These include MacOS, Android, FreeBSD, most flavours of Linux, and OpenBSD. Recently Microsoft released the Windows Subsystem for Linux, or WSL, which provides a compatibility layer between Linux and Windows, allowing for Unix sockets support [?] among other tools. Due to this, and the choice of Linux as a development system, Posix is the best target for development, although some flavours of Linux and some more obscure Unix based operating systems implement aspects of socket handling in mildly different ways, complicating things a little.
 
-### required libraries
+### 3.2 required libraries
 
 The libraries utilised must be picked to be as architecture and platform agnostic as possible. This means that they provide implementations for each of the platforms that will be targeted, and abstract away the handling of which to use. Most of the standard libraries for string, vector, and queue data types will be used, as will the libraries for handling threads, atomic variables, mutexes, and conditional variables.
 
@@ -195,7 +184,7 @@ In order to test game state syncing, if it's even started, a graphical output wo
 
 System socket, netdb, and unistd libraries will be used for the bulk of the networking, for socket handling, address structure handling, and the Posix API respectively. These allow connections to be made, ports to be bound, ip addresses to be resolved and data to be sent and received. The Posix file descriptor set will be used to store active socket numbers, as this pairs well with the select function.
 
-### socket handling & file descriptors
+### 3.2.1 socket handling & file descriptors
 
 There are two main methods for handling multiple sockets or file descriptors at a time. Sockets are treated as file descriptors in Unix systems, and can be read from, written to, and can throw exceptions. The older method of the two is the select function which takes a file descriptor set and waits for one or multiple to be readable or writable, then returns. This is normally a blocking function, but it can be set to time out. This is part of the Posix specification and so is implemented in the largest number of platforms and architectures, but the implementation may not always be exactly the same in all. For example, in some implementations the timing data structure passed to the select function is modified to return the time left on the timer, whereas in others it is not. Select will check all file descriptors in a set, even if they are not set, reducing the efficiency of networks with a large number of connections.
 
@@ -205,7 +194,7 @@ Due to a mesh network node combining the concept of a host and a client both the
 
 As one of the main aims is portability, and the very design of the type of mesh network results in a small number of connections over a large number, select is the most appropriate file descriptor handling function to use. The select function is a blocking call by default, and is used when handling received data from any open sockets. All sockets, including the listening socket of the bound port, are added to a file descriptor set and select is run on this, returning only when a socket has readable information. The sockets are then looped through until a set socket is found, and the received data is acted upon. If the socket set is the listening socket, a new connection attempt has been made and the connection can be accepted or rejected. Otherwise, the received data may be normal packets or a zero length, or negative length, value. A zero length value means that a normal disconnection event has occurred, whereas a negative length means that a network error has occurred.
 
-### threading & blocking
+### 3.3 threading & blocking
 
 Many of the socket handling calls can be set to either blocking or non-blocking. Blocking means that the function will pause the running thread until a certain criteria has met and data can be returned. This can be useful to prevent an unnecessary use of computing resources when an input or similar action is being waited upon but in certain situations it can be detrimental. Blocking functions often work much better in a non-primary thread, as they can be paused indefinitely without negatively effecting the performance of the program, but the addition of threading increases complexity considerably.
 
@@ -217,7 +206,7 @@ As the data receiving is all performed in one looping function that includes a b
 
 This method provides multiple advantages in that the user of the library does not have to perform any actions in order for messages to be sent or received passively. Messages will continue to queue up in the receive queue whether they read from it or not, meaning that they can be read at any time. Messages that are received and that must be forwarded can be forwarded without waiting for the next update step in the game engine, and sending and receiving messages does not affect performance in any significant fashion. This results in slow running games not effecting the overall performance of the mesh network, as only the information that they themselves are providing will be delayed or intermittent.
 
-### network structure
+### 3.4 network structure
 
 The first, and most intuitive, method for storing a network image during run-time is that of a tree data structure. As each member of the network is a node with a single parent and multiple children this method seems ideal, but it does present complications when attempting to quickly navigate the structure. Although use of pointers and references in the C++ language improves memory management as, unlike with a vector data type when the structure is modified the memory does not necessarily have to be reallocated, the structure itself can be navigated bidirectionally. Unlike with a list, which would only have to be navigated in a single direction, a tree can be traversed in multiple ways, which both complicates algorithms and decreases efficiency of even simple tasks such as searching for a node with a certain identifying feature. Tree traversal methods include depth-first techniques, such as inorder, preorder and postorder.
 
@@ -242,7 +231,7 @@ A peer in this network structure will have to contain all of the information req
         vector<Peer*> children;			// the peers that are connected to this peer
     };
 
-### mesh protocol
+### 3.5 mesh protocol
 
 In order to keep this network structure up to date a distinction must be made between packets which contain game state data, and packets which contain network event data. This is achieved using a protocol, or a layer in which the data is wrapped with a header which describes it. Examples of protocols include Transfer Control Protocol (TCP) and User Datagram Protocol (UDP). Both of these protocols act upon the same layer, and each have their advantages and disadvantages.
 
@@ -264,7 +253,7 @@ The most sensible choice for development of a protocol, and a tool which impleme
 
 One of the main goals of this project is to reduce the cost of server hosting. The main way in which this will be accomplished is by delegating the task of hosting to the users of the network, but that does not mean the program can then be inefficient when it comes to data usage. Not only will reducing the amount of data per packet improve performance, but considering the user's situation is also important. Users might be subject to data caps or limits and so reducing the burden on them as much as possible is also a priority. Because of this, a fixed header with non-human readable data will be used, as this offers the greatest efficiency and speed when it comes to transmitting and parsing packets.
 
-### network event breakdown
+### 3.6 network event breakdown
 
 All network packets contain a header that is setup as follows:
 
@@ -297,7 +286,7 @@ Contains a serialised network image or a portion of a serialised network image t
 
 A combination of these network event packets in the correct order results in a persistent image of the network structure on each client connected.
 
-### connection handshake
+### 3.6.1 connection handshake
 
 In order to create a fully decentralised mesh network all members of the network must be treated the same. Each node in the network will have to be as self-sufficient as possible. There is no one device that allocates identification numbers or target nodes to new connections. There is no one device that handles user input from each peer. There is no one source of information on the network structure. Instead, these tasks will have to be accomplished collaboratively, using a range of handshaking techniques designed to communicate information in the correct order.
 
@@ -312,7 +301,7 @@ One consideration to make is to decide which device is the initiator when a new 
 
 In this way every user in the network has knowledge of the new connection, their UUID, and which host they are connected to. The UUID generated by the new client is valid, as they have the whole network image to base it off of. Both the host and the child have associated the correct socket numbers with the correct UUIDs so that they may direct messages correctly and identify received packet sources.
 
-### reconnect events
+### 3.6.2 reconnect events
 
 One of the main uses of the network image construction is for autonomous reconnecting to the network should a host peer drop connection. Once a peer has all of the information on the network structure picking an appropriate target to reconnect to is relatively simple, although it depends on a few factors. Reconnect events can promote network load balancing if done correctly as when the choice of a new host is made the current load on each peer can be taken into account. Other factors which are important when selecting a new host are whether there is a host that is on the same network, which would improve network latency and performance, and which peers are accessible from outside of their own networks, as not every user might have port forwarded their connection.
 
@@ -326,11 +315,13 @@ There are a large number of edge cases in this network structure, and one of the
 
 In another scenario in which a node that has multiple children disconnects there is a scramble to find a new host to connect to. If the node that has disconnected is the root node it results in a network split. None of the child nodes can find a node further up in the hierarchy to connect to, and they cannot attempt to connect to each other as this would create a circular structure which might capture and trap packets. A potential solution is to force each host that has multiple children to nominate a child peer to inherit its position in the network should it disconnect. All other children of the disconnected node would then attempt to connect to one single child, while this child becomes the new root node.
 
-### load balancing
+// INSERT DIAGRAM OF PEER RECONNECT RACE CONDITION
+
+### 3.6.3 load balancing
 
 Although reconnect events give the network a chance to re-balance itself somewhat, it might be necessary even when no disconnects happen because a user might connect to a heavily loaded node manually. Fortunately, performing load balancing that is not triggered by a disconnect is a better position to be in, as you can create the new connection before disconnecting or being disconnected from the network, resulting in no loss of packets. The solutions suggested for avoiding such a loss of data in the reconnect section are no longer needed, improving efficiency. Other than that, load balancing is pretty similar to a reconnect event.
 
-### basic network imaging
+### 3.7 basic network imaging
 
 The complexity of a mesh network is largely due to the need for all data to be synced between all peers that are connected, including data that was sent prior to a peer's connection. When a new device connects to the network it must somehow receive all of the game state changes so far so that it can catch up. The same method can be used to keep all members of the network up to date on the network structure itself. A range of methods for storing and transmitting this data present themselves, each with pros and cons.
 
@@ -338,7 +329,7 @@ The simplest way to handle this task is to send the whole network state or game 
 
 Network structure serialisation is relatively simple. The root node must be found, and then all child nodes are recursively serialised and added to a string, separated by a special character. Starting at the root node means that when the string is parsed in no node will be added to the network structure that does not have a valid host already added. This reduces potential errors during the parsing process. To parse the serialised data the string is split on the same special characters as before and then each set of node data are added to the network as if they were a new connection.
 
-### ip address grepping
+### 3.7.1 ip address grepping
 
 To find a device's IP address is not simple as a device might have multiple addresses depending on the hardware available. Simply looping through all internet enabled hardware modules and picking the most likely address is not a reliable method. This method will also only return the device's local IP address at best, which is only useful if connecting from inside the local network.
 
@@ -346,35 +337,35 @@ The most reliable method of finding the IP address of a machine involves connect
 
 One final method that can be used is to have new peers communicate which IP address they used to connect to the network, associating the host peer with the given address. This might not be reliable as if the new peer connected over the local network with a local IP address the network will associate the local address with the host, which is not ideal. One upside to this method is that you know for sure that the address is correct in some way, as the peer managed to connect using it.
 
-## testing & evaluation
+## chapter 4 : testing & evaluation
 
-### data throughput
+### 4.1 data throughput
 
 // difference in data throughput compared to a normal network structure  
 // possible techniques for improving efficiency provided by new network structure  
 // 
 
-### socket load
+### 4.2 socket load
 
 // difference in number of connections handled compared to a normal network structure  
 // 
 
-### computational load
+### 4.3 computational load
 
 // discussion of increased computational load trade-off  
 // 
 
-### debugging process
+### 4.4 debugging process
 
 // use of netcat & other tools  
 // 
 
-### example scenario
+### 4.5 example scenario
 
 // evaluation of health of test setup  
 // 
 
-### discussion of reliability
+### 4.6 discussion of reliability
 
 // robustness of network image and autonomous reconnect handling  
 // difficulties arising from interaction between LAN & WAN networks  
@@ -383,28 +374,28 @@ One final method that can be used is to have new peers communicate which IP addr
 // discussion of handling simultaneous network disconnection events  
 // 
 
-### alternative potential use cases
+### 4.7 alternative potential use cases
 
 // other uses for mesh network architecture  
 // 
 
-## conclusion
+## chapter 5 : conclusion
 
-### evaluation of progress
-
-// 
-
-### target versus result
+### 5.1 evaluation of progress
 
 // 
 
-### future work
+### 5.2 target versus result
 
 // 
 
-## references
+### 5.3 future work
 
-[1] Internetworldstats.com. (2019). World Internet Users Statistics and 2019 World Population Stats. [online] Available at: https://www.internetworldstats.com/stats.htm [Accessed 9 May 2019].
+// 
+
+## chapter 6 : references
+
+[1] Internetworldstats.com. (2019). World Internet Users Statistics and 2019 World Population Stats. [online] Available at: https://www.internetworldstats.com/stats.htm [Accessed 2 January 2019].
 
 [2] 
 
@@ -413,3 +404,5 @@ One final method that can be used is to have new peers communicate which IP addr
 [4] 
 
 [5] 
+
+[?] Windows Subsystem for Linux. (2016). WSL Networking. [online] Available at: https://blogs.msdn.microsoft.com/wsl/2016/11/08/225/ [Accessed 10 February 2019].
