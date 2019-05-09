@@ -56,7 +56,7 @@ dissertation
 - [x] abstract 1.1: scenario
 - [x] abstract 1.2: proposition
 - chapter 2 : introduction
-- [ ] introduction 2.1: background
+- [x] introduction 2.1: background
 - [x] introduction 2.2: client-server architectures
 - [x] introduction 2.2.1: dedicated versus community
 - [x] introduction 2.2.2: server authoritative
@@ -75,8 +75,8 @@ dissertation
 - [x] methodology 3.5: mesh protocol
 - [x] methodology 3.6: network event breakdown
 - [x] methodology 3.6.1: connection handshake
-- [ ] methodology 3.6.2: reconnect events
-- [ ] methodology 3.6.3: load balancing
+- [x] methodology 3.6.2: reconnect events
+- [x] methodology 3.6.3: load balancing
 - [x] methodology 3.7: basic network imaging
 - [x] methodology 3.7.1: ip address grepping
 - chapter 4 : evaluation
