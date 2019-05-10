@@ -173,7 +173,7 @@ To aide in multi-platform development the language used will be C++. Unlike a lo
 
 ### 3.1.1 posix versus win32
 
-Nearly all platforms aside from Windows are Posix compliant. These include MacOS, Android, FreeBSD, most flavours of Linux, and OpenBSD. Recently Microsoft released the Windows Subsystem for Linux, or WSL, which provides a compatibility layer between Linux and Windows, allowing for Unix sockets support [?] among other tools. Due to this, and the choice of Linux as a development system, Posix is the best target for development, although some flavours of Linux and some more obscure Unix based operating systems implement aspects of socket handling in mildly different ways, complicating things a little.
+Nearly all platforms aside from Windows are Posix compliant. These include MacOS, Android, FreeBSD, most flavours of Linux, and OpenBSD. The existence of the Posix standard together with high-level languafes such as C or C++ meant that the programmer could write a single program which needed only be recompiled to run on any machine from a personal computer to the largest mainframe, as long as that machine was running a Posix operating system, states Korn D.G in a US patent on porting Posix to Win32, 2001 [?]. Recently Microsoft released the Windows Subsystem for Linux, or WSL, which provides a compatibility layer between Linux and Windows, allowing for Unix sockets support [?] among other tools. Due to this, and the choice of Linux as a development system, Posix is the best target for development, although some flavours of Linux and some more obscure Unix based operating systems implement aspects of socket handling in mildly different ways, complicating things a little.
 
 ### 3.2 required libraries
 
@@ -322,9 +322,11 @@ In another scenario in which a node that has multiple children disconnects there
 
 ### 3.6.3 load balancing
 
-Although reconnect events give the network a chance to re-balance itself somewhat, it might be necessary even when no disconnects happen because a user might connect to a heavily loaded node manually. Fortunately, performing load balancing that is not triggered by a disconnect is a better position to be in, as you can create the new connection before disconnecting or being disconnected from the network, resulting in no loss of packets. The solutions suggested for avoiding such a loss of data in the reconnect section are no longer needed, improving efficiency. Other than that, load balancing is pretty similar to a reconnect event.
+Although reconnect events give the network a chance to re-balance itself somewhat, it might be necessary even when no client disconnects for a number of reasons. A user might connect to a heavily loaded node manually, unbalancing the network, or other aspects of the network might change. Fortunately, performing load balancing that is not triggered by a disconnect is a better position to be in as you can create the new connection before disconnecting or being disconnected from the network, resulting in no loss of packets. The solutions suggested for avoiding such a loss of data in the reconnect section are no longer needed, improving efficiency.
 
-Load balancing offers the opportunity to not only reduce computational load on nodes in the network but to reposition nodes in a pattern that is more efficient in terms of geographical topology. The direct path between a pair of clients may have longer round trip times than a detour path between them, because of the triangle inequality violations in the internet, according to Ly, C, in a paper on Detour Routing for Online Multiplayer Games, 2010 [?]. To rearrange nodes in a pattern that would setup certain peers as relays would be beneficial for latency, but would require significant amounts of IP address analysis and round trip time testing in order to perform optimally.
+Load balancing offers the opportunity to not only reduce computational load on nodes in the network but to reposition nodes in a pattern that is more efficient in terms of geographical topology. The direct path between a pair of clients may have longer round trip times than a detour path between them, because of the triangle inequality violations in the internet, according to Ly, C, in a paper on Detour Routing for Online Multiplayer Games, 2010 [?]. To rearrange nodes in a pattern that would setup certain peers as relays would be beneficial for latency, but would require significant amounts of IP address and round trip time analysis in order to perform optimally.
+
+In a way this is similar to a US patent on Minimizing Bandwidth Costs for Online Games, 2013, by Miyaki, K [?], in which they aim to provide an online game with capability to dynamically adjust the networking topology: querying a participant of the online game to determine preference and position of the participant in the networking topology of the online game. In this particular patent the focus is more on providing a monetary incentive to users in order to convince them to contribute to the network topology.
 
 ### 3.7 basic network imaging
 
@@ -350,7 +352,7 @@ One final method that can be used is to have new peers communicate which IP addr
 // possible techniques for improving efficiency provided by new network structure  
 // 
 
-Data throughput is an important factor, as larger amounts of data might incur a higher cost for users of the network, but perhaps more important is the latency induced by the network structure. In fast paced, or real-time games such as first person shooter games even small amounts of latency can prove for a large disadvantage, although there are some factors which can remedy this slightly. The delay value which can be tolerated by the participants depends on the used camera perspective... at least 50ms of additional delay can be tolerated [using certain fields of vision]. In a paper on the Impact of Delay in Real-Time Multiplayer Games, 2002, by Pantel, L, claims that for games such as first person shooters, presentation delays of 100ms or more may be acceptable.
+Data throughput is an important factor, as larger amounts of data might incur a higher cost for users of the network, but perhaps more important is the latency induced by the network structure. In fast paced, or real-time games such as first person shooter games even small amounts of latency can prove for a large disadvantage, although there are some factors which can remedy this slightly. The delay value which can be tolerated by the participants depends on the used camera perspective... at least 50ms of additional delay can be tolerated [using certain fields of vision]. In a paper on the Impact of Delay in Real-Time Multiplayer Games, 2002, by Pantel, L, claims that for games such as first person shooters, presentation delays of 100ms or more may be acceptable [?].
 
 ### 4.2 socket & computational load
 
@@ -406,6 +408,8 @@ In a traditional network structure the socket load for clients is very low, but 
 
 [?] Lemon, J., 2001, June. Kqueue-A Generic and Scalable Event Notification Facility. In USENIX Annual Technical Conference, FREENIX Track (pp. 141-153).
 
+[?] Korn, D.G., AT&T Corp, 2001. Porting POSIX-conforming operating systems to Win32 API-conforming operating systems. U.S. Patent 6,292,820.
+
 [?] Windows Subsystem for Linux. (2016). WSL Networking. [online] Available at: https://blogs.msdn.microsoft.com/wsl/2016/11/08/225/ [Accessed 10 February 2019].
 
 [?] Tulip, J., Bekkema, J. and Nesbitt, K., 2006, December. Multi-threaded game engine design. In Proceedings of the 3rd Australasian conference on Interactive entertainment (pp. 9-14). Murdoch University.
@@ -413,5 +417,7 @@ In a traditional network structure the socket load for clients is very low, but 
 [?] Cronin, E., Filstrup, B. and Kurc, A., 2001. A distributed multiplayer game server system. In University of Michigan.
 
 [?] Ly, C., 2010. Latency reduction in online multiplayer games using detour routing (Doctoral dissertation, Applied Science: School of Computing Science).
+
+[?] Miyaki, K., Sony Interactive Entertainment America LLC, 2013. Minimizing bandwidth costs for online games. U.S. Patent 8,369,243.
 
 [?] Pantel, L. and Wolf, L.C., 2002, May. On the impact of delay on real-time multiplayer games. In Proceedings of the 12th international workshop on Network and operating systems support for digital audio and video (pp. 23-29). ACM.
