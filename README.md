@@ -391,7 +391,11 @@ Generic tools for debugging C++ code include Valgrind and Memwatch, which can ho
 
 ### 5.1 evaluation of progress
 
-// 
+The progress made during the project was not as planned. The complexity of the system as a whole was hugely underestimated due to a lack of experience in network programming. A minimum viable product was not quite achieved as it was lacking major features such as autonomous reconnect handling.
+
+However, a common network image was achieved. New nodes in the network would correctly receive and parse the current network state, and every node in the network would correctly receive connection, disconnection, and chat events. The network was relatively efficient considering the use of TCP over UDP, and the library did have some multi-platform capabilities, as it was successfully built for both x86-x64 and ARM devices.
+
+The next task would have been to have used the information stored in the network image and set up automatic reconnecting, ensuring the network image was updated correctly on the disconnected client. Evaluation of appropriate new hosts would have come next, with a number of factors that would effect the decision indicated and discussed.
 
 ### 5.2 target versus result
 
