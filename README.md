@@ -364,8 +364,9 @@ In a traditional network structure the socket load for clients is very low, but 
 
 ### 4.3 debugging process
 
-// use of netcat & other tools  
-// 
+The debugging process of networking code consists largely of the same tools and practices as with other programs, with the addition of software such as Netcat and Wireshark. Netcat can be used to connect to and interact with TCP based networks in order to manually give certain inputs and monitor the outputs. Wireshark can be used to capture and view all packets broadcast to and from a certain application or interface, allowing for statistical analysis, packet evaluation and other such methods of network diagnosis.
+
+Generic tools for debugging C++ code include Valgrind and Memwatch, which can hook into your program and watch for memory leaks, unallocated variables and dangling pointers. Often the IDE in use can catch and warn these problems if the code is run through their own debugging tools.
 
 ### 4.4 example scenario
 
