@@ -80,12 +80,11 @@ dissertation
 - [x] methodology 3.7.1: ip address grepping
 - chapter 4 : evaluation
 - [ ] evaluation 4.1: data throughput
-- [ ] evaluation 4.2: socket load
-- [ ] evaluation 4.3: computational load
-- [ ] evaluation 4.4: debugging process
-- [ ] evaluation 4.5: example scenario
-- [ ] evaluation 4.6: discussion on reliability
-- [ ] evaluation 4.7: alternative potential use cases
+- [ ] evaluation 4.2: socket & computational load
+- [ ] evaluation 4.3: debugging process
+- [ ] evaluation 4.4: example scenario
+- [ ] evaluation 4.5: discussion on reliability
+- [ ] evaluation 4.6: alternative potential use cases
 - chapter 5 : conclusion
 - [ ] conclusion 5.1: evaluation of progress
 - [ ] conclusion 5.2: target versus result
@@ -194,6 +193,8 @@ Due to a mesh network node combining the concept of a host and a client both the
 
 As one of the main aims is portability, and the very design of the type of mesh network results in a small number of connections over a large number, select is the most appropriate file descriptor handling function to use. The select function is a blocking call by default, and is used when handling received data from any open sockets. All sockets, including the listening socket of the bound port, are added to a file descriptor set and select is run on this, returning only when a socket has readable information. The sockets are then looped through until a set socket is found, and the received data is acted upon. If the socket set is the listening socket, a new connection attempt has been made and the connection can be accepted or rejected. Otherwise, the received data may be normal packets or a zero length, or negative length, value. A zero length value means that a normal disconnection event has occurred, whereas a negative length means that a network error has occurred.
 
+There exists an alternative in event based socket handling, which has been shown to improve increasing numbers of descriptors; a task which both poll and select struggle with. These interfaces are also limited in the respect that they are unable to handle other potentially interesting acivities that an application might be interested in, states Lemon, J, when discussing KQueue, a Generic & Scalable Event Notification Facility, 2001. These might include signals, file system changes, and AIO completions.
+
 ### 3.3 threading & blocking
 
 Many of the socket handling calls can be set to either blocking or non-blocking. Blocking means that the function will pause the running thread until a certain criteria has met and data can be returned. This can be useful to prevent an unnecessary use of computing resources when an input or similar action is being waited upon but in certain situations it can be detrimental. Blocking functions often work much better in a non-primary thread, as they can be paused indefinitely without negatively effecting the performance of the program, but the addition of threading increases complexity considerably.
@@ -205,6 +206,8 @@ Threading, however, can introduce a number of potential problems such as race co
 As the data receiving is all performed in one looping function that includes a blocking call it would be best to move this to a separate thread. The data received can be added to a queue that is protected by a mutex, so that it may be accessed from the main thread. Due to the blocking call no extra thread handling will have to be performed to reduce redundant processing usage. The same cannot be said for the sending thread, which will read from a mutex protected queue and broadcast the message to the appropriate recipients. When there are no messages to broadcast the thread must sleep, but there is no way to know how long for and so a conditional variable must be used. A conditional variable uses a mutex and a lock in order to notify a thread on when a certain criteria is met. Because locking a mutex is a blocking call, the thread will sleep without consuming large amounts of resources until otherwise notified.
 
 This method provides multiple advantages in that the user of the library does not have to perform any actions in order for messages to be sent or received passively. Messages will continue to queue up in the receive queue whether they read from it or not, meaning that they can be read at any time. Messages that are received and that must be forwarded can be forwarded without waiting for the next update step in the game engine, and sending and receiving messages does not affect performance in any significant fashion. This results in slow running games not effecting the overall performance of the mesh network, as only the information that they themselves are providing will be delayed or intermittent.
+
+Delegating a thread each for these tasks is quite coarse granularity when it comes to multi-threading. Granularity refers to the amount of work executed per concurrent task. A fine grained breakdown of tasks results in relatively higher levels of system overhead, according to Tulip, J, in a paper on Multi-Threaded Game Engine Design, 2006. The large granularity of these tasks means that the overhead increase is relatively insignificant as task switching will not happen too often.
 
 ### 3.4 network structure
 
@@ -267,7 +270,7 @@ GAMEDAT == 0:
 This packet is just game data. It will be forwarded around the network but not parsed and acted upon.
 
 NEWCONN == 1:  
-Contains a HOST_UUID that must be associated with the SOURCE_UUID and added to the network image.
+Contains a HOST_UUID that must be associated with the SOURCE_UUID in the header.
 
 REMCONN == 2:  
 Contains a PEER_UUID of the peer that has lost connection to the network and should be removed.
@@ -276,10 +279,10 @@ SETSOCK == 3:
 Contains no information, as the SOURCE_UUID can be obtained from the header information.
 
 SETNAME == 4:  
-Contains a dynamically sized string containing the connection name to be associated with the SOURCE_UUID in the header.
+Contains the connection name to be associated with the SOURCE_UUID in the header.
 
 SETIDIP == 5:  
-Contains the connection IP Address to be associated with the SOURCE_UUID in the header.
+Contains the connection IP address to be associated with the SOURCE_UUID in the header.
 
 NETSTAT == 6:  
 Contains a serialised network image or a portion of a serialised network image to be parsed.
@@ -321,6 +324,8 @@ In another scenario in which a node that has multiple children disconnects there
 
 Although reconnect events give the network a chance to re-balance itself somewhat, it might be necessary even when no disconnects happen because a user might connect to a heavily loaded node manually. Fortunately, performing load balancing that is not triggered by a disconnect is a better position to be in, as you can create the new connection before disconnecting or being disconnected from the network, resulting in no loss of packets. The solutions suggested for avoiding such a loss of data in the reconnect section are no longer needed, improving efficiency. Other than that, load balancing is pretty similar to a reconnect event.
 
+Load balancing offers the opportunity to not only reduce computational load on nodes in the network but to reposition nodes in a pattern that is more efficient in terms of geographical topology. The direct path between a pair of clients may have longer round trip times than a detour path between them, because of the triangle inequality violations in the internet, according to Ly, C, in a paper on Detour Routing for Online Multiplayer Games, 2010 [?]. To rearrange nodes in a pattern that would setup certain peers as relays would be beneficial for latency, but would require significant amounts of IP address analysis and round trip time testing in order to perform optimally.
+
 ### 3.7 basic network imaging
 
 The complexity of a mesh network is largely due to the need for all data to be synced between all peers that are connected, including data that was sent prior to a peer's connection. When a new device connects to the network it must somehow receive all of the game state changes so far so that it can catch up. The same method can be used to keep all members of the network up to date on the network structure itself. A range of methods for storing and transmitting this data present themselves, each with pros and cons.
@@ -345,27 +350,27 @@ One final method that can be used is to have new peers communicate which IP addr
 // possible techniques for improving efficiency provided by new network structure  
 // 
 
-### 4.2 socket load
+Data throughput is an important factor, as larger amounts of data might incur a higher cost for users of the network, but perhaps more important is the latency induced by the network structure. In fast paced, or real-time games such as first person shooter games even small amounts of latency can prove for a large disadvantage, although there are some factors which can remedy this slightly. The delay value which can be tolerated by the participants depends on the used camera perspective... at least 50ms of additional delay can be tolerated [using certain fields of vision]. In a paper on the Impact of Delay in Real-Time Multiplayer Games, 2002, by Pantel, L, claims that for games such as first person shooters, presentation delays of 100ms or more may be acceptable.
+
+### 4.2 socket & computational load
 
 // difference in number of connections handled compared to a normal network structure  
-// 
-
-### 4.3 computational load
-
 // discussion of increased computational load trade-off  
-// 
+//
 
-### 4.4 debugging process
+In a traditional network structure the socket load for clients is very low, but for the server it increases linearly with the number of clients connected. In order to remove the centralised server aspect completely these clients must take up the slack, but with efficient load balancing the number of connections per client could potentially be kept between two to four, which should not incur any performance penalties.
+
+### 4.3 debugging process
 
 // use of netcat & other tools  
 // 
 
-### 4.5 example scenario
+### 4.4 example scenario
 
 // evaluation of health of test setup  
 // 
 
-### 4.6 discussion of reliability
+### 4.5 discussion of reliability
 
 // robustness of network image and autonomous reconnect handling  
 // difficulties arising from interaction between LAN & WAN networks  
@@ -374,7 +379,7 @@ One final method that can be used is to have new peers communicate which IP addr
 // discussion of handling simultaneous network disconnection events  
 // 
 
-### 4.7 alternative potential use cases
+### 4.6 alternative potential use cases
 
 // other uses for mesh network architecture  
 // 
@@ -399,6 +404,14 @@ One final method that can be used is to have new peers communicate which IP addr
 
 [?] Muir, R., Muir Robert Linley, 2004. Multi-platform gaming architecture. U.S. Patent Application 10/648,178.
 
+[?] Lemon, J., 2001, June. Kqueue-A Generic and Scalable Event Notification Facility. In USENIX Annual Technical Conference, FREENIX Track (pp. 141-153).
+
 [?] Windows Subsystem for Linux. (2016). WSL Networking. [online] Available at: https://blogs.msdn.microsoft.com/wsl/2016/11/08/225/ [Accessed 10 February 2019].
 
+[?] Tulip, J., Bekkema, J. and Nesbitt, K., 2006, December. Multi-threaded game engine design. In Proceedings of the 3rd Australasian conference on Interactive entertainment (pp. 9-14). Murdoch University.
+
 [?] Cronin, E., Filstrup, B. and Kurc, A., 2001. A distributed multiplayer game server system. In University of Michigan.
+
+[?] Ly, C., 2010. Latency reduction in online multiplayer games using detour routing (Doctoral dissertation, Applied Science: School of Computing Science).
+
+[?] Pantel, L. and Wolf, L.C., 2002, May. On the impact of delay on real-time multiplayer games. In Proceedings of the 12th international workshop on Network and operating systems support for digital audio and video (pp. 23-29). ACM.
