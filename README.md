@@ -106,7 +106,7 @@ One of the primary costs associated with developing multi-player online video ga
 
 ### 1.2 proposition
 
-This project aims to develop and test a method for enabling the distributed processing and hosting of virtual game worlds in which all clients act as equal nodes in the network. Eliminating as many aspects of the centralised network architecture is important; complete independence from any third party is a major factor in the development of this project. The result will be compared to a more traditional network design and the viability of the network architecture will be evaluated. An attempt will also be made to introduce data persistence and load balancing to the resulting partial mesh network. The deliverable will be a module written in C++, integrated loosely with a simple, custom, 3D capable game engine in order to display the library's capabilities.
+This project aims to develop and test a method for enabling the distributed processing and hosting of virtual game worlds in which all clients act as equal nodes in the network. Eliminating as many aspects of the centralised network architecture is important; complete player independence from any third party hosted tools is a major factor in the development of this project. The result will be compared to a more traditional network design and the viability of the network architecture will be evaluated. An attempt will also be made to introduce data persistence and load balancing to the resulting partial mesh network. The deliverable will be a module written in C++, integrated loosely with a simple, custom, 3D capable game engine in order to display the library's capabilities.
 
 ## chapter 2 : introduction, aims & objectives
 
@@ -116,7 +116,7 @@ Not long after the introduction of the very first commercially available compute
 
 Since then it has expanded massively. According to the Internet World Stats, March 2019 [1], 56.1% of the world's population has access to the internet, including up to 81% of the developed world. With such a large audience accessing the internet on devices ranging from mobile phones to desktop computers the potential market value is incomprehensible. The internet has become a tool for communication, research, media consumption and entertainment. A number of these uses are relatively latency agnostic, but for those that aren't, and with such large distances separating many users of the internet, many different solutions for reducing the impact of high latency have been suggested.
 
-Multiplayer games are one area in which time is an important factor. Improving latency and data throughput without sacrificing reliability of information transfer is a difficult task, but is essential for the development of complex real time virtual worlds. Not only must all interactions occur as instantaneously as possible, but there must be little, or no, chance of data loss in order for all users to share a common view of the world. In order to perform this task multiple different network architectures have been developed with differing requirements in mind.
+Multiplayer games are one area in which time is an important factor. Improving latency and data throughput without sacrificing reliability of information transfer is a difficult task, but is essential for the development of complex real time virtual worlds. Not only must all interactions occur as instantaneously as possible, but there must be little, or no, chance of data loss in order for all users to share a common view of the world. Multiple different network architectures have been developed to perform this task, each with differing use cases.
 
 ### 2.2 client-server architecture
 
@@ -178,7 +178,7 @@ Nearly all platforms aside from Windows are Posix compliant. These include MacOS
 
 ### 3.2 required libraries
 
-The libraries utilised must be picked to be as architecture and platform agnostic as possible. This means that they provide implementations for each of the platforms that will be targeted, and abstract away the handling of which to use. Most of the standard libraries for string, vector, and queue data types will be used, as will the libraries for handling threads, atomic variables, mutexes, and conditional variables.
+The libraries utilised must be picked to be as architecture and platform agnostic as possible. This means that they provide implementations for each of the platforms that will be targeted, and abstract away the handling of which to use. This is called "platform code" in the patent on Multi-Platform Gaming Architecture by Muir Robert Linley, 2004, and it may perform the separation and distribution of game functions for those platforms for which it is required [?]. Most of the standard libraries for string, vector, and queue data types will be used, as will the libraries for handling threads, atomic variables, mutexes, and conditional variables.
 
 In order to test game state syncing, if it's even started, a graphical output would be ideal. This can be achieved using OpenGL, the most cross platform (without being absurdly verbose) graphics library, and a cross platform window manager such as GLFW or SDL. SDL provides a much larger number of features, but is considered too heavy for the needs of the project. In order to handle OpenGL contexts an OpenGL handling library must be used, such as GLEW or GLUT. For vector and matrix mathematics GLM will be used, as it is an industry standard.
 
@@ -237,7 +237,7 @@ In order to keep this network structure up to date a distinction must be made be
 
 The User Datagram Protocol is a protocol for communicating datagrams between devices. A datagram is a set of information, potentially split into multiple packets, which is broadcast at the target device. No response is expected, meaning that this protocol does not usually open and maintain a connection between two devices, and is known as a connectionless protocol. The sender does not know if the receiver has received the information, and as such, packet loss can occur. Packets can be received out-of-order, or not at all, but they will always contain the correct information. More light weight than TCP, and quicker due to the communication not requiring multiple steps, this protocol is often used when packet loss is acceptable and speed is important. The Transfer Control Protocol is a protocol for reliable two-way communication of data between multiple devices. A connection can be made and maintained, and while this connection is open any data can be sent and received through it. No packet loss will occur, and packets will arrive in the correct order.
 
-In this use-case it would be best to create a protocol one layer under TCP. Reliability of communication is important, as a single lost packet could result in a de-synced network image which could cause problems further into development. Speed of transmission is not so important in this demonstration, although in a full commercial product it would be a significant discussion point. Many fast paced first person shooter games have picked UDP over TCP in order to reduce latency of packets, such as Quake 3. An ideal solution would be to utilise UDP while giving packets priorities. Packets with a certain priority will be stored in a buffer until a response with that packet identification is received. After a certain amount of time without this response the packet will be re-broadcast. This means that with relatively unimportant packets you would still get the advantage of speed that UDP provides but with packets which must be received there is a safety net to prevent packet loss.
+In this use-case it would be best to create a protocol one layer under TCP. Reliability of communication is important, as a single lost packet could result in a de-synced network image which could cause problems further into development. Speed of transmission is not so important in this demonstration, although in a full commercial product it would be a significant discussion point. Many fast paced first person shooter games have picked UDP over TCP in order to reduce latency of packets, such as Quake 3. An ideal solution would be to utilise UDP while giving packets priorities. Packets with a certain priority will be stored in a buffer until a response with that packet identification is received. After a certain amount of time without this response the packet will be re-broadcast. This means that with relatively unimportant packets you would still get the advantage of speed that UDP provides but with packets which must be received there is a safety net to prevent packet loss. Introduced into games such as Quake 3 is a "multicast" system in which packets can be marked as reliable, implementing a portion of the TCP call and response over UDP. As Cronin, E, et al (2001) state, reliability is achieved using a stop-and-wait protocol with a single bit reliable sequence number [?].
 
 When it comes to developing a protocol there are a number of considerations to be made when designing the header, such as whether it is human readable or not, or whether it is a dynamic or fixed length. These options can influence network reliability, extensibility, speed, and efficiency so it is important to find the correct balance.
 
@@ -397,12 +397,8 @@ One final method that can be used is to have new peers communicate which IP addr
 
 [1] Internetworldstats.com. (2019). World Internet Users Statistics and 2019 World Population Stats. [online] Available at: https://www.internetworldstats.com/stats.htm [Accessed 2 January 2019].
 
-[2] 
-
-[3] 
-
-[4] 
-
-[5] 
+[?] Muir, R., Muir Robert Linley, 2004. Multi-platform gaming architecture. U.S. Patent Application 10/648,178.
 
 [?] Windows Subsystem for Linux. (2016). WSL Networking. [online] Available at: https://blogs.msdn.microsoft.com/wsl/2016/11/08/225/ [Accessed 10 February 2019].
+
+[?] Cronin, E., Filstrup, B. and Kurc, A., 2001. A distributed multiplayer game server system. In University of Michigan.
