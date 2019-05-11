@@ -87,7 +87,7 @@ dissertation
 - [ ] evaluation 4.6: alternative potential use cases
 - chapter 5 : conclusion
 - [ ] conclusion 5.1: evaluation of progress
-- [ ] conclusion 5.2: target versus result
+- [ ] conclusion 5.2: viability
 - [ ] conclusion 5.3: future work
 - chapter 6 : 
 
@@ -122,6 +122,8 @@ Multiplayer games are one area in which time is an important factor. Improving l
 Traditional video game networks are single-server many-client constructs. A central server is hosted which can be connected to by any number of clients. This server is often distributed and run as a separate tool to the client software. Not only does this result in more work for developers, in order to keep both server and client programs up to date and compatible, but also the server instance has to be hosted temporarily, or in some cases indefinitely, by either the developers of the game or by the players themselves. This latter option is often referred to as a community hosted server.
 
 // INSERT DIAGRAM OF TRADITIONAL HOST-CLIENTS NETWORK STRUCTURE
+
+When it comes to large numbers of players in the hundreds or even thousands in one game instance a single server may no longer cut it. For this situation a number of solutions involving linked server machines and virtual spacial partitioning have been developed in order to allocate devices to sections of the game. Load balancing in this scenario involves assigning more cores to certain segments of the world with higher numbers of entities. The virtual location based partitioning has a better scalability in that each server only needs to manage a portion of the whole world, Ta Nguyen, et al, 2003 [?].
 
 ### 2.2.1 dedicated versus community
 
@@ -403,7 +405,7 @@ However, a common network image was achieved. New nodes in the network would cor
 
 The next task would have been to have used the information stored in the network image and set up automatic reconnecting, ensuring the network image was updated correctly on the disconnected client. Evaluation of appropriate new hosts would have come next, with a number of factors that would effect the decision indicated and discussed.
 
-### 5.2 target versus result
+### 5.2 viability
 
 // 
 
@@ -414,6 +416,8 @@ The next task would have been to have used the information stored in the network
 ## chapter 6 : references
 
 [1] Internetworldstats.com. (2019). World Internet Users Statistics and 2019 World Population Stats. [online] Available at: https://www.internetworldstats.com/stats.htm [Accessed 2 January 2019].
+
+[?] Duong, T.N.B. and Zhou, S., 2003, October. A dynamic load sharing algorithm for massively multiplayer online games. In The 11th IEEE International Conference on Networks, 2003. ICON2003. (pp. 131-136). IEEE.
 
 [?] Bethea, D., Cochran, R.A. and Reiter, M.K., 2011. Server-side verification of client behavior in online games. ACM Transactions on Information and System Security (TISSEC), 14(4), p.32.
 
