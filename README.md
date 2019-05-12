@@ -89,7 +89,8 @@ dissertation
 - [x] conclusion 5.1: evaluation of progress
 - [ ] conclusion 5.2: viability
 - [x] conclusion 5.3: future work
-- chapter 6 : 
+- chapter 6 : references
+- [ ] references 6.1: references
 
 # standard project
 

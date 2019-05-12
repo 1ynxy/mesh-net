@@ -23,6 +23,8 @@ void Server::set_name(const std::string& name) {
 }
 
 int Server::bind(const std::string& port) {
+	if (port == "") return 0;
+
 	const char* port_c = port.c_str();
 
 	// Get Linked-List Of Address Structures
@@ -103,6 +105,8 @@ int Server::bind(const std::string& port) {
 }
 
 int Server::connect(const std::string& addr, const std::string& port) {
+	if (addr == "" || port == "") return 0;
+
 	const char* addr_c = addr.c_str();
 	const char* port_c = port.c_str();
 
