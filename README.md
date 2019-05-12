@@ -79,8 +79,8 @@ dissertation
 - [x] methodology 3.7: basic network imaging
 - [x] methodology 3.7.1: ip address grepping
 - chapter 4 : evaluation
-- [ ] evaluation 4.1: data throughput
-- [ ] evaluation 4.2: socket & computational load
+- [x] evaluation 4.1: data throughput
+- [x] evaluation 4.2: socket & computational load
 - [x] evaluation 4.3: debugging process
 - [x] evaluation 4.4: example scenario
 - [ ] evaluation 4.5: discussion on reliability
@@ -357,21 +357,65 @@ One final method that can be used is to have new peers communicate which IP addr
 
 ### 4.1 data throughput
 
-// difference in data throughput compared to a normal network structure  
-// possible techniques for improving efficiency provided by new network structure  
-// 
+Packet analysis:
 
-One method for improving data efficiency would be to switch over from using TCP to using UDP. For packets which do not have to be reliably sent, or have a short usefulness half-life, UDP would work perfectly fine, reducing the need for the call and response pattern of information transmission.
+First Connection: 192.168.0.15 To 192.168.0.29
+
+- 74 From		[Connection Request]
+- 74 To			[Connection Request Confirmation]
+- 66 From		[TCP ACK]
+- 90 From		["This is a test packet;"]
+- 66 To			[TCP ACK]
+- 90 To			[Network Image Serialised]
+- 66 From		[TCP ACK]
+- 73 To			[Set Socket Host]
+- 66 From		[TCP ACK]
+- 72 From		[New Connection]
+- 66 To			[TCP ACK]
+- 113 From		[Set Name] [Set Socket] [Set Host] [Set IP Address]
+- 66 To			[TCP ACK]
+
+Totals: 547 bytes from (349 bytes without TCP ACK) | 435 bytes to (237 bytes without TCP ACK)
+
+Second Connection: 192.168.0.16 To 192.168.0.15
+
+- 90 From		["This is a test packet;"]
+- 66 To			[TCP ACK]
+- 72 From		[New Connection]
+- 66 To			[TCP ACK]
+- 79 From		[Set Name]
+- 66 To			[TCP ACK]
+- 93 From		[Set Host] [Set IP Address]
+- 66 To			[TCP ACK]
+
+Totals: 334 bytes from (334 bytes without TCP ACK) | 264 bytes to (0 bytes without TCP ACK)
+
+Third Connection: 192.168.0.66 To 192.168.0.15
+
+- 90 From		["This is a test packet;"]
+- 66 To			[TCP ACK]
+- 72 From		[New Connection]
+- 66 To			[TCP ACK]
+- 106 From		[Set Name] [Set Host] [Set Ip Address]
+- 66 To			[TCP ACK]
+
+Totals: 268 bytes from (268 bytes without TCP ACK) | 198 bytes to (0 bytes without TCP ACK)
+
+This is the captured packet history of three devices connecting to the root node. The first device connects directly, whereas the other two devices both connect to the first, so indirectly.
+
+There will always be slight variations in data usage with new connections due to variable length data such as client names. Larger variations in data usage can be attributed to inconsistent packet merging. Packet merging is performed by the Huffman algorithm, a particular type of optimal prefix code that is commonly used for lossless data compression. Packet merging is incredibly useful for reducing the amount of unnecessary data that is transmitted, although it can introduce some latency to the system.
+
+The aspect that the data showed that was not expected was just how large the headers are once you get to the TCP layer. Up to an estimated 50 bytes per packet is utilised by layers of the networking stack that you do not see. This is one reason why packet merging algorithms are so useful. Another aspect that was surprising was just how much data was taken up by TCP packet acknowledgements because of this. For packets that are not overly important, or have a short usefulness half-life, it seems a much better idea to implement UDP over TCP; eliminating the need for the call and response pattern of information transmission that TCP uses.
+
+As expected the load on the root node might get increasingly higher in a linear fashion with each new connection, but the direct connections incur a much higher load than indirect connections. This means that were the network correctly balanced each new connection should have little effect on the network load. The main reason direct connections require more data throughput is that the host in a direct connection must communicate large volumes of data that the network has collated so far.
 
 Data throughput is an important factor, as larger amounts of data might incur a higher cost for users of the network, but perhaps more important is the latency induced by the network structure. In fast paced, or real-time games such as first person shooter games even small amounts of latency can prove for a large disadvantage, although there are some factors which can remedy this slightly. The delay value which can be tolerated by the participants depends on the used camera perspective... at least 50ms of additional delay can be tolerated [using certain fields of vision]. In a paper on the Impact of Delay in Real-Time Multiplayer Games, 2002, by Pantel, L, claims that for games such as first person shooters, presentation delays of 100ms or more may be acceptable [?].
 
 ### 4.2 socket & computational load
 
-// difference in number of connections handled compared to a normal network structure  
-// discussion of increased computational load trade-off  
-//
-
 In a traditional network structure the socket load for clients is very low, but for the server it increases linearly with the number of clients connected. In order to remove the centralised server aspect completely these clients must take up the slack, but with efficient load balancing the number of connections per client could potentially be kept between two to four, which should not incur any discernible performance penalties. Extra computational load might be attributed to the need for all packets received to be parsed before forwarding even if the packet data is not useful for that client.
+
+Because all important network handling functions are handled in a separate thread even slow machines should not have their game performance effected in any significant way, showing that this is a viable method for eliminating a central server architecture.
 
 ### 4.3 debugging process
 
@@ -381,12 +425,12 @@ Generic tools for debugging C++ code include Valgrind and Memwatch, which can ho
 
 ### 4.4 example scenario
 
-The setup used during the evaluation phase consisted of a mix of x86-x64 devices of differing capabilities and a handful of low power ARM devices, all running on the same network, connected over ethernet. This does not represent a real world scenario terribly well, unless the mesh network capabilities are limited to a LAN connection, but it provides more realistic latency statistics than performing the same test on a single machine using docker or virtual machines. All devices ran the same flavour of Linux as this was the simplest way to build and run the tool for each. These devices include:
+The setup used during the evaluation phase consisted of a mix of x86-x64 devices of differing capabilities and a handful of low power ARM devices, all running on the same network, connected over ethernet. This does not represent a real world scenario terribly well, unless the mesh network capabilities are limited to a LAN connection, but it provides more realistic latency statistics than performing the same test on a single machine using docker or virtual machines. All devices ran the same flavour of Linux as this was the simplest way to build and run the tool for each. These devices include, ranging from most computationally capable to least:
 
 - x86-x64 AMD based desktop computing device
 - x86-x64 Intel based portable computing device
 - ARM 64Bit Broadcom computing device (Raspberry Pi 3 B+)
-- ARM 64Bit Broadcom computing device (Raspberry Pi Zero W)
+- ARM 64Bit Broadcom computing device (Raspberry Pi 3 B+)
 
 ### 4.5 discussion of reliability
 
