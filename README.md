@@ -81,14 +81,14 @@ dissertation
 - chapter 4 : evaluation
 - [ ] evaluation 4.1: data throughput
 - [ ] evaluation 4.2: socket & computational load
-- [ ] evaluation 4.3: debugging process
-- [ ] evaluation 4.4: example scenario
+- [x] evaluation 4.3: debugging process
+- [x] evaluation 4.4: example scenario
 - [ ] evaluation 4.5: discussion on reliability
 - [ ] evaluation 4.6: alternative potential use cases
 - chapter 5 : conclusion
-- [ ] conclusion 5.1: evaluation of progress
+- [x] conclusion 5.1: evaluation of progress
 - [ ] conclusion 5.2: viability
-- [ ] conclusion 5.3: future work
+- [x] conclusion 5.3: future work
 - chapter 6 : 
 
 # standard project
@@ -266,7 +266,7 @@ All network packets contain a header that is setup as follows:
 
 TARGET_UUID:SOURCE_UUID:PACKET_TYPE:PACKET_DATA
 
-UUIDs are always three characters long, and so they must be padded with zeros if the number is too small. If the packet is a global broadcast then the UUID of 000 can be used. In this way packets can be associated with a source peer and can be forwarded smartly to reduce the amount of redundant data transmitted. A global packet will always be forwarded throughout the network whereas a packet with a specific target UUID will be sent only through the correct path to the target.
+UUIDs are always three characters long, and so they must be padded with zeros if the number is too small. If the packet is a global broadcast then the UUID of 000 can be used. In this way packets can be associated with a source peer and a target peer and can be forwarded smartly to reduce the amount of redundant data transmitted. A global packet will always be forwarded throughout the network whereas a packet with a specific target UUID will be sent only through the correct path to the target.
 
 The packet type can be one of the following:
 
@@ -360,6 +360,8 @@ One final method that can be used is to have new peers communicate which IP addr
 // possible techniques for improving efficiency provided by new network structure  
 // 
 
+One method for improving data efficiency would be to switch over from using TCP to using UDP. For packets which do not have to be reliably sent, or have a short usefulness half-life, UDP would work perfectly fine, reducing the need for the call and response pattern of information transmission.
+
 Data throughput is an important factor, as larger amounts of data might incur a higher cost for users of the network, but perhaps more important is the latency induced by the network structure. In fast paced, or real-time games such as first person shooter games even small amounts of latency can prove for a large disadvantage, although there are some factors which can remedy this slightly. The delay value which can be tolerated by the participants depends on the used camera perspective... at least 50ms of additional delay can be tolerated [using certain fields of vision]. In a paper on the Impact of Delay in Real-Time Multiplayer Games, 2002, by Pantel, L, claims that for games such as first person shooters, presentation delays of 100ms or more may be acceptable [?].
 
 ### 4.2 socket & computational load
@@ -368,7 +370,7 @@ Data throughput is an important factor, as larger amounts of data might incur a 
 // discussion of increased computational load trade-off  
 //
 
-In a traditional network structure the socket load for clients is very low, but for the server it increases linearly with the number of clients connected. In order to remove the centralised server aspect completely these clients must take up the slack, but with efficient load balancing the number of connections per client could potentially be kept between two to four, which should not incur any performance penalties.
+In a traditional network structure the socket load for clients is very low, but for the server it increases linearly with the number of clients connected. In order to remove the centralised server aspect completely these clients must take up the slack, but with efficient load balancing the number of connections per client could potentially be kept between two to four, which should not incur any discernible performance penalties. Extra computational load might be attributed to the need for all packets received to be parsed before forwarding even if the packet data is not useful for that client.
 
 ### 4.3 debugging process
 
@@ -378,8 +380,12 @@ Generic tools for debugging C++ code include Valgrind and Memwatch, which can ho
 
 ### 4.4 example scenario
 
-// evaluation of health of test setup  
-// 
+The setup used during the evaluation phase consisted of a mix of x86-x64 devices of differing capabilities and a handful of low power ARM devices, all running on the same network, connected over ethernet. This does not represent a real world scenario terribly well, unless the mesh network capabilities are limited to a LAN connection, but it provides more realistic latency statistics than performing the same test on a single machine using docker or virtual machines. All devices ran the same flavour of Linux as this was the simplest way to build and run the tool for each. These devices include:
+
+- x86-x64 AMD based desktop computing device
+- x86-x64 Intel based portable computing device
+- ARM 64Bit Broadcom computing device (Raspberry Pi 3 B+)
+- ARM 64Bit Broadcom computing device (Raspberry Pi Zero W)
 
 ### 4.5 discussion of reliability
 
@@ -392,8 +398,7 @@ Generic tools for debugging C++ code include Valgrind and Memwatch, which can ho
 
 ### 4.6 alternative potential use cases
 
-// other uses for mesh network architecture  
-// 
+This mesh architecture need not be restricted to use in video games. The persistent data aspect might lend itself to many forms of chat clients or embedded networks such as in a mesh network of actual physical devices. The central idea is very transferable, even if the libraries used are not.
 
 ## chapter 5 : conclusion
 
@@ -411,7 +416,7 @@ The next task would have been to have used the information stored in the network
 
 ### 5.3 future work
 
-// 
+Future work would include continued work on the library to improve speed and reliability, possibly switching out TCP for UDP and working on a multi-cast system with packet importance. Full integration with an industry standard game engine might also be a goal, as it shows the platform-agnostic aspects of the library and will enable useful visual debugging processes.
 
 ## chapter 6 : references
 
