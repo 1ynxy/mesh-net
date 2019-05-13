@@ -143,7 +143,7 @@ An alternative network structure is that of a mesh network. In a mesh network th
 
 ### 2.3.1 mesh-network potential pitfalls
 
-The first pitfall the one might encounter with this architecture is the issue of authority. As there is no one central device that is not a user there is no viable peer that can be selected as an authoritative member of the network. Every peer has the same level of trust, and so the network is open to exploitation. One potential solution to this problem is to provide versions of the client which do not act as in-game entities, but continue to interact with the network as is normal. These clients will be able to compare and analyse inputs from all peers connected to the network and will be able to single out potential malicious devices. Other solutions include industry standard methods of anti-tampering, such as hashing game files and comparing results with expected hashes or those of peers in the network. Unfortunately a number of these methods are no longer applicable with no central authority.
+The first pitfall the one might encounter with this architecture is the issue of authority. As there is no one central device that is not a user there is no viable peer that can be selected as an authoritative member of the network. Every peer has the same level of trust, and so the network is open to exploitation. Peer-to-peer game architectures provide better scaling, but open the game to additional cheating, since players are responsible for distributing events and storing state, Jardine, J, et al, 2008 [?]. One potential solution to this problem is to provide versions of the client which do not act as in-game entities, but continue to interact with the network as is normal. These clients will be able to compare and analyse inputs from all peers connected to the network and will be able to single out potential malicious devices. Other solutions include industry standard methods of anti-tampering, such as hashing game files and comparing results with expected hashes or those of peers in the network. Unfortunately a number of these methods are no longer applicable with no central authority.
 
 A second hurdle which is that of a problem with handling connections between devices on Local Area Network (LAN) versus devices on Wide Area Network (WAN). Any users that wish to be accessible from outside of their local network must port-forward the connection on their router. The only way to test if this port forward is active is to connect to the device from outside of the network, which complicates the process considerably. Listing device accessibility in the network image is a must, as this information is required when picking a new target for reconnecting. 
 
@@ -402,13 +402,15 @@ Totals: 268 bytes from (268 bytes without TCP ACK) | 198 bytes to (0 bytes witho
 
 This is the captured packet history of three devices connecting to the root node. The first device connects directly, whereas the other two devices both connect to the first, so indirectly.
 
-There will always be slight variations in data usage with new connections due to variable length data such as client names. Larger variations in data usage can be attributed to inconsistent packet merging. Packet merging is performed by the Huffman algorithm, a particular type of optimal prefix code that is commonly used for lossless data compression. Packet merging is incredibly useful for reducing the amount of unnecessary data that is transmitted, although it can introduce some latency to the system.
+There will always be slight variations in data usage with new connections due to variable length data such as client names. Larger variations in data usage can be attributed to inconsistent packet merging. Packet merging is performed by the Huffman algorithm, a particular type of optimal prefix code that is commonly used for lossless data compression. Packet merging is incredibly useful for reducing the amount of unnecessary data that is transmitted, although it can introduce some latency to the system. By compressing the messages the distributed system can save bandwidth at the cost of computational power, Smed, J, 2001.
 
 The aspect that the data showed that was not expected was just how large the headers are once you get to the TCP layer. Up to an estimated 50 bytes per packet is utilised by layers of the networking stack that you do not see. This is one reason why packet merging algorithms are so useful. Another aspect that was surprising was just how much data was taken up by TCP packet acknowledgements because of this. For packets that are not overly important, or have a short usefulness half-life, it seems a much better idea to implement UDP over TCP; eliminating the need for the call and response pattern of information transmission that TCP uses.
 
 As expected the load on the root node might get increasingly higher in a linear fashion with each new connection, but the direct connections incur a much higher load than indirect connections. This means that were the network correctly balanced each new connection should have little effect on the network load. The main reason direct connections require more data throughput is that the host in a direct connection must communicate large volumes of data that the network has collated so far.
 
 Data throughput is an important factor, as larger amounts of data might incur a higher cost for users of the network, but perhaps more important is the latency induced by the network structure. In fast paced, or real-time games such as first person shooter games even small amounts of latency can prove for a large disadvantage, although there are some factors which can remedy this slightly. The delay value which can be tolerated by the participants depends on the used camera perspective... at least 50ms of additional delay can be tolerated [using certain fields of vision]. In a paper on the Impact of Delay in Real-Time Multiplayer Games, 2002, by Pantel, L, claims that for games such as first person shooters, presentation delays of 100ms or more may be acceptable [?].
+
+Packet merging and data compression aren't the only methods of reducing the amount of data transferred over the network. One particularly interesting method is described by A Bharambe, et al, 2008. To extrapolate the behaviour of a remote player that sends only infrequent information (because it is not in focus), we use a special replica called a doppelgänger. A doppelgänger is a bot... running on the local machine whose goal is to act in a manner that realistically approximates the behaviour of the remote player (using guided AI) [?].
 
 ### 4.2 socket & computational load
 
@@ -462,6 +464,8 @@ Future work would include continued work on the library to improve speed and rel
 
 [?] Bethea, D., Cochran, R.A. and Reiter, M.K., 2011. Server-side verification of client behavior in online games. ACM Transactions on Information and System Security (TISSEC), 14(4), p.32.
 
+[?] Jardine, J. and Zappala, D., 2008, October. A hybrid architecture for massively multiplayer online games. In Proceedings of the 7th ACM SIGCOMM Workshop on Network and System Support for Games (pp. 60-65). ACM.
+
 [?] Muir, R., Muir Robert Linley, 2004. Multi-platform gaming architecture. U.S. Patent Application 10/648,178.
 
 [?] Lemon, J., 2001, June. Kqueue-A Generic and Scalable Event Notification Facility. In USENIX Annual Technical Conference, FREENIX Track (pp. 141-153).
@@ -482,4 +486,8 @@ Future work would include continued work on the library to improve speed and rel
 
 [?] Guttman, E., 2001. Autoconfiguration for ip networking: Enabling local communication. IEEE Internet computing, 5(3), pp.81-86.
 
+[?] Smed, J., Kaukoranta, T. and Hakonen, H., 2002. Aspects of networking in multiplayer computer games. The Electronic Library, 20(2), pp.87-97.
+
 [?] Pantel, L. and Wolf, L.C., 2002, May. On the impact of delay on real-time multiplayer games. In Proceedings of the 12th international workshop on Network and operating systems support for digital audio and video (pp. 23-29). ACM.
+
+[?] Bharambe, A., Douceur, J.R., Lorch, J.R., Moscibroda, T., Pang, J., Seshan, S. and Zhuang, X., 2008. Donnybrook: enabling large-scale, high-speed, peer-to-peer games. ACM SIGCOMM Computer Communication Review, 38(4), pp.389-400.
