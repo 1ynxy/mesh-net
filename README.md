@@ -83,8 +83,7 @@ dissertation
 - [x] evaluation 4.2: socket & computational load
 - [x] evaluation 4.3: debugging process
 - [x] evaluation 4.4: example scenario
-- [ ] evaluation 4.5: discussion on reliability
-- [ ] evaluation 4.6: alternative potential use cases
+- [x] evaluation 4.5: alternative potential use cases
 - chapter 5 : conclusion
 - [x] conclusion 5.1: evaluation of progress
 - [ ] conclusion 5.2: viability
@@ -421,7 +420,7 @@ Because all important network handling functions are handled in a separate threa
 
 The debugging process of networking code consists largely of the same tools and practices as with other programs, with the addition of software such as Netcat and Wireshark. Netcat can be used to connect to and interact with TCP based networks in order to manually give certain inputs and monitor the outputs. Wireshark can be used to capture and view all packets broadcast to and from a certain application or interface, allowing for statistical analysis, packet evaluation and other such methods of network diagnosis.
 
-Generic tools for debugging C++ code include Valgrind and Memwatch, which can hook into your program and watch for memory leaks, unallocated variables and dangling pointers. Often the IDE in use can catch and warn these problems if the code is run through their own debugging tools.
+Generic tools for debugging C++ code include Valgrind and Memwatch, which can hook into your program and watch for memory leaks, un-allocated variables and dangling pointers. Often the IDE in use can catch and warn these problems if the code is run through their own debugging tools.
 
 ### 4.4 example scenario
 
@@ -430,18 +429,8 @@ The setup used during the evaluation phase consisted of a mix of x86-x64 devices
 - x86-x64 AMD based desktop computing device
 - x86-x64 Intel based portable computing device
 - ARM 64Bit Broadcom computing device (Raspberry Pi 3 B+)
-- ARM 64Bit Broadcom computing device (Raspberry Pi 3 B+)
 
-### 4.5 discussion of reliability
-
-// robustness of network image and autonomous reconnect handling  
-// difficulties arising from interaction between LAN & WAN networks  
-// estimated load and connection capacities  
-// outlier scenarios, such as root node disconnecting  
-// discussion of handling simultaneous network disconnection events  
-// 
-
-### 4.6 alternative potential use cases
+### 4.5 alternative potential use cases
 
 This mesh architecture need not be restricted to use in video games. The persistent data aspect might lend itself to many forms of chat clients or embedded networks such as in a mesh network of actual physical devices. The central idea is very transferable, even if the libraries used are not.
 
@@ -457,7 +446,9 @@ The next task would have been to have used the information stored in the network
 
 ### 5.2 viability
 
-// 
+What limited testing has been performed shows that this form of network at least works with small numbers of clients. As select has been used over alternatives such as poll or an event driven system there will be a hard limit on most systems of 1024 connections, but as not every client is connected to each other but connected through other nodes this limit does not effect the network. The most load will be put on the root node of the network, but as the root node can be disconnected at any time like any other peer it's likely that when the network reaches a stable state the device that is hosting the network will be capable.
+
+Viability testing for large numbers of devices, say into the triple digits, has not been performed due to limited resources.
 
 ### 5.3 future work
 
